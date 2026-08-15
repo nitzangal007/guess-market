@@ -10,13 +10,14 @@ The documentation is grouped by purpose so readers can move from product intent 
 
 ## Planning
 
-The detailed implementation plan will be added as `planning/IMPLEMENTATION-PLAN.md` after repository migration and before Java implementation.
+- [Exercise 1 implementation plan](planning/IMPLEMENTATION-PLAN.md): approved staged test-first tasks, file ownership, review gates, and active-effort estimates.
 
 ## Guides
 
 - [Build and run](guides/BUILD-AND-RUN.md): Java version, dependency roles, planned build authority, and final artifact layout.
 - [Testing](guides/TESTING.md): test topology and the required evidence layers.
 - [JAXB and XML](guides/JAXB-AND-XML.md): generation, mapping, validation, and resource boundaries.
+- [Implementation walkthrough](guides/IMPLEMENTATION-WALKTHROUGH.md): living method inventory, learning explanations, and stage verification record.
 
 ## Reviews
 
