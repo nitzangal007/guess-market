@@ -473,23 +473,23 @@ if (t < -37.0) {
 
 `softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. `logExpm1(h)` uses `log(expm1(h))` in the safe branch and `h + log1p(-exp(-h))` for large positive `h`. All quantity differences are formed in `long`. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
 
-- [ ] **Step 1: Write `LmsrCalculatorTest` first**
+- [x] **Step 1: Write `LmsrCalculatorTest` first**
 
 Include the approved initial price, price sum, monotonicity, larger-`b`, maximum-subsidy, `b = 100` worked example, simulator oracle values, very large quantities, representable `6.392138950083687E-44` delta, price underflow with representable aggregate delta, unrepresentable positive delta, `int` boundary arithmetic, and invalid input cases.
 
-- [ ] **Step 2: Run the focused test and confirm failures**
+- [x] **Step 2: Run the focused test and confirm failures**
 
 Expected: the class or methods are missing.
 
-- [ ] **Step 3: Implement the minimal final calculator**
+- [x] **Step 3: Implement the minimal final calculator**
 
 Keep the class final and stateless. Do not import DTO, XML, persistence, console, or commission types.
 
-- [ ] **Step 4: Run focused tests and simulator reconciliation**
+- [x] **Step 4: Run focused tests and simulator reconciliation**
 
 Expected: every named numerical category passes within its documented tolerance, and no case returns `NaN`, infinity, or free positive shares.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 Explain log-sum-exp, softmax, cancellation, underflow, and why the direct delta is separate from display price.
 
