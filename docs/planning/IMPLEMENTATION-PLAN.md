@@ -459,9 +459,17 @@ The critical direct-delta implementation follows this structure:
 long difference = (long) selectedQuantity - otherQuantity;
 double z = difference / (double) b;
 double h = purchaseQuantity / (double) b;
-double logP = -softplus(-z);
-double logExpm1 = logExpm1(h);
-double t = logP + logExpm1;
+double t;
+if (difference < 0) {
+    long combinedDifference = difference + purchaseQuantity;
+    t = combinedDifference / (double) b
+            - softplus(z)
+            + logOneMinusExpOfNegative(h);
+} else {
+    double logP = -softplus(-z);
+    double logExpm1 = logExpm1(h);
+    t = logP + logExpm1;
+}
 
 double cost;
 if (t < -37.0) {
@@ -471,7 +479,7 @@ if (t < -37.0) {
 }
 ```
 
-`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. `logExpm1(h)` uses `log(expm1(h))` in the safe branch and `h + log(1 - exp(-h))` for large positive `h`. The correction term uses `log(-expm1(-h))` when `h <= ln(2)` and `log1p(-exp(-h))` otherwise. Every negative quantity difference uses the exact combined identity `t = (difference + purchaseQuantity) / b - softplus(z) + log(1 - exp(-h))`, with the numerator formed in `long` before conversion. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
+`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. For every negative quantity difference, the combined branch forms `difference + purchaseQuantity` in `long` before conversion and uses the exact identity `t = (difference + purchaseQuantity) / b - softplus(z) + log(1 - exp(-h))`. `logOneMinusExpOfNegative(h)` evaluates the final correction as `log(-expm1(-h))` when `h <= ln(2)` and `log1p(-exp(-h))` otherwise. For a nonnegative difference, the ordinary branch evaluates `t = logP + logExpm1(h)`, where `logExpm1(h)` uses `log(expm1(h))` before the large-value boundary and `h + log(1 - exp(-h))` after it. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
 
 - [x] **Step 1: Write `LmsrCalculatorTest` first**
 
