@@ -2,7 +2,7 @@
 
 ## Mode
 
-Review. Stage 1 is implemented and verified on `codex/e1-project-foundation`. Work is stopped at the first human checkpoint for Nitzan's review before Stage 2.
+Implement. Nitzan reviewed and accepted all three Stage 1 tasks. Pull request 1 is merged, and Stage 2 is authorized on `codex/e1-lmsr-domain`.
 
 ## Current state
 
@@ -19,6 +19,8 @@ Review. Stage 1 is implemented and verified on `codex/e1-project-foundation`. Wo
 - JUnit Platform Console Standalone 6.1.1 is vendored only under `tools/testing`; its module identity, license material, notice material, and SHA-256 are verified and documented.
 - Stage 1 implementation commits are `219738d`, `2d4e249`, `d628b14`, and review correction `0912d68`.
 - The independent code review found no critical issue. Its one important floating-point finding was reproduced, fixed with a documented eight-ULP comparison, and independently rechecked with no remaining critical or important issue.
+- Nitzan accepted Stage 1 on 2026-08-15. GitHub merged pull request 1 as squash commit `d8d9b0c` because the repository permits squash merges only.
+- The Stage 2 baseline was compiled with Oracle Java 25.0.4 and reran all 12 Stage 1 tests successfully before new implementation.
 - Domain behavior, LMSR, XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 constructor, getter group, Engine operation, and verification result.
@@ -44,4 +46,4 @@ Review. Stage 1 is implemented and verified on `codex/e1-project-foundation`. Wo
 
 ## Exact next action
 
-Review the Stage 1 implementation, tests, public signatures, and walkthrough. Do not begin Stage 2 until Nitzan explicitly accepts this checkpoint.
+Execute Stage 2 Tasks 4 and 5 test-first on `codex/e1-lmsr-domain`. Stop at the Stage 2 human review gate before Stage 3.
