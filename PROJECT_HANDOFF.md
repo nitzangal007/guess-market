@@ -2,12 +2,15 @@
 
 ## Mode
 
-Repository migration. The Exercise 1 design is approved through D-071 and implementation has not started.
+Planning. The standalone repository migration is complete, the Exercise 1 design is approved through D-071, and implementation has not started.
 
 ## Current state
 
 - This folder is the dedicated Guess Market repository root.
-- The repository remains private during the active Java course.
+- The private repository is published at `https://github.com/nitzangal007/guess-market` with `main` as its default branch.
+- The outer workspace split commit is `df4219e0406d2b0315f739b737f28d126a80d2c2`.
+- The standalone root commit is `d006eaf45910d4cdc164d800d07e70d697d0eb90`.
+- A fresh private clone reproduced the approved 22-file baseline with no `provided` or `private` directory and only the approved JAXB subset.
 - The approved design passed its pre-implementation review with no blocking finding.
 - Documentation is organized under `docs/design`, `docs/planning`, `docs/guides`, `docs/reviews`, and `docs/repository`.
 - Course originals, private submission files, raw internal review evidence, build output, runtime `.ser` files, and identity-bearing archives remain untracked.
