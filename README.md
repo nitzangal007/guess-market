@@ -4,7 +4,7 @@ Guess Market is a Java 25 prediction-market simulator designed around LMSR prici
 
 ## Current status
 
-Exercise 1 design is complete through decision D-071 and passed a full pre-implementation review with no blocking design findings. The standalone repository is being established before implementation planning. No Java implementation, build script, generated JAXB project source, or release artifact exists yet.
+Exercise 1 design is complete through decision D-071 and passed a full pre-implementation review with no blocking design findings. The private standalone repository is established, and the seven-stage implementation plan is approved. Stage 1 is now in progress. No verified Java implementation, build script, generated JAXB project source, or release artifact exists yet.
 
 ## Planned architecture
 
@@ -47,13 +47,15 @@ Start with the [documentation index](docs/README.md).
 - [Architecture](docs/design/ARCHITECTURE.md)
 - [Exercise 1 design brief](docs/design/EXERCISE-1-DESIGN-BRIEF.md)
 - [Complete Exercise 1 design](docs/design/EXERCISE-1-DESIGN.md)
+- [Exercise 1 implementation plan](docs/planning/IMPLEMENTATION-PLAN.md)
+- [Living implementation walkthrough](docs/guides/IMPLEMENTATION-WALKTHROUGH.md)
 - [Build and run](docs/guides/BUILD-AND-RUN.md)
 - [Testing strategy](docs/guides/TESTING.md)
 - [JAXB and XML](docs/guides/JAXB-AND-XML.md)
 - [Design review resolutions](docs/reviews/DESIGN-REVIEW-RESOLUTIONS.md)
 - [Repository design](docs/repository/GITHUB-REPOSITORY-DESIGN.md)
 
-The detailed implementation plan will be added under `docs/planning` after the repository migration is verified and before Java implementation begins.
+The detailed plan was approved on 2026-08-15. Implementation proceeds through seven human review checkpoints.
 
 ## Repository boundaries
 

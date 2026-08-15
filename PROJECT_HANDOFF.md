@@ -2,7 +2,7 @@
 
 ## Mode
 
-Planning. The standalone repository migration is complete, the Exercise 1 design is approved through D-071, and implementation has not started.
+Implementation. Nitzan approved the seven-stage implementation plan on 2026-08-15. Stage 1 is authorized and begins test-first on the isolated `codex/e1-project-foundation` milestone branch.
 
 ## Current state
 
@@ -15,6 +15,8 @@ Planning. The standalone repository migration is complete, the Exercise 1 design
 - Documentation is organized under `docs/design`, `docs/planning`, `docs/guides`, `docs/reviews`, and `docs/repository`.
 - Course originals, private submission files, raw internal review evidence, build output, runtime `.ser` files, and identity-bearing archives remain untracked.
 - Java source roots, build files, generated JAXB project source, IntelliJ configuration, tests, and packaging inputs do not exist yet.
+- `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
+- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` is the living method and learning record. Every entry remains `Planned` because no implementation exists.
 
 ## Authority
 
@@ -22,6 +24,8 @@ Planning. The standalone repository migration is complete, the Exercise 1 design
 - Concise design entry point: `docs/design/EXERCISE-1-DESIGN-BRIEF.md`
 - Repository policy: `docs/repository/GITHUB-REPOSITORY-DESIGN.md`
 - Documentation map: `docs/README.md`
+- Detailed implementation plan: `docs/planning/IMPLEMENTATION-PLAN.md`
+- Living implementation walkthrough: `docs/guides/IMPLEMENTATION-WALKTHROUGH.md`
 
 ## Fixed implementation boundaries
 
@@ -35,4 +39,4 @@ Planning. The standalone repository migration is complete, the Exercise 1 design
 
 ## Exact next action
 
-Create and approve `docs/planning/IMPLEMENTATION-PLAN.md` from the reviewed D-071 design. Do not create Java source, configuration, or implementation branches before that approval.
+Create the isolated Stage 1 worktree, then execute Tasks 1 through 3 test-first. Stop after the Stage 1 regression gate and walkthrough update for Nitzan's review before Stage 2.

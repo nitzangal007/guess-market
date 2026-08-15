@@ -108,6 +108,7 @@ The intended public documentation set is:
 - `docs/guides/BUILD-AND-RUN.md`: Java version, dependencies, authoritative build, launcher, artifact layout, and clean-machine instructions.
 - `docs/guides/TESTING.md`: test topology, requirement traceability, packaged-system verification, and known evidence boundaries.
 - `docs/guides/JAXB-AND-XML.md`: the externally useful parts of the JAXB generation, mapping, validation, and resource workflow.
+- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md`: the living method inventory, learning explanations, and verified stage history maintained alongside implementation.
 - `docs/reviews/DESIGN-REVIEW-RESOLUTIONS.md`: a concise record of the adversarial review's material findings and their approved resolutions.
 - `docs/repository/GITHUB-REPOSITORY-DESIGN.md`: this repository and publication policy.
 
