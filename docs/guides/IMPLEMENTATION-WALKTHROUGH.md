@@ -2,7 +2,7 @@
 
 ## Status
 
-The seven-stage plan was approved on 2026-08-15. Stage 1 implemented and verified the test foundation, immutable DTO boundary, and complete supported Engine contract. It is ready for Nitzan's review before Stage 2.
+The seven-stage plan was approved on 2026-08-15. Stage 1 implemented and verified the test foundation, immutable DTO boundary, and complete supported Engine contract. Stage 2 is in progress: Task 4 implements and verifies the cancellation-safe LMSR calculator, while domain state and transitions remain planned for Task 5.
 
 ## Purpose
 
@@ -63,6 +63,20 @@ Every expected operation failure crosses the boundary as one checked `EngineOper
 
 The UI must not parse `getMessage()`. It will switch on `getCode()` and read typed context, because message wording is presentation detail while the enum and getters are the stable recovery contract. The path context is transient because this exception is not part of the approved saved-state graph; the public getter remains unchanged during normal use.
 
+## Stage 2 cancellation-safe LMSR mathematics
+
+`LmsrCalculator` is a final, stateless, package-private Engine helper. Its four package-private static methods accept only primitive quantities and `b`, return unrounded `double` values, and do not import or mutate DTO, domain, XML, persistence, commission, or console state.
+
+`totalCost` uses log-sum-exp. It divides both quantities by `b`, subtracts their maximum before exponentiation, and then restores that maximum after taking the logarithm. The largest adjusted exponential is therefore `exp(0)`, so large valid quantities do not overflow merely because the direct formula would evaluate `exp(large value)`.
+
+`priceForOption` uses the same subtract-the-maximum softmax idea as a stable two-option logistic calculation. It forms the quantity difference as `long` before converting to `double`. The favored side uses `1 / (1 + exp(-difference / b))`; the disfavored side uses the algebraically equal branch `exp(difference / b) / (1 + exp(difference / b))`. At extreme imbalance an observational price may legitimately become exactly `0.0` or `1.0` in binary64.
+
+`purchaseCost` is deliberately separate from both `totalCost` and display price. Subtracting two independently rounded total costs can cancel a real small delta to zero, while multiplying an already underflowed price by an overflowing exponential can produce an invalid result. The direct delta instead calculates `logP`, `logExpm1`, and their sum `t` in the log domain. `softplus` uses `max(x, 0) + log1p(exp(-abs(x)))`, and the large-`h` branch rewrites `log(expm1(h))` as `h + log1p(-exp(-h))` before `expm1` can overflow.
+
+For `t < -37.0`, the calculator evaluates `exp(log(b) + t)`. Keeping the multiplication by `b` inside the logarithm preserves representable tiny costs such as `6.392138950083687E-44`, even when `softplus(t)` alone would be too small. If a mathematically positive purchase still rounds to zero, the method rejects it instead of granting free shares. Nonnegative current quantities, positive purchases, positive `b`, and finite outputs are checked before a future domain operation can mutate state.
+
+`maximumSubsidy` derives `b * ln(2)`. It is a maximum-exposure measure, not cash placed into the market-maker account. The calculator tests cover the approved worked example, supplied-simulator oracle cases, ordinary invariants, larger `b`, extreme quantities, both underflow outcomes, and invalid inputs with documented absolute or relative tolerances.
+
 ## Planned supported Engine methods
 
 | Method | Responsibility | Success result | Expected failure boundary | Status |
@@ -92,10 +106,10 @@ Add constructors, public methods, and meaningful package-private helpers as code
 | 1 | `EngineErrorCode` | Sixteen enum values | Identify XML, market, calculation, and saved-state failure categories without embedding UI text | `GuessMarketEngineUseCaseTest.errorCodeContainsExactlyApprovedValues` and `javap -public` | Implemented |
 | 1 | `EngineOperationException` | Simple and complete constructors | Preserve required failure data, optional context, and a diagnostic cause in one checked type | `GuessMarketEngineUseCaseTest.simpleExceptionPreservesRequiredFields` and `completeExceptionPreservesOptionalContextAndCause` | Implemented |
 | 1 | `EngineOperationException` | Structured getters | Return typed `Optional`, `OptionalInt`, enum, detail, and recovery values so callers never parse a message | `GuessMarketEngineUseCaseTest` and `javap -public` | Implemented |
-| 2 | `LmsrCalculator` | `totalCost` | Evaluate stable LMSR cost through log-sum-exp | `LmsrCalculatorTest` | Planned |
-| 2 | `LmsrCalculator` | `priceForOption` | Derive an observational price through stable softmax | `LmsrCalculatorTest` | Planned |
-| 2 | `LmsrCalculator` | `purchaseCost` | Calculate the D-068 cancellation-safe direct delta | `LmsrCalculatorTest` | Planned |
-| 2 | `LmsrCalculator` | `maximumSubsidy` | Derive `b * ln(2)` without treating it as account cash | `LmsrCalculatorTest` | Planned |
+| 2 | `LmsrCalculator` | `totalCost` | Evaluate stable LMSR cost through log-sum-exp without state effects | `LmsrCalculatorTest.maximumSubsidyEqualsInitialTotalCost`, `approvedWorkedExampleMatchesAtFullPrecision`, and `veryLargeQuantitiesRemainFinite` | Implemented |
+| 2 | `LmsrCalculator` | `priceForOption` | Derive an observational price through stable two-branch softmax, allowing honest binary64 endpoint rounding | `LmsrCalculatorTest.initialPricesAreOneHalf`, `complementaryPricesSumToOneForUnequalQuantities`, and boundary tests | Implemented |
+| 2 | `LmsrCalculator` | `purchaseCost` | Calculate the D-068 cancellation-safe direct delta, preserve representable tiny values, and reject a required-positive zero | `LmsrCalculatorTest.approvedWorkedExampleMatchesAtFullPrecision`, `suppliedSimulatorOracleCasesMatch`, and direct-delta boundary tests | Implemented |
+| 2 | `LmsrCalculator` | `maximumSubsidy` | Derive `b * ln(2)` without treating it as account cash | `LmsrCalculatorTest.maximumSubsidyEqualsInitialTotalCost` | Implemented |
 | 2 | `MarketEvent` | Constructor | Establish one open two-option event with zero quantities, account, commission, and history | `MarketEventTest` and mapper tests | Planned |
 | 2 | `MarketEvent` | `purchase` | Validate and commit quantity, cost, account, commission, and history atomically | `MarketEventTest` | Planned |
 | 2 | `MarketEvent` | `close` | Validate and commit winner, payout, final account, commission, and lifecycle atomically | `MarketEventTest` | Planned |
@@ -117,7 +131,7 @@ Add constructors, public methods, and meaningful package-private helpers as code
 | Stage | Verified behavior | Focused tests | Regression evidence | Accepted commit | State |
 | --- | --- | --- | --- | --- | --- |
 | 1 | JUnit foundation, immutable DTO boundary, and complete supported Engine contract implemented | `DtoContractTest`: 8 successful; `GuessMarketEngineUseCaseTest`: 4 successful | Clean Java 25 compile with `-Xlint:all`; 12 tests successful with zero failures, skips, disabled tests, or aborts; JDK-only DTO dependency and public `javap` inspections passed | `219738d`, `2d4e249`, `d628b14`, review fix `0912d68` | Ready for review |
-| 2 | LMSR and domain transitions | None before execution | None before execution | None before approval | Planned |
+| 2 | Cancellation-safe LMSR implemented; domain transitions remain for Task 5 | `LmsrCalculatorTest`: 14 successful | Clean Java 25 compile with `-Xlint:all -Werror`; 26 total tests successful with zero failures, skips, disabled tests, or aborts; package-private API and JDK-only dependency inspections passed | None before stage approval | In progress |
 | 3 | JAXB, mapping, and XML loading | None before execution | None before execution | None before approval | Planned |
 | 4 | Persistence and complete Engine | None before execution | None before execution | None before approval | Planned |
 | 5 | Console UI | None before execution | None before execution | None before approval | Planned |
