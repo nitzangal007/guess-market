@@ -356,6 +356,27 @@ class MarketEventTest {
     }
 
     @Test
+    void reachableModerateHOpposingPurchasesUseStableAccountingCost() throws Exception {
+        int b = 65_075_262;
+        int purchaseQuantity = Integer.MAX_VALUE - 2;
+        MarketEvent event = event(CommissionMode.ON_CLOSE, 0, b);
+        event.purchase(2, Integer.MAX_VALUE);
+        long difference = -(long) Integer.MAX_VALUE;
+        long combinedDifference = difference + purchaseQuantity;
+        double z = difference / (double) b;
+        double h = purchaseQuantity / (double) b;
+        double t = combinedDifference / (double) b
+                - Math.log1p(Math.exp(z))
+                + Math.log(-Math.expm1(-h));
+        double expected = b * (Math.max(t, 0.0)
+                + Math.log1p(Math.exp(-Math.abs(t))));
+
+        TradeRecord record = event.purchase(1, purchaseQuantity);
+
+        assertEquals(expected, record.getBaseShareCost(), 8.0 * Math.ulp(expected));
+    }
+
+    @Test
     void domainSerializationAndVisibilityStayInsideTheEngineBoundary() throws Exception {
         assertTrue(Serializable.class.isAssignableFrom(MarketEvent.class));
         assertTrue(Serializable.class.isAssignableFrom(MarketOption.class));

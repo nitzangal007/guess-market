@@ -3,6 +3,7 @@ package guessmarket.engine;
 final class LmsrCalculator {
     private static final double SMALL_RESULT_THRESHOLD = -37.0;
     private static final double LARGE_EXPM1_THRESHOLD = 50.0;
+    private static final double LOG_ONE_MINUS_EXP_THRESHOLD = Math.log(2.0);
 
     private LmsrCalculator() {
     }
@@ -55,10 +56,10 @@ final class LmsrCalculator {
         double z = difference / (double) b;
         double h = purchaseQuantity / (double) b;
         double t;
-        if (difference < 0 && h >= LARGE_EXPM1_THRESHOLD) {
+        if (difference < 0) {
             long combinedDifference = difference + purchaseQuantity;
             double logisticCorrection = softplus(z);
-            double expm1Correction = largeLogExpm1Correction(h);
+            double expm1Correction = logOneMinusExpOfNegative(h);
             t = combinedDifference / (double) b
                     - logisticCorrection
                     + expm1Correction;
@@ -96,10 +97,13 @@ final class LmsrCalculator {
         if (positiveValue < LARGE_EXPM1_THRESHOLD) {
             return Math.log(Math.expm1(positiveValue));
         }
-        return positiveValue + largeLogExpm1Correction(positiveValue);
+        return positiveValue + logOneMinusExpOfNegative(positiveValue);
     }
 
-    private static double largeLogExpm1Correction(double positiveValue) {
+    private static double logOneMinusExpOfNegative(double positiveValue) {
+        if (positiveValue <= LOG_ONE_MINUS_EXP_THRESHOLD) {
+            return Math.log(-Math.expm1(-positiveValue));
+        }
         return Math.log1p(-Math.exp(-positiveValue));
     }
 

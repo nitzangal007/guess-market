@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 was reviewed, accepted, and merged through pull request 1. Stage 2 is authorized to begin test-first on `codex/e1-lmsr-domain`.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 was reviewed, accepted, and merged through pull request 1. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-domain`, including the residual numerical correction completed after re-review. Stage 2 awaits Nitzan's checkpoint and has not been accepted for Stage 3.
 
 ## Global Constraints
 
@@ -471,7 +471,7 @@ if (t < -37.0) {
 }
 ```
 
-`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. `logExpm1(h)` uses `log(expm1(h))` in the safe branch and `h + log1p(-exp(-h))` for large positive `h`. All quantity differences are formed in `long`. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
+`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. `logExpm1(h)` uses `log(expm1(h))` in the safe branch and `h + log(1 - exp(-h))` for large positive `h`. The correction term uses `log(-expm1(-h))` when `h <= ln(2)` and `log1p(-exp(-h))` otherwise. Every negative quantity difference uses the exact combined identity `t = (difference + purchaseQuantity) / b - softplus(z) + log(1 - exp(-h))`, with the numerator formed in `long` before conversion. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
 
 - [x] **Step 1: Write `LmsrCalculatorTest` first**
 
@@ -560,7 +560,7 @@ git add modules/guessmarket-engine docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: implement market event transitions"
 ```
 
-- [ ] **Step 6: Run the Stage 2 gate**
+- [x] **Step 6: Run the Stage 2 gate**
 
 Review numerical evidence, accounting examples, serializable-type boundary, domain visibility, full regression tests, and the updated walkthrough before merging the milestone.
 

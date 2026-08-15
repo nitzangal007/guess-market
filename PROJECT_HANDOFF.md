@@ -2,7 +2,7 @@
 
 ## Mode
 
-Review. Stage 2 Tasks 4 and 5 are implemented on `codex/e1-lmsr-domain`. The whole-branch review correction is complete under the focused commit subject `fix: address stage 2 final review findings`. Stop at the Stage 2 human checkpoint before any Stage 3 work.
+Review. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-domain`. The whole-branch review correction and residual numerical correction are complete. Stop at the Stage 2 human checkpoint before any Stage 3 work.
 
 ## Current state
 
@@ -23,8 +23,8 @@ Review. Stage 2 Tasks 4 and 5 are implemented on `codex/e1-lmsr-domain`. The who
 - The Stage 2 baseline was compiled with Oracle Java 25.0.4 and reran all 12 Stage 1 tests successfully before new implementation.
 - Task 4 implemented the package-private stateless `LmsrCalculator` in commits `542768d` and `cf14539`. Its direct delta preserves representable tiny values, rejects free positive shares, and now combines large opposing quantity terms in `long` before conversion so cancellation does not erase low-order information.
 - Task 5 implemented the serializable event aggregate, accounting, history, immutable DTO conversion, and atomic purchase and close transitions in commits `7502964`, review fix `e0a341a`, and completion record `3daadb1`.
-- The Stage 2 whole-branch review found one important large-opposing-term precision defect and three minor evidence or detail gaps. The focused correction adds the combined-long numerical branch, reachable event accounting proof, positive commission-underflow identity proof, operation-specific lifecycle and numerical details, and complete `Integer.MIN_VALUE` observation coverage.
-- The current focused Stage 2 gate has 15 `LmsrCalculatorTest` cases and 19 `MarketEventTest` cases, all successful. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
+- The Stage 2 whole-branch review found two important numerical precision defects and three minor evidence or detail gaps. The corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, and complete `Integer.MIN_VALUE` observation coverage.
+- The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
 - XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 and Stage 2 calculation, constructor, transition, observation, and verification result.

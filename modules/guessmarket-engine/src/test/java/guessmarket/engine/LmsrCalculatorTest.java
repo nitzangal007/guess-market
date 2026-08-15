@@ -189,6 +189,30 @@ class LmsrCalculatorTest {
     }
 
     @Test
+    void moderateHNegativeDifferenceUsesCombinedLongNumerator() {
+        int b = 65_075_262;
+        int purchaseQuantity = Integer.MAX_VALUE - 2;
+        long difference = -(long) Integer.MAX_VALUE;
+        long combinedDifference = difference + purchaseQuantity;
+        double z = difference / (double) b;
+        double h = purchaseQuantity / (double) b;
+        double t = combinedDifference / (double) b
+                - Math.log1p(Math.exp(z))
+                + Math.log(-Math.expm1(-h));
+        double expected = b * (Math.max(t, 0.0)
+                + Math.log1p(Math.exp(-Math.abs(t))));
+
+        assertEquals(
+                expected,
+                LmsrCalculator.purchaseCost(
+                        0,
+                        Integer.MAX_VALUE,
+                        purchaseQuantity,
+                        b),
+                8.0 * Math.ulp(expected));
+    }
+
+    @Test
     void invalidInputsAreRejected() {
         assertThrows(
                 IllegalArgumentException.class,
