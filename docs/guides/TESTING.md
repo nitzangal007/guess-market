@@ -2,7 +2,7 @@
 
 ## Status
 
-The complete testing strategy is approved. The Stage 1 test foundation is verified, but Java test source has not been created yet.
+The complete testing strategy is approved. The Stage 1 test foundation is verified, and `DtoContractTest` is the first implemented test class.
 
 ## Vendored test dependency
 

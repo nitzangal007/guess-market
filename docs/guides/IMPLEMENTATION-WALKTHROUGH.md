@@ -2,7 +2,7 @@
 
 ## Status
 
-The seven-stage plan was approved on 2026-08-15. Stage 1 Task 1 established the verified test foundation, and every Java method remains `Planned` until its focused test passes.
+The seven-stage plan was approved on 2026-08-15. Stage 1 Tasks 1 and 2 established the verified test foundation and immutable DTO boundary. The Engine public contract remains pending.
 
 ## Purpose
 
@@ -45,6 +45,14 @@ The repository vendors JUnit Platform Console Standalone 6.1.1 only as a develop
 
 The exact JAR is `2,996,922` bytes with SHA-256 `7B16416E5727C645105C31B533440397F20DF68F6AE850C6BFD0CE1D88DB66C3`. Oracle JDK 25.0.4 reports automatic module `org.junit.platform.console.standalone@6.1.1`. Matching license and notice material was copied from the JAR itself into `tools/testing`.
 
+## Stage 1 immutable DTO boundary
+
+DTO means data transfer object. These classes are immutable snapshots that cross module boundaries. They are not the live domain objects that will later own quantities, account state, history, or lifecycle transitions.
+
+Each constructor validates that its snapshot is internally meaningful. `List.copyOf` performs a defensive copy and returns an unmodifiable list, so changing the caller's original list cannot change the DTO. Empty XML-provided text and duplicate labels remain valid, while null nested values, invalid option numbering, invalid quantities, non-finite financial values, and inconsistent winner state are rejected.
+
+`MarketEventDetails` uses `OptionalInt` for the winner because an open event has no winner and option zero is never valid. `PurchaseReceipt` retains the exact `MarketEventDetails` instance created by the same successful operation, so the UI will not need a second Engine query that could observe a later state.
+
 ## Planned supported Engine methods
 
 | Method | Responsibility | Success result | Expected failure boundary | Status |
@@ -63,7 +71,13 @@ Add constructors, public methods, and meaningful package-private helpers as code
 
 | Stage | File or type | Method or method group | Responsibility and state effect | Primary proof | Status |
 | --- | --- | --- | --- | --- | --- |
-| 1 | DTO value classes | Constructors and getters | Preserve typed values and immutable nested collections without domain behavior | `DtoContractTest` | Planned |
+| 1 | `CommissionMode` and `EventStatus` | Enum values | Represent the two commission timings and two lifecycle states without display strings | `DtoContractTest` | Implemented |
+| 1 | `MarketEventSummary` | Constructor and getters | Preserve a compact event projection, full-range ID, empty text, and exactly two ordered immutable labels | `DtoContractTest.summaryPreservesFullRangeEventIdAndEmptyText` and `summaryDefensivelyCopiesTwoOrderedLabels` | Implemented |
+| 1 | `MarketOptionSnapshot` | Constructor and getters | Preserve one numbered option, quantity, and full-precision finite probability | `DtoContractTest.optionSnapshotRejectsInvalidOptionNumberQuantityAndPrice` | Implemented |
+| 1 | `TradeHistoryEntry` | Constructor and getters | Preserve one successful purchase's option, quantity, and exact financial breakdown | `DtoContractTest.historyEntryPreservesFinancialBreakdown` | Implemented |
+| 1 | `MarketEventDetails` | Constructor and getters | Preserve a self-contained event snapshot with ordered options, newest-first history, account values, and explicit winner absence | `DtoContractTest.detailsDefensivelyCopiesOptionsAndNewestFirstHistory` and `detailsRequiresWinnerOnlyForClosedEvent` | Implemented |
+| 1 | `PurchaseReceipt` | Constructor and getters | Preserve the successful purchase breakdown and same-operation resulting details | `DtoContractTest.purchaseReceiptKeepsSameOperationDetails` | Implemented |
+| 1 | DTO collection getters | `getOptionLabels`, `getOptions`, and `getPurchaseHistory` | Return stored immutable copies without exposing caller-owned lists | `DtoContractTest.allReturnedCollectionsRejectMutation` | Implemented |
 | 1 | `GuessMarketEngine` | Seven supported operations | Define the complete caller capability boundary | Compile and `javap` inspection | Planned |
 | 1 | `EngineOperationException` | Constructors and context getters | Carry one checked structured failure without UI formatting | Engine and renderer tests | Planned |
 | 2 | `LmsrCalculator` | `totalCost` | Evaluate stable LMSR cost through log-sum-exp | `LmsrCalculatorTest` | Planned |
@@ -90,7 +104,7 @@ Add constructors, public methods, and meaningful package-private helpers as code
 
 | Stage | Verified behavior | Focused tests | Regression evidence | Accepted commit | State |
 | --- | --- | --- | --- | --- | --- |
-| 1 | JUnit foundation verified; DTOs and Engine contract pending | No Java tests in Task 1 | JAR module inspection and SHA-256 verification passed | Task 1 commit pending | In progress |
+| 1 | JUnit foundation and immutable DTO boundary verified; Engine contract pending | `DtoContractTest`: 8 of 8 successful | JDK-only DTO compile passed; focused JUnit run had zero failures, skips, disabled tests, or aborts | Task 1 `219738d`; Task 2 pending | In progress |
 | 2 | LMSR and domain transitions | None before execution | None before execution | None before approval | Planned |
 | 3 | JAXB, mapping, and XML loading | None before execution | None before execution | None before approval | Planned |
 | 4 | Persistence and complete Engine | None before execution | None before execution | None before approval | Planned |
