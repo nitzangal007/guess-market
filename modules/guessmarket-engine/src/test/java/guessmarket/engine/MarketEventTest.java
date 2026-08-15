@@ -41,6 +41,8 @@ class MarketEventTest {
         MarketEventSummary summary = event.toSummary();
 
         assertEquals(Integer.MIN_VALUE, details.getEventId());
+        assertEquals(Integer.MIN_VALUE, event.getEventId());
+        assertEquals(Integer.MIN_VALUE, summary.getEventId());
         assertEquals("", details.getName());
         assertEquals("", details.getDescription());
         assertEquals(CommissionMode.ON_PURCHASE, details.getCommissionMode());
@@ -228,6 +230,12 @@ class MarketEventTest {
 
         assertEquals(EventStatus.CLOSED, purchaseFailure.getEventStatus().orElseThrow());
         assertEquals(EventStatus.CLOSED, closeFailure.getEventStatus().orElseThrow());
+        assertEquals(
+                "Cannot purchase shares because event 17 is closed",
+                purchaseFailure.getDetail());
+        assertEquals(
+                "Cannot close the event because event 17 is closed",
+                closeFailure.getDetail());
     }
 
     @Test
@@ -301,6 +309,50 @@ class MarketEventTest {
                 () -> event.purchase(2, 1));
 
         assertInstanceOf(ArithmeticException.class, failure.getCause());
+        assertEquals(
+                "Purchase could not produce a valid base share cost",
+                failure.getDetail());
+    }
+
+    @Test
+    void positivePurchaseCommissionUnderflowIsRejectedWithoutChangingOwnedState()
+            throws Exception {
+        MarketEvent event = event(CommissionMode.ON_PURCHASE, 1, 1);
+        event.purchase(1, 742);
+
+        EngineOperationException failure = assertRejectedUnchanged(
+                event,
+                EngineErrorCode.FINANCIAL_CALCULATION_FAILED,
+                () -> event.purchase(2, 1));
+
+        assertEquals(17, failure.getEventId().orElseThrow());
+        assertEquals(2, failure.getOptionNumber().orElseThrow());
+        assertEquals(1, failure.getQuantity().orElseThrow());
+        assertEquals(EventStatus.OPEN, failure.getEventStatus().orElseThrow());
+        assertInstanceOf(ArithmeticException.class, failure.getCause());
+        assertEquals(
+                "Purchase could not produce a valid purchase commission",
+                failure.getDetail());
+    }
+
+    @Test
+    void reachableLargeOpposingPurchasesUseCorrectedAccountingCost() throws Exception {
+        MarketEvent event = event(CommissionMode.ON_CLOSE, 0, 3);
+        TradeRecord first = event.purchase(2, Integer.MAX_VALUE);
+
+        TradeRecord second = event.purchase(1, Integer.MAX_VALUE - 2);
+        double expectedSecondCost = 3.0 * Math.log1p(Math.exp(-2.0 / 3.0));
+
+        assertEquals(expectedSecondCost, second.getBaseShareCost(), 1.0E-15);
+        assertEquals(expectedSecondCost, second.getTotalPaid(), 1.0E-15);
+        assertEquals(
+                first.getTotalPaid() + second.getTotalPaid(),
+                event.toDetails().getEventAccountBalance(),
+                0.0);
+        assertEquals(Integer.MAX_VALUE - 2,
+                event.toDetails().getOptions().get(0).getShareQuantity());
+        assertEquals(Integer.MAX_VALUE,
+                event.toDetails().getOptions().get(1).getShareQuantity());
     }
 
     @Test

@@ -54,9 +54,19 @@ final class LmsrCalculator {
         long difference = (long) selectedQuantity - otherQuantity;
         double z = difference / (double) b;
         double h = purchaseQuantity / (double) b;
-        double logP = -softplus(-z);
-        double logExpm1 = logExpm1(h);
-        double t = logP + logExpm1;
+        double t;
+        if (difference < 0 && h >= LARGE_EXPM1_THRESHOLD) {
+            long combinedDifference = difference + purchaseQuantity;
+            double logisticCorrection = softplus(z);
+            double expm1Correction = largeLogExpm1Correction(h);
+            t = combinedDifference / (double) b
+                    - logisticCorrection
+                    + expm1Correction;
+        } else {
+            double logP = -softplus(-z);
+            double logExpm1 = logExpm1(h);
+            t = logP + logExpm1;
+        }
 
         double cost;
         if (t < SMALL_RESULT_THRESHOLD) {
@@ -86,8 +96,11 @@ final class LmsrCalculator {
         if (positiveValue < LARGE_EXPM1_THRESHOLD) {
             return Math.log(Math.expm1(positiveValue));
         }
-        return positiveValue
-                + Math.log1p(-Math.exp(-positiveValue));
+        return positiveValue + largeLogExpm1Correction(positiveValue);
+    }
+
+    private static double largeLogExpm1Correction(double positiveValue) {
+        return Math.log1p(-Math.exp(-positiveValue));
     }
 
     private static void requireNonnegative(int value, String name) {

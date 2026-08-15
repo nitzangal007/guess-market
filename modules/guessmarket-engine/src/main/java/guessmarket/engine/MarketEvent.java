@@ -55,7 +55,7 @@ public final class MarketEvent implements Serializable {
 
     TradeRecord purchase(int optionNumber, int quantity)
             throws EngineOperationException {
-        requireOpen(optionNumber, quantity);
+        requireOpen("purchase shares", optionNumber, quantity);
         MarketOption selectedOption = requireOption(optionNumber, quantity);
         requirePositiveQuantity(quantity, optionNumber);
 
@@ -78,6 +78,7 @@ public final class MarketEvent implements Serializable {
         double newBalance;
         double newTotalCommission;
         TradeRecord newRecord;
+        String failedCalculation = "base share cost";
 
         try {
             baseCost = LmsrCalculator.purchaseCost(
@@ -85,14 +86,18 @@ public final class MarketEvent implements Serializable {
                     otherOption.getQuantity(),
                     quantity,
                     b);
+            failedCalculation = "purchase commission";
             purchaseCommission = commissionPolicy.purchaseCommission(baseCost);
             requireCommissionRepresentable(purchaseCommission);
+            failedCalculation = "total paid";
             totalPaid = requireFinitePositive(
                     baseCost + purchaseCommission,
                     "total paid");
+            failedCalculation = "event account balance";
             newBalance = requireFinite(
                     account.getBalance() + totalPaid,
                     "event account balance");
+            failedCalculation = "total commission collected";
             newTotalCommission = requireFiniteNonnegative(
                     account.getTotalCommissionCollected() + purchaseCommission,
                     "total commission collected");
@@ -103,13 +108,16 @@ public final class MarketEvent implements Serializable {
             int secondQuantity = optionNumber == 2
                     ? newSelectedQuantity
                     : options.get(1).getQuantity();
+            failedCalculation = "first option price";
             requireProbability(
                     LmsrCalculator.priceForOption(firstQuantity, secondQuantity, b),
                     "first option price");
+            failedCalculation = "second option price";
             requireProbability(
                     LmsrCalculator.priceForOption(secondQuantity, firstQuantity, b),
                     "second option price");
 
+            failedCalculation = "purchase history record";
             newRecord = new TradeRecord(
                     optionNumber,
                     selectedOption.getLabel(),
@@ -118,7 +126,12 @@ public final class MarketEvent implements Serializable {
                     purchaseCommission,
                     totalPaid);
         } catch (ArithmeticException | IllegalArgumentException exception) {
-            throw calculationFailure(optionNumber, quantity, exception);
+            throw calculationFailure(
+                    "Purchase",
+                    failedCalculation,
+                    optionNumber,
+                    quantity,
+                    exception);
         }
 
         selectedOption.commitPurchase(newSelectedQuantity);
@@ -128,29 +141,38 @@ public final class MarketEvent implements Serializable {
     }
 
     void close(int winningOptionNumber) throws EngineOperationException {
-        requireOpen(winningOptionNumber, null);
+        requireOpen("close the event", winningOptionNumber, null);
         MarketOption winningOption = requireOption(winningOptionNumber, null);
 
         double closingCommission;
         double newBalance;
         double newTotalCommission;
+        String failedCalculation = "closing commission";
 
         try {
             double grossPayout = winningOption.getQuantity();
             closingCommission = requireFiniteNonnegative(
                     commissionPolicy.closingCommission(grossPayout),
                     "closing commission");
+            failedCalculation = "net payout";
             double netPayout = requireFiniteNonnegative(
                     grossPayout - closingCommission,
                     "net payout");
+            failedCalculation = "event account balance";
             newBalance = requireFinite(
                     account.getBalance() - netPayout,
                     "event account balance");
+            failedCalculation = "total commission collected";
             newTotalCommission = requireFiniteNonnegative(
                     account.getTotalCommissionCollected() + closingCommission,
                     "total commission collected");
         } catch (ArithmeticException | IllegalArgumentException exception) {
-            throw calculationFailure(winningOptionNumber, null, exception);
+            throw calculationFailure(
+                    "Close",
+                    failedCalculation,
+                    winningOptionNumber,
+                    null,
+                    exception);
         }
 
         account.commitClose(newBalance, newTotalCommission);
@@ -252,12 +274,15 @@ public final class MarketEvent implements Serializable {
                 : OptionalInt.of(winningOptionNumber);
     }
 
-    private void requireOpen(Integer optionNumber, Integer quantity)
+    private void requireOpen(
+            String operation,
+            Integer optionNumber,
+            Integer quantity)
             throws EngineOperationException {
         if (status != EventStatus.OPEN) {
             throw operationFailure(
                     EngineErrorCode.EVENT_NOT_OPEN,
-                    "Event " + eventId + " is not open",
+                    "Cannot " + operation + " because event " + eventId + " is closed",
                     "Choose an open event.",
                     optionNumber,
                     quantity,
@@ -347,12 +372,14 @@ public final class MarketEvent implements Serializable {
     }
 
     private EngineOperationException calculationFailure(
+            String operation,
+            String calculationName,
             int optionNumber,
             Integer quantity,
             Throwable cause) {
         return operationFailure(
                 EngineErrorCode.FINANCIAL_CALCULATION_FAILED,
-                "The market calculation could not produce a valid finite result",
+                operation + " could not produce a valid " + calculationName,
                 "Choose a different quantity or option.",
                 optionNumber,
                 quantity,

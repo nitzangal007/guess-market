@@ -174,6 +174,21 @@ class LmsrCalculatorTest {
     }
 
     @Test
+    void largeOpposingTermsUseCombinedLongNumerator() {
+        double expected = 3.0 * Math.log1p(Math.exp(-2.0 / 3.0));
+
+        assertEquals(1.2431102605562161, expected, 0.0);
+        assertEquals(
+                expected,
+                LmsrCalculator.purchaseCost(
+                        0,
+                        Integer.MAX_VALUE,
+                        Integer.MAX_VALUE - 2,
+                        3),
+                1.0E-15);
+    }
+
+    @Test
     void invalidInputsAreRejected() {
         assertThrows(
                 IllegalArgumentException.class,
