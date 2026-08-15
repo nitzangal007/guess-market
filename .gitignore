@@ -1,0 +1,38 @@
+# Course originals and private submission material
+/provided/
+/private/
+/submissions/*
+!/submissions/README.md
+
+# Local-only documentation and operational records
+/docs/planning/EXERCISE-1-MASTER-ROADMAP.md
+/docs/reviews/EXERCISE-1-PRE-IMPLEMENTATION-REVIEW-BRIEF.md
+/docs/reviews/EXERCISE-1-PRE-IMPLEMENTATION-REVIEW.md
+/docs/reviews/JAR-PACKAGING-RECORDING-EVIDENCE.md
+/docs/guides/WORKSPACE-LAYOUT.md
+/docs/guides/JAXB-AND-XML-GUIDE.md
+/docs/repository/GITHUB-REPOSITORY-MIGRATION-PLAN.md
+
+# Generated and local development output
+/build/
+/out/
+/.idea/
+*.iml
+*.class
+*.log
+*.tmp
+*.ser
+*.zip
+
+# Keep only the approved JAXB subset from the complete local distribution
+/tools/jaxb-ri-4.0.5/*
+!/tools/jaxb-ri-4.0.5/mod/
+!/tools/jaxb-ri-4.0.5/mod/*.jar
+!/tools/jaxb-ri-4.0.5/xjc-run.bat
+!/tools/jaxb-ri-4.0.5/LICENSE.txt
+
+# Future approved test dependency location
+/tools/testing/*
+!/tools/testing/junit-platform-console-standalone-6.1.1.jar
+!/tools/testing/LICENSE.txt
+!/tools/testing/NOTICE.txt
