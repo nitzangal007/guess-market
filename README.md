@@ -4,7 +4,7 @@ Guess Market is a Java 25 prediction-market simulator designed around LMSR prici
 
 ## Current status
 
-Exercise 1 design is complete through decision D-071 and passed a full pre-implementation review with no blocking design findings. The private standalone repository is established, and the seven-stage implementation plan is approved. Stage 1 is now in progress. No verified Java implementation, build script, generated JAXB project source, or release artifact exists yet.
+Exercise 1 design is complete through decision D-071 and passed a full pre-implementation review with no blocking design findings. Stage 1 is verified and awaiting human review. It provides immutable DTO values, the complete supported Engine interface and failure contract, and the JUnit test foundation. Domain behavior, XML loading, persistence, UI, the authoritative build, and release artifacts remain later stages.
 
 ## Planned architecture
 
@@ -36,7 +36,7 @@ Each module will produce a separate non-fat JAR. The UI JAR will be the only exe
 - Oracle JDK 25
 - Windows for the authoritative `build.bat` and final package verification
 - Repository-vendored JAXB 4.0.5 dependencies
-- Repository-vendored JUnit Platform Console Standalone dependency after the implementation foundation milestone
+- Repository-vendored JUnit Platform Console Standalone 6.1.1 dependency for tests only
 
 The authoritative build does not download dependencies.
 

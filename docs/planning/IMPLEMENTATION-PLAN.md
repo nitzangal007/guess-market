@@ -192,7 +192,7 @@ Milestone branch: `codex/e1-project-foundation`
 - Consumes: Oracle JDK 25 and the repository's approved dependency policy.
 - Produces: a locally vendored JUnit 6.1.1 test tool with recorded source, SHA-256, license evidence, and no production dependency.
 
-- [ ] **Step 1: Verify the repository boundary before creating files**
+- [x] **Step 1: Verify the repository boundary before creating files**
 
 Run:
 
@@ -203,7 +203,7 @@ git check-ignore -v provided private build sample.ser
 
 Expected: the branch is the milestone branch, the worktree has no unexplained changes, and every private or generated sample path is ignored by the intended rule.
 
-- [ ] **Step 2: Acquire and verify JUnit Platform Console Standalone 6.1.1**
+- [x] **Step 2: Acquire and verify JUnit Platform Console Standalone 6.1.1**
 
 Use the exact Maven Central artifact `org.junit.platform:junit-platform-console-standalone:6.1.1`, preserve its matching license and notice material, calculate SHA-256, and record the source URL, version, hash, and test-only role in `docs/guides/TESTING.md`.
 
@@ -216,7 +216,7 @@ Get-FileHash -Algorithm SHA256 tools\testing\junit-platform-console-standalone-6
 
 Expected: module description succeeds, the version is 6.1.1, and the recorded hash matches the file.
 
-- [ ] **Step 3: Confirm the dependency is test-only**
+- [x] **Step 3: Confirm the dependency is test-only**
 
 Run:
 
@@ -226,11 +226,11 @@ git status --short
 
 Expected: only the approved JUnit JAR, its legal files, and documentation changes appear. No production module contains a copied JUnit binary.
 
-- [ ] **Step 4: Update the walkthrough foundation entry**
+- [x] **Step 4: Update the walkthrough foundation entry**
 
 Record why JUnit is a development tool, why it is excluded from the runtime ZIP, and the verified SHA-256. Do not mark any Java method implemented in this task.
 
-- [ ] **Step 5: Commit the foundation evidence**
+- [x] **Step 5: Commit the foundation evidence**
 
 ```powershell
 git add tools/testing docs/guides/TESTING.md docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -303,7 +303,7 @@ public PurchaseReceipt(
 
 Every class exposes conventional `get...()` accessors, makes defensive copies with `List.copyOf`, and returns the immutable stored lists. DTO validation rejects null nested values, wrong option-list sizes, option numbers outside 1 or 2, negative quantities, non-finite financial values, an open event with a winner, and a closed event without a valid winner. Empty XML-provided strings and duplicate labels remain valid.
 
-- [ ] **Step 1: Write `DtoContractTest` with named contract cases**
+- [x] **Step 1: Write `DtoContractTest` with named contract cases**
 
 Include separate tests for:
 
@@ -318,25 +318,25 @@ purchaseReceiptKeepsSameOperationDetails
 allReturnedCollectionsRejectMutation
 ```
 
-- [ ] **Step 2: Compile the tests first and confirm the expected failure**
+- [x] **Step 2: Compile the tests first and confirm the expected failure**
 
 Expected: compilation fails because the DTO types do not exist.
 
-- [ ] **Step 3: Implement the seven immutable DTO types**
+- [x] **Step 3: Implement the seven immutable DTO types**
 
 Use explicit final classes with private final fields. Do not use console formatting, domain calculations, file APIs, JAXB types, or mutable collection exposure.
 
-- [ ] **Step 4: Run focused DTO tests**
+- [x] **Step 4: Run focused DTO tests**
 
 Run JUnit selecting `guessmarket.dto.DtoContractTest`.
 
 Expected: all DTO tests pass with no skipped, disabled, or aborted test.
 
-- [ ] **Step 5: Update the walkthrough**
+- [x] **Step 5: Update the walkthrough**
 
 Add one row for every DTO constructor and getter group. Explain defensive copying, immutable snapshots, and why a DTO is not a domain object.
 
-- [ ] **Step 6: Commit the DTO slice**
+- [x] **Step 6: Commit the DTO slice**
 
 ```powershell
 git add modules/guessmarket-dto docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -397,29 +397,29 @@ SAVED_STATE_INVALID
 
 `EngineOperationException` stores `code`, `detail`, `recoveryHint`, optional `Path`, XML event number, event ID, field name, option number, quantity, current event status, line, and column. Use typed getters based on `Optional`, `OptionalInt`, and DTO `EventStatus`. Provide one concise constructor for failures with no context and one complete constructor for Engine and XML collaborators. Retain a low-level cause only for developer diagnosis.
 
-- [ ] **Step 1: Write the public contract cases in `GuessMarketEngineUseCaseTest`**
+- [x] **Step 1: Write the public contract cases in `GuessMarketEngineUseCaseTest`**
 
 Cover the seven interface operations, the exact error-code set, and both structured exception constructors. Compile the test first and confirm that it fails because the three Engine contract types do not exist. This starts one of the eleven approved final test classes early instead of adding a temporary twelfth class.
 
-- [ ] **Step 2: Create the three approved contract types**
+- [x] **Step 2: Create the three approved contract types**
 
 Keep the interface and error enum public. Keep exception construction and getters typed, with no formatted console message or dependency on an implementation class.
 
-- [ ] **Step 3: Compile DTO, the three Engine contract files, and focused contract tests**
+- [x] **Step 3: Compile DTO, the three Engine contract files, and focused contract tests**
 
 Expected: compilation succeeds with Engine depending on compiled DTO and no JAXB or UI classpath.
 
-- [ ] **Step 4: Inspect public signatures**
+- [x] **Step 4: Inspect public signatures**
 
 Run `javap -public` on all three compiled types.
 
 Expected: the seven operations and structured checked failure types match this task, and no Engine implementation, JAXB, console, or persistence type appears in a supported signature.
 
-- [ ] **Step 5: Update the walkthrough**
+- [x] **Step 5: Update the walkthrough**
 
 Explain interface-based programming, one checked exception category, structured context, and why the UI must not parse `getMessage()`.
 
-- [ ] **Step 6: Run the Stage 1 gate**
+- [x] **Step 6: Run the Stage 1 gate**
 
 Verify DTO tests, JDK-only DTO compilation, Engine-to-DTO compilation, import direction, Git status, and walkthrough completeness. Then open one milestone pull request for Nitzan's review.
 

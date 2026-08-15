@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation. Nitzan approved the seven-stage implementation plan on 2026-08-15. Stage 1 is authorized and begins test-first on the isolated `codex/e1-project-foundation` milestone branch.
+Review. Stage 1 is implemented and verified on `codex/e1-project-foundation`. Work is stopped at the first human checkpoint for Nitzan's review before Stage 2.
 
 ## Current state
 
@@ -14,9 +14,14 @@ Implementation. Nitzan approved the seven-stage implementation plan on 2026-08-1
 - The approved design passed its pre-implementation review with no blocking finding.
 - Documentation is organized under `docs/design`, `docs/planning`, `docs/guides`, `docs/reviews`, and `docs/repository`.
 - Course originals, private submission files, raw internal review evidence, build output, runtime `.ser` files, and identity-bearing archives remain untracked.
-- Java source roots, build files, generated JAXB project source, IntelliJ configuration, tests, and packaging inputs do not exist yet.
+- Stage 1 contains seven immutable DTO production types, the supported seven-method Engine interface, sixteen structured error codes, and one checked Engine exception contract.
+- `DtoContractTest` has eight tests, and the initial public-contract portion of `GuessMarketEngineUseCaseTest` has four tests. All 12 pass with no failures, skips, disabled tests, or aborts.
+- JUnit Platform Console Standalone 6.1.1 is vendored only under `tools/testing`; its module identity, license material, notice material, and SHA-256 are verified and documented.
+- Stage 1 implementation commits are `219738d`, `2d4e249`, `d628b14`, and review correction `0912d68`.
+- The independent code review found no critical issue. Its one important floating-point finding was reproduced, fixed with a documented eight-ULP comparison, and independently rechecked with no remaining critical or important issue.
+- Domain behavior, LMSR, XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
-- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` is the living method and learning record. Every entry remains `Planned` because no implementation exists.
+- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 constructor, getter group, Engine operation, and verification result.
 
 ## Authority
 
@@ -39,4 +44,4 @@ Implementation. Nitzan approved the seven-stage implementation plan on 2026-08-1
 
 ## Exact next action
 
-Create the isolated Stage 1 worktree, then execute Tasks 1 through 3 test-first. Stop after the Stage 1 regression gate and walkthrough update for Nitzan's review before Stage 2.
+Review the Stage 1 implementation, tests, public signatures, and walkthrough. Do not begin Stage 2 until Nitzan explicitly accepts this checkpoint.
