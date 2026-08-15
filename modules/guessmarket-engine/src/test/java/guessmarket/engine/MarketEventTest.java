@@ -57,6 +57,22 @@ class MarketEventTest {
         assertEquals(List.of("same", "same"), summary.getOptionLabels());
         assertEquals(EventStatus.OPEN, summary.getStatus());
         assertEquals(100.0 * Math.log(2.0), event.maximumSubsidy(), TOLERANCE);
+
+        for (int eventId : new int[] {-17, 0, Integer.MAX_VALUE}) {
+            MarketEvent boundaryEvent = new MarketEvent(
+                    eventId,
+                    "boundary",
+                    "",
+                    CommissionMode.ON_CLOSE,
+                    90,
+                    1,
+                    "first",
+                    "second");
+
+            assertEquals(eventId, boundaryEvent.getEventId());
+            assertEquals(eventId, boundaryEvent.toSummary().getEventId());
+            assertEquals(eventId, boundaryEvent.toDetails().getEventId());
+        }
     }
 
     @Test
@@ -360,6 +376,13 @@ class MarketEventTest {
             EngineErrorCode expectedCode,
             ThrowingTransition transition) throws IOException {
         byte[] before = serialize(event);
+        CommissionPolicy commissionPolicy = event.getCommissionPolicy();
+        EventAccount account = event.getAccount();
+        List<MarketOption> options = event.getOptions();
+        MarketOption firstOption = options.get(0);
+        MarketOption secondOption = options.get(1);
+        List<TradeRecord> history = event.getPurchaseHistory();
+        List<TradeRecord> existingRecords = List.copyOf(history);
 
         EngineOperationException exception = assertThrows(
                 EngineOperationException.class,
@@ -367,6 +390,16 @@ class MarketEventTest {
 
         assertEquals(expectedCode, exception.getCode());
         assertArrayEquals(before, serialize(event));
+        assertSame(commissionPolicy, event.getCommissionPolicy());
+        assertSame(account, event.getAccount());
+        assertSame(options, event.getOptions());
+        assertSame(firstOption, event.getOptions().get(0));
+        assertSame(secondOption, event.getOptions().get(1));
+        assertSame(history, event.getPurchaseHistory());
+        assertEquals(existingRecords.size(), event.getPurchaseHistory().size());
+        for (int index = 0; index < existingRecords.size(); index++) {
+            assertSame(existingRecords.get(index), event.getPurchaseHistory().get(index));
+        }
         return exception;
     }
 

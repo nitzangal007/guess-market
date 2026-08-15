@@ -51,8 +51,6 @@ public final class MarketEvent implements Serializable {
         purchaseHistory = new ArrayList<>();
         status = EventStatus.OPEN;
         winningOptionNumber = null;
-
-        LmsrCalculator.maximumSubsidy(b);
     }
 
     TradeRecord purchase(int optionNumber, int quantity)
