@@ -2,7 +2,23 @@
 
 ## Status
 
-The complete testing strategy is approved, but no test source or executable evidence exists yet.
+The complete testing strategy is approved. The Stage 1 test foundation is verified, but Java test source has not been created yet.
+
+## Vendored test dependency
+
+JUnit is a development-only dependency. It compiles and executes test source, but it is not copied into any production module and will not enter the runtime ZIP.
+
+| Item | Verified value |
+| --- | --- |
+| Maven coordinate | `org.junit.platform:junit-platform-console-standalone:6.1.1` |
+| Source | `https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/6.1.1/junit-platform-console-standalone-6.1.1.jar` |
+| Local path | `tools/testing/junit-platform-console-standalone-6.1.1.jar` |
+| Size | `2,996,922` bytes |
+| SHA-256 | `7B16416E5727C645105C31B533440397F20DF68F6AE850C6BFD0CE1D88DB66C3` |
+| JDK inspection | Oracle `jar` 25.0.4 identifies automatic module `org.junit.platform.console.standalone@6.1.1` |
+| Legal evidence | `LICENSE.txt` and `NOTICE.txt` are exact copies of the JAR's embedded `META-INF/LICENSE.md` and `META-INF/LICENSE-notice.md` |
+
+The standalone JAR contains JUnit Platform, Jupiter, Vintage, and their bundled support libraries so the repository can compile and execute tests without introducing Maven or Gradle. Only Jupiter is used for the project's tests.
 
 ## Test topology
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-The seven-stage plan was approved on 2026-08-15. Stage 1 is in progress, and every method remains `Planned` until its focused test passes.
+The seven-stage plan was approved on 2026-08-15. Stage 1 Task 1 established the verified test foundation, and every Java method remains `Planned` until its focused test passes.
 
 ## Purpose
 
@@ -38,6 +38,12 @@ Engine and UI
 ```
 
 The UI translates temporary displayed positions into real event IDs. Engine receives and validates only the real IDs. XML and saved-state candidates remain quarantined until complete validation, then replace the Engine map through one reference assignment.
+
+## Stage 1 test foundation
+
+The repository vendors JUnit Platform Console Standalone 6.1.1 only as a development tool. A standalone runner fits this repository because the approved build uses direct Java 25 compiler and launcher commands instead of Maven or Gradle. The runner never becomes part of a production module or runtime artifact.
+
+The exact JAR is `2,996,922` bytes with SHA-256 `7B16416E5727C645105C31B533440397F20DF68F6AE850C6BFD0CE1D88DB66C3`. Oracle JDK 25.0.4 reports automatic module `org.junit.platform.console.standalone@6.1.1`. Matching license and notice material was copied from the JAR itself into `tools/testing`.
 
 ## Planned supported Engine methods
 
@@ -84,7 +90,7 @@ Add constructors, public methods, and meaningful package-private helpers as code
 
 | Stage | Verified behavior | Focused tests | Regression evidence | Accepted commit | State |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Foundation, DTOs, Engine contract | None before execution | None before execution | None before approval | Planned |
+| 1 | JUnit foundation verified; DTOs and Engine contract pending | No Java tests in Task 1 | JAR module inspection and SHA-256 verification passed | Task 1 commit pending | In progress |
 | 2 | LMSR and domain transitions | None before execution | None before execution | None before approval | Planned |
 | 3 | JAXB, mapping, and XML loading | None before execution | None before execution | None before approval | Planned |
 | 4 | Persistence and complete Engine | None before execution | None before execution | None before approval | Planned |
