@@ -2,7 +2,7 @@
 
 ## Status
 
-The seven-stage plan was approved on 2026-08-15. Stage 1 Tasks 1 and 2 established the verified test foundation and immutable DTO boundary. The Engine public contract remains pending.
+The seven-stage plan was approved on 2026-08-15. Stage 1 Tasks 1 through 3 implemented the test foundation, immutable DTO boundary, and complete supported Engine contract. The full Stage 1 regression gate remains before review.
 
 ## Purpose
 
@@ -53,6 +53,14 @@ Each constructor validates that its snapshot is internally meaningful. `List.cop
 
 `MarketEventDetails` uses `OptionalInt` for the winner because an open event has no winner and option zero is never valid. `PurchaseReceipt` retains the exact `MarketEventDetails` instance created by the same successful operation, so the UI will not need a second Engine query that could observe a later state.
 
+## Stage 1 supported Engine contract
+
+`GuessMarketEngine` defines the seven capabilities available to every caller. The future console will store this interface type instead of the concrete implementation type. That makes the capability boundary clear and prevents UI code from depending on domain, XML, persistence, or calculation helpers.
+
+Every expected operation failure crosses the boundary as one checked `EngineOperationException`. `EngineErrorCode` identifies the category, while typed optional getters expose available path, event, option, quantity, status, field, and XML location context. The low-level cause remains available for developer diagnosis.
+
+The UI must not parse `getMessage()`. It will switch on `getCode()` and read typed context, because message wording is presentation detail while the enum and getters are the stable recovery contract. The path context is transient because this exception is not part of the approved saved-state graph; the public getter remains unchanged during normal use.
+
 ## Planned supported Engine methods
 
 | Method | Responsibility | Success result | Expected failure boundary | Status |
@@ -78,8 +86,10 @@ Add constructors, public methods, and meaningful package-private helpers as code
 | 1 | `MarketEventDetails` | Constructor and getters | Preserve a self-contained event snapshot with ordered options, newest-first history, account values, and explicit winner absence | `DtoContractTest.detailsDefensivelyCopiesOptionsAndNewestFirstHistory` and `detailsRequiresWinnerOnlyForClosedEvent` | Implemented |
 | 1 | `PurchaseReceipt` | Constructor and getters | Preserve the successful purchase breakdown and same-operation resulting details | `DtoContractTest.purchaseReceiptKeepsSameOperationDetails` | Implemented |
 | 1 | DTO collection getters | `getOptionLabels`, `getOptions`, and `getPurchaseHistory` | Return stored immutable copies without exposing caller-owned lists | `DtoContractTest.allReturnedCollectionsRejectMutation` | Implemented |
-| 1 | `GuessMarketEngine` | Seven supported operations | Define the complete caller capability boundary | Compile and `javap` inspection | Planned |
-| 1 | `EngineOperationException` | Constructors and context getters | Carry one checked structured failure without UI formatting | Engine and renderer tests | Planned |
+| 1 | `GuessMarketEngine` | Seven supported operations | Define the complete caller capability boundary using only JDK paths, DTO results, and one checked failure type | `GuessMarketEngineUseCaseTest.engineInterfaceDeclaresSevenCheckedOperations` and `javap -public` | Implemented |
+| 1 | `EngineErrorCode` | Sixteen enum values | Identify XML, market, calculation, and saved-state failure categories without embedding UI text | `GuessMarketEngineUseCaseTest.errorCodeContainsExactlyApprovedValues` and `javap -public` | Implemented |
+| 1 | `EngineOperationException` | Simple and complete constructors | Preserve required failure data, optional context, and a diagnostic cause in one checked type | `GuessMarketEngineUseCaseTest.simpleExceptionPreservesRequiredFields` and `completeExceptionPreservesOptionalContextAndCause` | Implemented |
+| 1 | `EngineOperationException` | Structured getters | Return typed `Optional`, `OptionalInt`, enum, detail, and recovery values so callers never parse a message | `GuessMarketEngineUseCaseTest` and `javap -public` | Implemented |
 | 2 | `LmsrCalculator` | `totalCost` | Evaluate stable LMSR cost through log-sum-exp | `LmsrCalculatorTest` | Planned |
 | 2 | `LmsrCalculator` | `priceForOption` | Derive an observational price through stable softmax | `LmsrCalculatorTest` | Planned |
 | 2 | `LmsrCalculator` | `purchaseCost` | Calculate the D-068 cancellation-safe direct delta | `LmsrCalculatorTest` | Planned |
@@ -104,7 +114,7 @@ Add constructors, public methods, and meaningful package-private helpers as code
 
 | Stage | Verified behavior | Focused tests | Regression evidence | Accepted commit | State |
 | --- | --- | --- | --- | --- | --- |
-| 1 | JUnit foundation and immutable DTO boundary verified; Engine contract pending | `DtoContractTest`: 8 of 8 successful | JDK-only DTO compile passed; focused JUnit run had zero failures, skips, disabled tests, or aborts | Task 1 `219738d`; Task 2 pending | In progress |
+| 1 | JUnit foundation, immutable DTO boundary, and complete supported Engine contract implemented | `DtoContractTest`: 8 successful; `GuessMarketEngineUseCaseTest`: 4 successful | Clean Java 25 compile with `-Xlint:all`; 12 tests successful with zero failures, skips, disabled tests, or aborts; public `javap` inspection passed | Task 1 `219738d`; Task 2 `2d4e249`; Task 3 pending | Gate pending |
 | 2 | LMSR and domain transitions | None before execution | None before execution | None before approval | Planned |
 | 3 | JAXB, mapping, and XML loading | None before execution | None before execution | None before approval | Planned |
 | 4 | Persistence and complete Engine | None before execution | None before execution | None before approval | Planned |

@@ -2,7 +2,7 @@
 
 ## Status
 
-The complete testing strategy is approved. The Stage 1 test foundation is verified, and `DtoContractTest` is the first implemented test class.
+The complete testing strategy is approved. The Stage 1 test foundation, `DtoContractTest`, and the public-contract portion of `GuessMarketEngineUseCaseTest` are implemented.
 
 ## Vendored test dependency
 
@@ -37,6 +37,8 @@ The implementation plan must cover eleven behavior-centered test classes:
 11. Complete console conversations
 
 UI tests use a handwritten fake Engine. Domain collaborators may use focused same-package tests. Production visibility must not be widened for tests, and tests must not inspect private fields through reflection.
+
+`GuessMarketEngineUseCaseTest` begins in Stage 1 with four tests for the public interface, exact error-code set, checked exception shape, and structured optional context. Stage 4 extends this same approved class with complete Engine operation behavior rather than creating another test class.
 
 ## Evidence layers
 
