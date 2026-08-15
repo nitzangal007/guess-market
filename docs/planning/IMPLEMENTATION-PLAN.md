@@ -537,21 +537,21 @@ Purchase must calculate the new quantity, base cost, any on-purchase commission,
 
 Close must calculate gross payout, on-close commission, net payout, new balance, and new commission total before committing winner and `CLOSED`. For on-close commission, subtract only the net payout and do not credit the same commission twice.
 
-- [ ] **Step 1: Write `MarketEventTest` first**
+- [x] **Step 1: Write `MarketEventTest` first**
 
 Cover both commission modes, 0 and 90 percent boundaries, multiple purchases, newest-first public conversion order, quantity overflow, closed-event rejection, repeated close, profit, subsidy, exact break-even, no-purchase close, disfavored tiny purchase, numerical rejection, and before-after equality for every rejected operation.
 
-- [ ] **Step 2: Confirm the focused test fails for missing domain types**
+- [x] **Step 2: Confirm the focused test fails for missing domain types**
 
-- [ ] **Step 3: Implement the five domain types**
+- [x] **Step 3: Implement the five domain types**
 
 Every custom serializable class required by D-070 declares `private static final long serialVersionUID = 1L`. The reachable DTO enums use Java's normal enum serialization identity. Do not make `GuessMarketEngineImpl`, `LmsrCalculator`, DTO classes, XML types, or technical file types serializable.
 
-- [ ] **Step 4: Run `LmsrCalculatorTest` and `MarketEventTest` together**
+- [x] **Step 4: Run `LmsrCalculatorTest` and `MarketEventTest` together**
 
 Expected: both pass and rejected operations leave every observable domain value unchanged.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 Record every meaningful constructor and transition method, the state it owns, its preconditions, its atomic commit point, and the test that proves it.
 
