@@ -51,6 +51,8 @@ DTO means data transfer object. These classes are immutable snapshots that cross
 
 Each constructor validates that its snapshot is internally meaningful. `List.copyOf` performs a defensive copy and returns an unmodifiable list, so changing the caller's original list cannot change the DTO. Empty XML-provided text and duplicate labels remain valid, while null nested values, invalid option numbering, invalid quantities, non-finite financial values, and inconsistent winner state are rejected.
 
+Receipt and history totals compare `totalPaid` with `baseShareCost + purchaseCommission` using an eight-ULP binary64 tolerance. ULP means one representable floating-point step at the current scale. This accepts harmless representation differences such as `0.1 + 0.2` compared with `0.3`, including at tiny LMSR scales, while still rejecting materially inconsistent totals.
+
 `MarketEventDetails` uses `OptionalInt` for the winner because an open event has no winner and option zero is never valid. `PurchaseReceipt` retains the exact `MarketEventDetails` instance created by the same successful operation, so the UI will not need a second Engine query that could observe a later state.
 
 ## Stage 1 supported Engine contract

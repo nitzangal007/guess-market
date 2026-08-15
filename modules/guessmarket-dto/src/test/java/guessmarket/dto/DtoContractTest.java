@@ -110,6 +110,7 @@ class DtoContractTest {
     @Test
     void historyEntryPreservesFinancialBreakdown() {
         TradeHistoryEntry entry = new TradeHistoryEntry(2, "", 3, 1.25, 0.25, 1.5);
+        TradeHistoryEntry decimalEntry = new TradeHistoryEntry(1, "A", 1, 0.1, 0.2, 0.3);
 
         assertAll(
                 () -> assertEquals(2, entry.getOptionNumber()),
@@ -118,6 +119,7 @@ class DtoContractTest {
                 () -> assertEquals(1.25, entry.getBaseShareCost()),
                 () -> assertEquals(0.25, entry.getPurchaseCommission()),
                 () -> assertEquals(1.5, entry.getTotalPaid()),
+                () -> assertEquals(0.3, decimalEntry.getTotalPaid()),
                 () -> assertThrows(IllegalArgumentException.class,
                         () -> new TradeHistoryEntry(0, "A", 1, 1.0, 0.0, 1.0)),
                 () -> assertThrows(NullPointerException.class,
@@ -212,6 +214,7 @@ class DtoContractTest {
     void purchaseReceiptKeepsSameOperationDetails() {
         MarketEventDetails details = details(EventStatus.OPEN, OptionalInt.empty());
         PurchaseReceipt receipt = new PurchaseReceipt(1, 4, 2.0, 0.5, 2.5, details);
+        PurchaseReceipt decimalReceipt = new PurchaseReceipt(2, 1, 0.1, 0.2, 0.3, details);
 
         assertAll(
                 () -> assertEquals(1, receipt.getOptionNumber()),
@@ -220,6 +223,7 @@ class DtoContractTest {
                 () -> assertEquals(0.5, receipt.getPurchaseCommission()),
                 () -> assertEquals(2.5, receipt.getTotalPaid()),
                 () -> assertSame(details, receipt.getResultingEventDetails()),
+                () -> assertEquals(0.3, decimalReceipt.getTotalPaid()),
                 () -> assertThrows(IllegalArgumentException.class,
                         () -> new PurchaseReceipt(3, 1, 1.0, 0.0, 1.0, details)),
                 () -> assertThrows(IllegalArgumentException.class,

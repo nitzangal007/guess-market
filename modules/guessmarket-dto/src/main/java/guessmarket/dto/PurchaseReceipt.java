@@ -3,6 +3,8 @@ package guessmarket.dto;
 import java.util.Objects;
 
 public final class PurchaseReceipt {
+    private static final int FINANCIAL_EQUALITY_ULPS = 8;
+
     private final int optionNumber;
     private final int purchasedShareQuantity;
     private final double baseShareCost;
@@ -32,7 +34,8 @@ public final class PurchaseReceipt {
         if (!Double.isFinite(totalPaid) || totalPaid <= 0.0) {
             throw new IllegalArgumentException("Total paid must be finite and positive");
         }
-        if (Double.compare(totalPaid, baseShareCost + purchaseCommission) != 0) {
+        double expectedTotal = baseShareCost + purchaseCommission;
+        if (!totalsMatch(totalPaid, expectedTotal)) {
             throw new IllegalArgumentException("Total paid must equal base cost plus purchase commission");
         }
 
@@ -66,5 +69,15 @@ public final class PurchaseReceipt {
 
     public MarketEventDetails getResultingEventDetails() {
         return resultingEventDetails;
+    }
+
+    private static boolean totalsMatch(double actualTotal, double expectedTotal) {
+        if (!Double.isFinite(expectedTotal)) {
+            return false;
+        }
+
+        double scale = Math.max(Math.abs(actualTotal), Math.abs(expectedTotal));
+        double tolerance = FINANCIAL_EQUALITY_ULPS * Math.ulp(scale);
+        return Math.abs(actualTotal - expectedTotal) <= tolerance;
     }
 }

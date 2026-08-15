@@ -10,8 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import guessmarket.dto.EventStatus;
 import guessmarket.dto.MarketEventDetails;
+import guessmarket.dto.MarketEventSummary;
 import guessmarket.dto.PurchaseReceipt;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +34,16 @@ class GuessMarketEngineUseCaseTest {
         Method close = GuessMarketEngine.class.getDeclaredMethod("closeEvent", int.class, int.class);
         Method save = GuessMarketEngine.class.getDeclaredMethod("saveState", Path.class);
         Method restore = GuessMarketEngine.class.getDeclaredMethod("restoreState", Path.class);
+        ParameterizedType listReturnType = (ParameterizedType) list.getGenericReturnType();
 
         assertAll(
                 () -> assertEquals(7, GuessMarketEngine.class.getDeclaredMethods().length),
                 () -> assertMethod(load, int.class),
                 () -> assertMethod(list, List.class),
+                () -> assertEquals(List.class, listReturnType.getRawType()),
+                () -> assertArrayEquals(
+                        new Object[] {MarketEventSummary.class},
+                        listReturnType.getActualTypeArguments()),
                 () -> assertMethod(details, MarketEventDetails.class),
                 () -> assertMethod(purchase, PurchaseReceipt.class),
                 () -> assertMethod(close, MarketEventDetails.class),
