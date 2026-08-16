@@ -2,7 +2,7 @@
 
 ## Status
 
-The seven-stage plan was approved on 2026-08-15. Stage 1 implemented and verified the test foundation, immutable DTO boundary, and complete supported Engine contract. Stage 2 Tasks 4 and 5 implement and verify the cancellation-safe LMSR calculator and complete event domain. The residual numerical correction is complete after re-review, and Stage 2 awaits Nitzan's human checkpoint before Stage 3.
+The seven-stage plan was approved on 2026-08-15. Stage 1 implemented and verified the test foundation, immutable DTO boundary, and complete supported Engine contract. Stage 2 Tasks 4 and 5 implement and verify the cancellation-safe LMSR calculator and complete event domain. The residual numerical correction is complete after re-review, and Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 is approved for merge before Stage 3 begins.
 
 ## Purpose
 

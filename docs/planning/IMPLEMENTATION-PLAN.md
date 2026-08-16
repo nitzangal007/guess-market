@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 was reviewed, accepted, and merged through pull request 1. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-domain`, including the residual numerical correction completed after re-review. Stage 2 awaits Nitzan's checkpoint and has not been accepted for Stage 3.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 was reviewed, accepted, and merged through pull request 1. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-domain`, including the residual numerical correction completed after re-review. Nitzan reviewed and accepted Stage 2 on 2026-08-16; pull request 2 is approved for merge before Stage 3 begins.
 
 ## Global Constraints
 

@@ -2,7 +2,7 @@
 
 ## Mode
 
-Review. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-domain`. The whole-branch review correction and residual numerical correction are complete. Stop at the Stage 2 human checkpoint before any Stage 3 work.
+Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently reviewed, and accepted by Nitzan on 2026-08-16. Merge pull request 2 before creating the Stage 3 milestone branch.
 
 ## Current state
 
@@ -26,6 +26,7 @@ Review. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-dom
 - The original Stage 2 whole-branch review found one Important numerical precision defect, one Important stale-handoff defect, and three Minor evidence or detail gaps. The residual re-review then found a second Important numerical precision defect and later documentation-only Minor corrections. The completed corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, complete `Integer.MIN_VALUE` observation coverage, and align the planning and walkthrough records with the implemented code.
 - The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
 - XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
+- Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 is approved for merge before Stage 3 begins.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 and Stage 2 calculation, constructor, transition, observation, and verification result.
 
@@ -50,4 +51,4 @@ Review. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-dom
 
 ## Exact next action
 
-Review the completed Stage 2 branch, its final fix report, numerical evidence, domain behavior, and walkthrough. Do not start Stage 3 until Nitzan accepts this checkpoint.
+Merge pull request 2, update `main`, and create the isolated `codex/e1-engine-xml` Stage 3 worktree. Then execute Tasks 6 through 8 with their test-first and review gates.
