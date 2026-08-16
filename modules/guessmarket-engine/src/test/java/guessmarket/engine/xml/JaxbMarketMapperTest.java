@@ -6,9 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import guessmarket.dto.CommissionMode;
+import guessmarket.dto.EventStatus;
+import guessmarket.dto.MarketEventDetails;
 import guessmarket.engine.EngineErrorCode;
 import guessmarket.engine.EngineOperationException;
 import guessmarket.engine.MarketEvent;
+import guessmarket.engine.MarketEventTestProbe;
 import guessmarket.engine.xml.generated.Comision;
 import guessmarket.engine.xml.generated.GMEvent;
 import guessmarket.engine.xml.generated.GMEvents;
@@ -34,10 +38,18 @@ class JaxbMarketMapperTest {
 
         assertEquals(List.of(3), List.copyOf(single.keySet()));
         assertEquals(List.of(1, 2, 3), List.copyOf(multiple.keySet()));
-        assertNotNull(single.get(3));
-        assertNotNull(multiple.get(1));
-        assertNotNull(multiple.get(2));
-        assertNotNull(multiple.get(3));
+        assertMappedInitialState(single.get(3), 3, "Earth Quake on Dead Sea",
+                "Will there be an earth quake at the dead sea until December 31th 2026",
+                CommissionMode.ON_PURCHASE, 50, 100, "Yes", "No");
+        assertMappedInitialState(multiple.get(1), 1, "Mujtaba is Dead",
+                "This event gambles if Mujtaba is a live or not. it will be determined if he will be shown in public until 31.8.26",
+                CommissionMode.ON_PURCHASE, 5, 100, "Hell Yea !", "No way !");
+        assertMappedInitialState(multiple.get(2), 2, "World Cap Winner",
+                "Who do you think will win the world cap ?", CommissionMode.ON_CLOSE,
+                15, 50, "Argentina", "Spain");
+        assertMappedInitialState(multiple.get(3), 3, "Earth Quake on Dead Sea",
+                "Will there be an earth quake on the dead sea until the December 31th 2026",
+                CommissionMode.ON_PURCHASE, 50, 400, "Yes", "No");
         assertTrue(single != multiple);
         assertTrue(single.get(3) != multiple.get(3));
     }
@@ -49,9 +61,14 @@ class JaxbMarketMapperTest {
 
         assertEquals(List.of(0, -17, Integer.MIN_VALUE, Integer.MAX_VALUE),
                 List.copyOf(events.keySet()));
-        for (int id : events.keySet()) {
-            assertNotNull(events.get(id));
-        }
+        assertMappedInitialState(events.get(0), 0, "", "", CommissionMode.ON_PURCHASE,
+                0, 1, "", "");
+        assertMappedInitialState(events.get(-17), -17, "negative id", "", CommissionMode.ON_CLOSE,
+                90, 2, "same", "same");
+        assertMappedInitialState(events.get(Integer.MIN_VALUE), Integer.MIN_VALUE, "minimum id",
+                "minimum int id", CommissionMode.ON_PURCHASE, 0, 3, "first", "second");
+        assertMappedInitialState(events.get(Integer.MAX_VALUE), Integer.MAX_VALUE, "maximum id",
+                "maximum int id", CommissionMode.ON_CLOSE, 90, 4, "up", "down");
     }
 
     @Test
@@ -68,7 +85,8 @@ class JaxbMarketMapperTest {
         LinkedHashMap<Integer, MarketEvent> events = mapper.map(root);
 
         assertEquals(List.of(8), List.copyOf(events.keySet()));
-        assertNotNull(events.get(8));
+        assertMappedInitialState(events.get(8), 8, "Alpha Beta", "first  second",
+                CommissionMode.ON_PURCHASE, 0, 1, "one  two", "three  four");
     }
 
     @Test
@@ -192,5 +210,36 @@ class JaxbMarketMapperTest {
         assertEquals(xmlEventNumber, exception.getXmlEventNumber().orElseThrow());
         assertEquals(eventId, exception.getEventId().orElseThrow());
         assertEquals(fieldName, exception.getFieldName().orElseThrow());
+    }
+
+    private static void assertMappedInitialState(
+            MarketEvent event,
+            int eventId,
+            String name,
+            String description,
+            CommissionMode commissionMode,
+            int commissionPercentage,
+            int b,
+            String firstOptionLabel,
+            String secondOptionLabel) {
+        assertNotNull(event);
+        MarketEventTestProbe.Snapshot snapshot = MarketEventTestProbe.snapshot(event);
+        MarketEventDetails details = snapshot.details();
+
+        assertEquals(eventId, details.getEventId());
+        assertEquals(name, details.getName());
+        assertEquals(description, details.getDescription());
+        assertEquals(commissionMode, details.getCommissionMode());
+        assertEquals(commissionPercentage, details.getCommissionPercentage());
+        assertEquals(b, snapshot.liquidityParameter());
+        assertEquals(List.of(firstOptionLabel, secondOptionLabel),
+                details.getOptions().stream().map(option -> option.getLabel()).toList());
+        assertEquals(List.of(0, 0),
+                details.getOptions().stream().map(option -> option.getShareQuantity()).toList());
+        assertEquals(0.0, details.getEventAccountBalance());
+        assertEquals(0.0, details.getTotalCommissionCollected());
+        assertEquals(List.of(), details.getPurchaseHistory());
+        assertEquals(EventStatus.OPEN, details.getStatus());
+        assertFalse(details.getWinningOptionNumber().isPresent());
     }
 }
