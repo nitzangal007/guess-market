@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 is authorized to begin test-first on its milestone branch.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 was reviewed, accepted, and merged through pull request 1. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-domain`, including the residual numerical correction completed after re-review. Nitzan reviewed and accepted Stage 2 on 2026-08-16; pull request 2 is approved for merge before Stage 3 begins.
 
 ## Global Constraints
 
@@ -459,9 +459,17 @@ The critical direct-delta implementation follows this structure:
 long difference = (long) selectedQuantity - otherQuantity;
 double z = difference / (double) b;
 double h = purchaseQuantity / (double) b;
-double logP = -softplus(-z);
-double logExpm1 = logExpm1(h);
-double t = logP + logExpm1;
+double t;
+if (difference < 0) {
+    long combinedDifference = difference + purchaseQuantity;
+    t = combinedDifference / (double) b
+            - softplus(z)
+            + logOneMinusExpOfNegative(h);
+} else {
+    double logP = -softplus(-z);
+    double logExpm1 = logExpm1(h);
+    t = logP + logExpm1;
+}
 
 double cost;
 if (t < -37.0) {
@@ -471,25 +479,25 @@ if (t < -37.0) {
 }
 ```
 
-`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. `logExpm1(h)` uses `log(expm1(h))` in the safe branch and `h + log1p(-exp(-h))` for large positive `h`. All quantity differences are formed in `long`. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
+`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. For every negative quantity difference, the combined branch forms `difference + purchaseQuantity` in `long` before conversion and uses the exact identity `t = (difference + purchaseQuantity) / b - softplus(z) + log(1 - exp(-h))`. `logOneMinusExpOfNegative(h)` evaluates the final correction as `log(-expm1(-h))` when `h <= ln(2)` and `log1p(-exp(-h))` otherwise. For a nonnegative difference, the ordinary branch evaluates `t = logP + logExpm1(h)`, where `logExpm1(h)` uses `log(expm1(h))` before the large-value boundary and `h + log(1 - exp(-h))` after it. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
 
-- [ ] **Step 1: Write `LmsrCalculatorTest` first**
+- [x] **Step 1: Write `LmsrCalculatorTest` first**
 
 Include the approved initial price, price sum, monotonicity, larger-`b`, maximum-subsidy, `b = 100` worked example, simulator oracle values, very large quantities, representable `6.392138950083687E-44` delta, price underflow with representable aggregate delta, unrepresentable positive delta, `int` boundary arithmetic, and invalid input cases.
 
-- [ ] **Step 2: Run the focused test and confirm failures**
+- [x] **Step 2: Run the focused test and confirm failures**
 
 Expected: the class or methods are missing.
 
-- [ ] **Step 3: Implement the minimal final calculator**
+- [x] **Step 3: Implement the minimal final calculator**
 
 Keep the class final and stateless. Do not import DTO, XML, persistence, console, or commission types.
 
-- [ ] **Step 4: Run focused tests and simulator reconciliation**
+- [x] **Step 4: Run focused tests and simulator reconciliation**
 
 Expected: every named numerical category passes within its documented tolerance, and no case returns `NaN`, infinity, or free positive shares.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 Explain log-sum-exp, softmax, cancellation, underflow, and why the direct delta is separate from display price.
 
@@ -537,21 +545,21 @@ Purchase must calculate the new quantity, base cost, any on-purchase commission,
 
 Close must calculate gross payout, on-close commission, net payout, new balance, and new commission total before committing winner and `CLOSED`. For on-close commission, subtract only the net payout and do not credit the same commission twice.
 
-- [ ] **Step 1: Write `MarketEventTest` first**
+- [x] **Step 1: Write `MarketEventTest` first**
 
 Cover both commission modes, 0 and 90 percent boundaries, multiple purchases, newest-first public conversion order, quantity overflow, closed-event rejection, repeated close, profit, subsidy, exact break-even, no-purchase close, disfavored tiny purchase, numerical rejection, and before-after equality for every rejected operation.
 
-- [ ] **Step 2: Confirm the focused test fails for missing domain types**
+- [x] **Step 2: Confirm the focused test fails for missing domain types**
 
-- [ ] **Step 3: Implement the five domain types**
+- [x] **Step 3: Implement the five domain types**
 
 Every custom serializable class required by D-070 declares `private static final long serialVersionUID = 1L`. The reachable DTO enums use Java's normal enum serialization identity. Do not make `GuessMarketEngineImpl`, `LmsrCalculator`, DTO classes, XML types, or technical file types serializable.
 
-- [ ] **Step 4: Run `LmsrCalculatorTest` and `MarketEventTest` together**
+- [x] **Step 4: Run `LmsrCalculatorTest` and `MarketEventTest` together**
 
 Expected: both pass and rejected operations leave every observable domain value unchanged.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 Record every meaningful constructor and transition method, the state it owns, its preconditions, its atomic commit point, and the test that proves it.
 
@@ -560,7 +568,7 @@ git add modules/guessmarket-engine docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: implement market event transitions"
 ```
 
-- [ ] **Step 6: Run the Stage 2 gate**
+- [x] **Step 6: Run the Stage 2 gate**
 
 Review numerical evidence, accounting examples, serializable-type boundary, domain visibility, full regression tests, and the updated walkthrough before merging the milestone.
 

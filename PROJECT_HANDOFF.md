@@ -2,7 +2,7 @@
 
 ## Mode
 
-Review. Stage 1 is implemented and verified on `codex/e1-project-foundation`. Work is stopped at the first human checkpoint for Nitzan's review before Stage 2.
+Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently reviewed, and accepted by Nitzan on 2026-08-16. Merge pull request 2 before creating the Stage 3 milestone branch.
 
 ## Current state
 
@@ -15,13 +15,20 @@ Review. Stage 1 is implemented and verified on `codex/e1-project-foundation`. Wo
 - Documentation is organized under `docs/design`, `docs/planning`, `docs/guides`, `docs/reviews`, and `docs/repository`.
 - Course originals, private submission files, raw internal review evidence, build output, runtime `.ser` files, and identity-bearing archives remain untracked.
 - Stage 1 contains seven immutable DTO production types, the supported seven-method Engine interface, sixteen structured error codes, and one checked Engine exception contract.
-- `DtoContractTest` has eight tests, and the initial public-contract portion of `GuessMarketEngineUseCaseTest` has four tests. All 12 pass with no failures, skips, disabled tests, or aborts.
+- `DtoContractTest` has eight tests, and the initial public-contract portion of `GuessMarketEngineUseCaseTest` has four tests. All 12 remain in the Stage 2 regression gate.
 - JUnit Platform Console Standalone 6.1.1 is vendored only under `tools/testing`; its module identity, license material, notice material, and SHA-256 are verified and documented.
 - Stage 1 implementation commits are `219738d`, `2d4e249`, `d628b14`, and review correction `0912d68`.
 - The independent code review found no critical issue. Its one important floating-point finding was reproduced, fixed with a documented eight-ULP comparison, and independently rechecked with no remaining critical or important issue.
-- Domain behavior, LMSR, XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
+- Nitzan accepted Stage 1 on 2026-08-15. GitHub merged pull request 1 as squash commit `d8d9b0c` because the repository permits squash merges only.
+- The Stage 2 baseline was compiled with Oracle Java 25.0.4 and reran all 12 Stage 1 tests successfully before new implementation.
+- Task 4 implemented the package-private stateless `LmsrCalculator` in commits `542768d` and `cf14539`. Its direct delta preserves representable tiny values, rejects free positive shares, and now combines large opposing quantity terms in `long` before conversion so cancellation does not erase low-order information.
+- Task 5 implemented the serializable event aggregate, accounting, history, immutable DTO conversion, and atomic purchase and close transitions in commits `7502964`, review fix `e0a341a`, and completion record `3daadb1`.
+- The original Stage 2 whole-branch review found one Important numerical precision defect, one Important stale-handoff defect, and three Minor evidence or detail gaps. The residual re-review then found a second Important numerical precision defect and later documentation-only Minor corrections. The completed corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, complete `Integer.MIN_VALUE` observation coverage, and align the planning and walkthrough records with the implemented code.
+- The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
+- XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
+- Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 is approved for merge before Stage 3 begins.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
-- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 constructor, getter group, Engine operation, and verification result.
+- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 and Stage 2 calculation, constructor, transition, observation, and verification result.
 
 ## Authority
 
@@ -44,4 +51,4 @@ Review. Stage 1 is implemented and verified on `codex/e1-project-foundation`. Wo
 
 ## Exact next action
 
-Review the Stage 1 implementation, tests, public signatures, and walkthrough. Do not begin Stage 2 until Nitzan explicitly accepts this checkpoint.
+Merge pull request 2, update `main`, and create the isolated `codex/e1-engine-xml` Stage 3 worktree. Then execute Tasks 6 through 8 with their test-first and review gates.
