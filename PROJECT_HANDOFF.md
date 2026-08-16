@@ -2,7 +2,7 @@
 
 ## Mode
 
-Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently reviewed, and accepted by Nitzan on 2026-08-16. Merge pull request 2 before creating the Stage 3 milestone branch.
+Implement. Stage 2 was accepted by Nitzan and merged through pull request 2 as `6842dfd`. Stage 3 is active on `codex/e1-engine-xml`; Task 6 is the current bounded task.
 
 ## Current state
 
@@ -26,7 +26,8 @@ Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently revi
 - The original Stage 2 whole-branch review found one Important numerical precision defect, one Important stale-handoff defect, and three Minor evidence or detail gaps. The residual re-review then found a second Important numerical precision defect and later documentation-only Minor corrections. The completed corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, complete `Integer.MIN_VALUE` observation coverage, and align the planning and walkthrough records with the implemented code.
 - The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
 - XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
-- Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 is approved for merge before Stage 3 begins.
+- Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 was squash-merged as `6842dfd`.
+- The isolated Stage 3 branch `codex/e1-engine-xml` starts from that exact merged commit. Its fresh Java 25 baseline compiled with warnings as errors and passed all 48 existing tests.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 and Stage 2 calculation, constructor, transition, observation, and verification result.
 
@@ -51,4 +52,4 @@ Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently revi
 
 ## Exact next action
 
-Merge pull request 2, update `main`, and create the isolated `codex/e1-engine-xml` Stage 3 worktree. Then execute Tasks 6 through 8 with their test-first and review gates.
+Execute Task 6 from the approved implementation plan: derive hash-verified XML resources, create the D-069 boundary fixtures, generate the retained JAXB source through the course wrapper, compile it against the five runtime JARs, update the guides, and complete the task review before Task 7.
