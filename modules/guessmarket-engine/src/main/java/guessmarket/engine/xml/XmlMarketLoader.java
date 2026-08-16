@@ -10,7 +10,9 @@ import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import javax.xml.XMLConstants;
@@ -26,14 +28,25 @@ public final class XmlMarketLoader {
 
     private final InputStreamOpener inputStreamOpener;
     private final CandidateMapper candidateMapper;
+    private final TrustedSchemaOpener trustedSchemaOpener;
 
     public XmlMarketLoader() {
-        this(Files::newInputStream, new JaxbMarketMapper()::map);
+        this(Files::newInputStream, new JaxbMarketMapper()::map,
+                XmlMarketLoader::openTrustedSchemaResource);
     }
 
     XmlMarketLoader(InputStreamOpener inputStreamOpener, CandidateMapper candidateMapper) {
+        this(inputStreamOpener, candidateMapper, XmlMarketLoader::openTrustedSchemaResource);
+    }
+
+    XmlMarketLoader(
+            InputStreamOpener inputStreamOpener,
+            CandidateMapper candidateMapper,
+            TrustedSchemaOpener trustedSchemaOpener) {
         this.inputStreamOpener = Objects.requireNonNull(inputStreamOpener, "inputStreamOpener");
         this.candidateMapper = Objects.requireNonNull(candidateMapper, "candidateMapper");
+        this.trustedSchemaOpener = Objects.requireNonNull(trustedSchemaOpener,
+                "trustedSchemaOpener");
     }
 
     public LinkedHashMap<Integer, MarketEvent> load(Path path)
@@ -76,14 +89,19 @@ public final class XmlMarketLoader {
                     "Choose an existing readable XML file and try again.",
                     path, null, null, null, null, null, null, null, null, null);
         }
-        if (!Files.exists(path)) {
+        BasicFileAttributes attributes;
+        try {
+            attributes = Files.readAttributes(path, BasicFileAttributes.class);
+        } catch (NoSuchFileException exception) {
             throw new EngineOperationException(
                     EngineErrorCode.XML_FILE_NOT_FOUND,
                     "The selected XML file does not exist.",
                     "Choose an existing XML file and try again.",
                     path, null, null, null, null, null, null, null, null, null);
+        } catch (IOException exception) {
+            throw accessFailed(path, exception);
         }
-        if (!Files.isRegularFile(path)) {
+        if (!attributes.isRegularFile()) {
             throw new EngineOperationException(
                     EngineErrorCode.INVALID_XML_PATH,
                     "The selected path must name a regular .xml file.",
@@ -105,7 +123,7 @@ public final class XmlMarketLoader {
                 .endsWith(".xml");
     }
 
-    private static Unmarshaller trustedUnmarshaller(Path path) throws EngineOperationException {
+    private Unmarshaller trustedUnmarshaller(Path path) throws EngineOperationException {
         Schema schema = trustedSchema(path);
         try {
             Unmarshaller unmarshaller = JAXBContext.newInstance(GuessMarket.class).createUnmarshaller();
@@ -116,9 +134,8 @@ public final class XmlMarketLoader {
         }
     }
 
-    private static Schema trustedSchema(Path path) throws EngineOperationException {
-        try (InputStream schemaInput = XmlMarketLoader.class.getClassLoader()
-                .getResourceAsStream(TRUSTED_SCHEMA_RESOURCE)) {
+    private Schema trustedSchema(Path path) throws EngineOperationException {
+        try (InputStream schemaInput = trustedSchemaOpener.open(TRUSTED_SCHEMA_RESOURCE)) {
             if (schemaInput == null) {
                 throw configurationFailed(path, "The trusted XML schema resource is missing.", null);
             }
@@ -130,6 +147,10 @@ public final class XmlMarketLoader {
             throw configurationFailed(path, "The trusted XML schema resource is invalid or unreadable.",
                     exception);
         }
+    }
+
+    private static InputStream openTrustedSchemaResource(String resourcePath) {
+        return XmlMarketLoader.class.getClassLoader().getResourceAsStream(resourcePath);
     }
 
     private static EngineOperationException accessFailed(Path path, IOException cause) {
@@ -184,5 +205,10 @@ public final class XmlMarketLoader {
     @FunctionalInterface
     interface CandidateMapper {
         LinkedHashMap<Integer, MarketEvent> map(GuessMarket root) throws EngineOperationException;
+    }
+
+    @FunctionalInterface
+    interface TrustedSchemaOpener {
+        InputStream open(String resourcePath) throws IOException;
     }
 }

@@ -10,8 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import guessmarket.engine.EngineErrorCode;
 import guessmarket.engine.EngineOperationException;
 import guessmarket.engine.MarketEvent;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.net.URISyntaxException;
@@ -36,12 +38,14 @@ class XmlMarketLoaderTest {
     }
 
     @Test
-    void rejectsDirectoryAsInvalidXmlPath() {
+    void rejectsXmlNamedDirectoryAsInvalidXmlPath() throws IOException {
+        Path directory = Files.createDirectory(temporaryDirectory.resolve("folder.xml"));
+
         EngineOperationException exception = assertThrows(EngineOperationException.class,
-                () -> loader.load(temporaryDirectory));
+                () -> loader.load(directory));
 
         assertEquals(EngineErrorCode.INVALID_XML_PATH, exception.getCode());
-        assertEquals(temporaryDirectory, exception.getPath().orElseThrow());
+        assertEquals(directory, exception.getPath().orElseThrow());
     }
 
     @Test
@@ -150,6 +154,55 @@ class XmlMarketLoaderTest {
     }
 
     @Test
+    void reportsMissingTrustedSchemaAsConfigurationError() {
+        XmlMarketLoader configurationFailingLoader = new XmlMarketLoader(
+                Files::newInputStream,
+                new JaxbMarketMapper()::map,
+                resourcePath -> null);
+        Path path = fixturePath("supplied/single.xml");
+
+        EngineOperationException exception = assertThrows(EngineOperationException.class,
+                () -> configurationFailingLoader.load(path));
+
+        assertConfigurationFailure(exception, path);
+        assertNull(exception.getCause());
+    }
+
+    @Test
+    void reportsUnreadableTrustedSchemaAsConfigurationError() {
+        IOException expectedCause = new IOException("simulated schema read failure");
+        XmlMarketLoader configurationFailingLoader = new XmlMarketLoader(
+                Files::newInputStream,
+                new JaxbMarketMapper()::map,
+                resourcePath -> {
+                    throw expectedCause;
+                });
+        Path path = fixturePath("supplied/single.xml");
+
+        EngineOperationException exception = assertThrows(EngineOperationException.class,
+                () -> configurationFailingLoader.load(path));
+
+        assertConfigurationFailure(exception, path);
+        assertEquals(expectedCause, exception.getCause());
+    }
+
+    @Test
+    void reportsBrokenTrustedSchemaAsConfigurationError() {
+        XmlMarketLoader configurationFailingLoader = new XmlMarketLoader(
+                Files::newInputStream,
+                new JaxbMarketMapper()::map,
+                resourcePath -> new ByteArrayInputStream("not an XML schema".getBytes(
+                        StandardCharsets.UTF_8)));
+        Path path = fixturePath("supplied/single.xml");
+
+        EngineOperationException exception = assertThrows(EngineOperationException.class,
+                () -> configurationFailingLoader.load(path));
+
+        assertConfigurationFailure(exception, path);
+        assertNotNull(exception.getCause());
+    }
+
+    @Test
     void closesSuccessfulInputBeforeWindowsMoveAndDelete() throws Exception {
         Path path = copyFixture("supplied/single.xml", "close after success.xml");
         loader.load(path);
@@ -191,6 +244,11 @@ class XmlMarketLoaderTest {
 
     private void assertStructureFailure(EngineOperationException exception, Path path) {
         assertEquals(EngineErrorCode.XML_STRUCTURE_INVALID, exception.getCode());
+        assertEquals(path, exception.getPath().orElseThrow());
+    }
+
+    private void assertConfigurationFailure(EngineOperationException exception, Path path) {
+        assertEquals(EngineErrorCode.ENGINE_CONFIGURATION_ERROR, exception.getCode());
         assertEquals(path, exception.getPath().orElseThrow());
     }
 
