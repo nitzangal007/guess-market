@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 was reviewed, accepted, and merged through pull request 1. Stage 2 Tasks 4 and 5 are implemented and verified on `codex/e1-lmsr-domain`, including the residual numerical correction completed after re-review. Nitzan reviewed and accepted Stage 2 on 2026-08-16; pull request 2 is approved for merge before Stage 3 begins.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 and 2 were reviewed, accepted, and merged through pull requests 1 and 2. Stage 3 Tasks 6 through 8 are implemented and verified on `codex/e1-engine-xml` and await Nitzan's Stage 3 review and approval. Stage 4 has not started.
 
 ## Global Constraints
 
@@ -592,19 +592,19 @@ Milestone branch: `codex/e1-engine-xml`
 - Consumes: immutable canonical files under local `provided/assignment-1/test-files` and the intact approved XJC wrapper.
 - Produces: hash-verified derived resources and retained generated Java in `guessmarket.engine.xml.generated`.
 
-- [ ] **Step 1: Recheck canonical hashes before copying**
+- [x] **Step 1: Recheck canonical hashes before copying**
 
 Calculate SHA-256 for the canonical XSD and all four XML fixtures and compare them with `provided/assignment-1/test-files/README.md`.
 
-- [ ] **Step 2: Copy derived resources without changing canonical bytes**
+- [x] **Step 2: Copy derived resources without changing canonical bytes**
 
 Recalculate hashes at every destination. Supplied copies must match their canonical sources byte-for-byte.
 
-- [ ] **Step 3: Create custom D-069 fixtures**
+- [x] **Step 3: Create custom D-069 fixtures**
 
 Include valid zero, negative, minimum, and maximum IDs; duplicate nonpositive IDs; empty description and option labels; duplicate labels; one-option invalid business data; commission 0 and 90; positive `b`; paths or filenames containing spaces; and missing-versus-empty schema cases. Use clear filenames that state the boundary.
 
-- [ ] **Step 4: Run XJC through the exact course wrapper**
+- [x] **Step 4: Run XJC through the exact course wrapper**
 
 From `tools/jaxb-ri-4.0.5`, use:
 
@@ -614,11 +614,11 @@ xjc-run.bat -p guessmarket.engine.xml.generated GM-EX1-Schema.xsd
 
 Copy the complete generated package tree into the Engine production source root, inspect every package declaration, compile with the five runtime JAXB JARs, and then remove only the verified temporary XSD and staging tree beside the wrapper.
 
-- [ ] **Step 5: Record generated ownership**
+- [x] **Step 5: Record generated ownership**
 
 List the exact generated filenames, generation command, source XSD hash, JAXB version, and the rule that generated files are never hand-edited.
 
-- [ ] **Step 6: Commit generated and resource inputs**
+- [x] **Step 6: Commit generated and resource inputs**
 
 ```powershell
 git add modules/guessmarket-engine/src/main/java/guessmarket/engine/xml/generated modules/guessmarket-engine/src/main/resources modules/guessmarket-engine/src/test/resources docs/guides/JAXB-AND-XML.md docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -649,19 +649,19 @@ final class JaxbMarketMapper {
 
 The mapper joins `xs:list` name tokens with one space, trims description and option outer whitespace, accepts empty text and duplicate option labels, requires exactly two options, accepts all unique `int` IDs, maps `on-purchase` and `on-close`, requires commission `0..90`, requires positive `b`, and constructs every event with zero quantities, zero balance, no winner, and empty history.
 
-- [ ] **Step 1: Write `JaxbMarketMapperTest` first**
+- [x] **Step 1: Write `JaxbMarketMapperTest` first**
 
 Cover every supplied business-invalid fixture and every custom D-069 boundary with precise event, field, and option context assertions.
 
-- [ ] **Step 2: Confirm mapping tests fail**
+- [x] **Step 2: Confirm mapping tests fail**
 
-- [ ] **Step 3: Implement the mapper without file or JAXB-context mechanics**
+- [x] **Step 3: Implement the mapper without file or JAXB-context mechanics**
 
 Do not cache or retain the candidate. Do not mutate live Engine state. Do not invent nonblank, positivity, case-normalization, unique-label, or length rules.
 
-- [ ] **Step 4: Run mapper, DTO, math, and domain regression tests**
+- [x] **Step 4: Run mapper, DTO, math, and domain regression tests**
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-engine/src/main/java/guessmarket/engine/xml/JaxbMarketMapper.java modules/guessmarket-engine/src/test/java/guessmarket/engine/xml/JaxbMarketMapperTest.java docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -692,26 +692,26 @@ public final class XmlMarketLoader {
 
 Validate null, case-insensitive `.xml`, existence, regular-file status, and readability. Load the XSD only from classpath resource `guessmarket/engine/xml/GM-EX1-Schema.xsd`. Configure schema parsing against the trusted resource, close streams with try-with-resources, retain safe line and column details when available, and translate only expected I/O, schema, JAXB, and mapping failures. Do not catch all `Exception` or `RuntimeException`.
 
-- [ ] **Step 1: Write `XmlMarketLoaderTest` first**
+- [x] **Step 1: Write `XmlMarketLoaderTest` first**
 
 Cover null, directory, wrong suffix, uppercase suffix, missing, inaccessible where the OS permits, malformed, schema-invalid, business-invalid, valid path with spaces, trusted-resource loading, safe cause retention, resource closure, and programming-defect visibility.
 
-- [ ] **Step 2: Confirm loader tests fail**
+- [x] **Step 2: Confirm loader tests fail**
 
-- [ ] **Step 3: Implement loader mechanics and six XML error categories**
+- [x] **Step 3: Implement loader mechanics and six XML error categories**
 
-- [ ] **Step 4: Run all five current test classes**
+- [x] **Step 4: Run all six current test classes**
 
-Expected: DTO, LMSR, domain, mapper, and loader tests pass together. The public Engine integration classes are added in Stage 4.
+Expected: `DtoContractTest`, `GuessMarketEngineUseCaseTest`, `LmsrCalculatorTest`, `MarketEventTest`, `JaxbMarketMapperTest`, and `XmlMarketLoaderTest` pass together. Complete Engine integration behavior is added in Stage 4.
 
-- [ ] **Step 5: Update the walkthrough, inspect imports, and commit**
+- [x] **Step 5: Update the walkthrough, inspect imports, and commit**
 
 ```powershell
 git add modules/guessmarket-engine/src/main/java/guessmarket/engine/xml/XmlMarketLoader.java modules/guessmarket-engine/src/test/java/guessmarket/engine/xml/XmlMarketLoaderTest.java docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: load markets with trusted XML schema"
 ```
 
-- [ ] **Step 6: Run the Stage 3 gate**
+- [x] **Step 6: Run the Stage 3 gate**
 
 Verify hashes, generated-source tracking, five-JAR compilation, trusted-resource use, full-range IDs, text rules, error context, state isolation, and walkthrough entries before merging.
 

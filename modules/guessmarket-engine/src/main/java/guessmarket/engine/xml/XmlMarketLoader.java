@@ -7,6 +7,7 @@ import guessmarket.engine.xml.generated.GuessMarket;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -67,7 +68,7 @@ public final class XmlMarketLoader {
             throw accessFailed(path, exception);
         } catch (JAXBException exception) {
             IOException ioCause = findCause(exception, IOException.class);
-            if (ioCause != null) {
+            if (ioCause != null && !(ioCause instanceof CharConversionException)) {
                 throw accessFailed(path, ioCause);
             }
             throw structureInvalid(path, "The XML file is malformed or violates the trusted schema.",

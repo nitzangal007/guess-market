@@ -109,6 +109,20 @@ class XmlMarketLoaderTest {
     }
 
     @Test
+    void translatesInvalidUtf8AsStructuralFailure() throws IOException {
+        Path path = temporaryDirectory.resolve("invalid encoding.xml");
+        String xml = Files.readString(fixturePath("supplied/single.xml"))
+                .replace("Will there be", "\u00c3(ill there be");
+        Files.write(path, xml.getBytes(StandardCharsets.ISO_8859_1));
+
+        EngineOperationException exception = assertThrows(EngineOperationException.class,
+                () -> loader.load(path));
+
+        assertStructureFailure(exception, path);
+        assertNotNull(exception.getCause());
+    }
+
+    @Test
     void translatesSchemaInvalidMissingStructureWithSafeCauseAndLocation() {
         Path path = fixturePath("custom/invalid missing description.xml");
 
