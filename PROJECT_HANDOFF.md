@@ -32,7 +32,7 @@ Review. Stage 2 was accepted by Nitzan and merged through pull request 2 as `684
 - The Stage 3 review correction classifies invalid UTF-8 parser decoding as `XML_STRUCTURE_INVALID` while preserving genuine input open and read failures as `XML_FILE_ACCESS_FAILED`.
 - The final Stage 3 strict Java 25 gate used exactly the five approved JAXB runtime JARs and all six current suites: 74 tests found, started, and successful, with zero failures, skips, or aborts.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
-- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 and Stage 2 calculation, constructor, transition, observation, and verification result.
+- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 3 calculation, constructor, transition, observation, and verification result.
 
 ## Authority
 
