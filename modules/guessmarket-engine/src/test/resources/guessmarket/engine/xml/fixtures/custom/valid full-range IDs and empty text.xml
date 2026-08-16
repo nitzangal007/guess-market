@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Guess-Market>
+    <GM-events>
+        <GM-event name="">
+            <id>0</id>
+            <description></description>
+            <comision type="on-purchase">0</comision>
+            <GM-options>
+                <GM-option></GM-option>
+                <GM-option></GM-option>
+            </GM-options>
+            <GM-method>
+                <GM-LMSR>
+                    <b>1</b>
+                </GM-LMSR>
+            </GM-method>
+        </GM-event>
+        <GM-event name="negative id">
+            <id>-17</id>
+            <description>   </description>
+            <comision type="on-close">90</comision>
+            <GM-options>
+                <GM-option>same</GM-option>
+                <GM-option>same</GM-option>
+            </GM-options>
+            <GM-method>
+                <GM-LMSR>
+                    <b>2</b>
+                </GM-LMSR>
+            </GM-method>
+        </GM-event>
+        <GM-event name="minimum id">
+            <id>-2147483648</id>
+            <description>minimum int id</description>
+            <comision type="on-purchase">0</comision>
+            <GM-options>
+                <GM-option>first</GM-option>
+                <GM-option>second</GM-option>
+            </GM-options>
+            <GM-method>
+                <GM-LMSR>
+                    <b>3</b>
+                </GM-LMSR>
+            </GM-method>
+        </GM-event>
+        <GM-event name="maximum id">
+            <id>2147483647</id>
+            <description>maximum int id</description>
+            <comision type="on-close">90</comision>
+            <GM-options>
+                <GM-option>up</GM-option>
+                <GM-option>down</GM-option>
+            </GM-options>
+            <GM-method>
+                <GM-LMSR>
+                    <b>4</b>
+                </GM-LMSR>
+            </GM-method>
+        </GM-event>
+    </GM-events>
+</Guess-Market>

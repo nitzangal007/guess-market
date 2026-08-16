@@ -95,6 +95,14 @@ Internal history stays chronological for accounting and restore validation. `toD
 
 The five Task 5 domain classes implement `Serializable` and each declares `private static final long serialVersionUID = 1L`. The two DTO enums retain normal enum serialization identity. The owned collection fields use the concrete serializable `ArrayList` type, which also satisfies Java 25 serial lint. DTO classes, `LmsrCalculator`, Engine coordination types, XML types, and technical file objects were not added to the reachable event graph.
 
+## Stage 3 Task 6: XML resources and retained JAXB source
+
+Task 6 establishes the reproducible XML inputs before mapper or loader behavior exists. The production Engine resource owns a byte-identical trusted copy of `GM-EX1-Schema.xsd`; four course fixtures live under `fixtures/supplied` with their canonical SHA-256 values preserved. Four separately authored D-069 fixtures live under `fixtures/custom`, including the full `xs:int` range, duplicate nonpositive IDs, present empty text and duplicate labels, a valid-schema one-option business failure, commission `0` and `90`, positive `b`, a filename containing spaces, and a missing-required-description schema failure.
+
+The intact JAXB RI 4.0.5 wrapper generated eight retained types in `guessmarket.engine.xml.generated` from the verified schema: `Comision`, `GMEvent`, `GMEvents`, `GMLMSR`, `GMMethod`, `GMOptions`, `GuessMarket`, and `ObjectFactory`. Every generated source declares the approved package and matches its staging counterpart by SHA-256. Generated source is schema-owned, kept in Git, and never hand-edited.
+
+The generated source compilation gate used Oracle Java 25.0.4 with `--release 25 -encoding UTF-8 -Xlint:all -Werror` and only the five approved JAXB runtime JARs. It compiled all eight sources cleanly with exit code `0` and no warnings or errors. The initial sandbox denial while creating a temporary output directory was rerun through elevated execution and is retained as diagnostic evidence in the Task 6 report. Task 6 adds no mapper or loader behavior; Task 7 will prove conversion and Task 8 will prove trusted-schema loading.
+
 ## Planned supported Engine methods
 
 | Method | Responsibility | Success result | Expected failure boundary | Status |
