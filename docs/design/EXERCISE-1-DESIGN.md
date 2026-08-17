@@ -1,6 +1,6 @@
 # Exercise 1 Design
 
-Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified but remains unmerged in draft pull request 4. Stage 5 implements the approved Clean Sections console presentation and is independently reviewed on `codex/e1-console-ui`, based on the Stage 4 candidate. Task 12 is commit `49627ea`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. Before integration, Stage 5 must be rebased onto the eventual Stage 4 squash-merge result. Stage 5 is not merged, pushed, or accepted by Nitzan.
+Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation and is independently reviewed on `codex/e1-console-ui`, based on the Stage 4 candidate. Task 12 is commit `49627ea`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. Before its final integration and review handoff, Stage 5 must be rebased onto `9a8c87c`. Stage 5 is not merged, pushed, or accepted by Nitzan.
 
 Last updated: 2026-08-17
 
@@ -14,7 +14,7 @@ After every approval round, update this file before advancing to the next design
 
 ## Current boundary
 
-- The written design is complete. Implementation planning is the next project stage, but no Java source tree, module project, generated JAXB classes, or implementation is approved yet.
+- The written design is complete. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation exist on `codex/e1-console-ui`, based on the Stage 4 candidate. Stage 5 awaits Nitzan's review and must be rebased onto `9a8c87c` before its final integration and review handoff.
 - Exercise 1 is the implementation scope.
 - Exercise 2 and Exercise 3 are compatibility evidence only. Their features will not be designed or implemented early.
 - The target is every base requirement plus the 5-point save-and-restore bonus.
@@ -2745,4 +2745,4 @@ Current SHA-256 evidence:
 
 The written design is approved through D-072. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, and D-072 controls the Stage 5 console presentation without changing Engine or DTO behavior.
 
-Stage 4 is independently verified but remains unmerged in draft pull request 4 pending Nitzan's review and acceptance. Stage 5 has implemented D-072 Tasks 11 and 12 and passed independent review on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Do not modify the Stage 4 worktree or pull request. After the eventual Stage 4 squash merge, rebase Stage 5 onto that result before any Stage 5 integration. Stage 5 is not merged, pushed, or accepted by Nitzan.
+Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12 and passed independent review on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Do not modify the completed Stage 4 history. Rebase Stage 5 onto `9a8c87c` before its final integration and review handoff. Stage 5 is not merged, pushed, or accepted by Nitzan.

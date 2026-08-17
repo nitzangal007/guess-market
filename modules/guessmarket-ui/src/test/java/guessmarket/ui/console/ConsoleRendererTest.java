@@ -168,7 +168,11 @@ class ConsoleRendererTest {
                 List.of(history(1, "Yes", 1, 1.0, 0.0, 1.0)), OptionalInt.empty());
         zeroPercentRenderer.renderPurchaseReceipt(new PurchaseReceipt(1, 1, 1.0, 0.0, 1.0, zeroPercentDetails));
 
-        assertTrue(zeroPercentText.toString().contains("Purchase commission: 0.00"));
+        String zeroPercentOutput = zeroPercentText.toString();
+        int zeroPercentUpdatedStatusIndex = zeroPercentOutput.indexOf("UPDATED EVENT STATUS");
+        assertTrue(zeroPercentUpdatedStatusIndex > 0);
+        assertTrue(zeroPercentOutput.substring(0, zeroPercentUpdatedStatusIndex)
+                .contains("Purchase commission: 0.00"));
     }
 
     @Test

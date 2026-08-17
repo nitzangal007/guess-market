@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed and verified, but remain unmerged in Nitzan's draft pull request 4. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate, and follows the approved D-072 Clean Sections console presentation. This branch must be rebased onto the eventual Stage 4 squash-merge result before Stage 5 integration. Stage 5 is not merged, pushed, or accepted by Nitzan.
+Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate, and follows the approved D-072 Clean Sections console presentation. Before its final integration and review handoff, Stage 5 must be rebased onto `9a8c87c`. Stage 5 is not merged, pushed, or accepted by Nitzan.
 
 ## Current state
 
@@ -25,7 +25,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 - Task 5 implemented the serializable event aggregate, accounting, history, immutable DTO conversion, and atomic purchase and close transitions in commits `7502964`, review fix `e0a341a`, and completion record `3daadb1`.
 - The original Stage 2 whole-branch review found one Important numerical precision defect, one Important stale-handoff defect, and three Minor evidence or detail gaps. The residual re-review then found a second Important numerical precision defect and later documentation-only Minor corrections. The completed corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, complete `Integer.MIN_VALUE` observation coverage, and align the planning and walkthrough records with the implemented code.
 - The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
-- UI, `build.bat`, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
+- Stage 5 UI production source and its three UI test suites now exist: `ConsoleInputTest`, `ConsoleRendererTest`, and `GuessMarketConsoleAppTest`. The current strict Java 25 all-eleven-suite result is 137 successful tests. `build.bat`, IntelliJ configuration, packaging inputs, and release artifacts remain planned later-stage work.
 - Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 was squash-merged as `6842dfd`.
 - Stage 3 was accepted and squash-merged as full commit `15c8c8f70d21b4a2e8021ef6b7d3dfb88bac2caf`.
 - Task 6 added the trusted XSD, supplied and custom fixtures, and eight retained XJC-generated sources. Task 7 added ordered JAXB-to-domain candidate mapping. Task 8 added trusted-schema XML loading and structured error translation.
@@ -36,12 +36,12 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 - Task 10 review fixes centralize complete DTO equality with exact binary64 comparisons and prove load and restore replacement atomicity for injected `XML_FILE_ACCESS_FAILED`, `ENGINE_CONFIGURATION_ERROR`, and `STATE_FILE_ACCESS_FAILED` failures.
 - The final Stage 4 persistence review fix `acf3c36` validates raw saved graph elements before casting, correctly separates stream-opening access failures from serialization-format failures, rejects trailing `null` data as `SAVED_STATE_INVALID`, and records the completed Task 9 and Task 10 plan steps.
 - The final independent strict Java 25 gate uses exactly the five approved JAXB runtime JARs and all eight suites: 112 tests found, started, and successful, with zero failures, skips, disabled tests, or aborts. A final persistence re-review found no remaining Critical, Important, or Minor issue.
-- Stage 4 is independently verified but remains unmerged in draft pull request 4 pending Nitzan's review and acceptance.
+- Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c` (`9a8c87c1a291fe58253a55140dafb710c34a5299`).
 - Nitzan approved D-072 on 2026-08-17 after comparing Clean Sections, Command Center, and Minimal Transcript console mockups. Clean Sections is the controlling Stage 5 presentation direction.
 - Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Task 11 commits are `681fd47` and `52ccd59`; Task 12 is commit `49627ea` (`feat: implement console application flows`). The current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 5 production UI is unchanged by the final renderer-coverage correction.
 - D-072 keeps the eight commands and existing Engine behavior, while grouping the menu under `DATA`, `TRADING`, and `STATE AND SESSION` and using named 60-character ASCII output sections.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
-- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 4 calculation, constructor, transition, observation, and verification result.
+- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 5 calculation, constructor, transition, observation, console conversation, and verification result.
 
 ## Authority
 
@@ -64,4 +64,4 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 
 ## Exact next action
 
-Keep Stage 4 pull request 4 unchanged while Nitzan reviews it. After Nitzan accepts Stage 4 and its squash merge completes, rebase `codex/e1-console-ui` onto that exact squash-merge result before considering Stage 5 integration. Stage 5 remains unmerged and awaits its own later acceptance decision.
+Rebase `codex/e1-console-ui` onto `9a8c87c` before its final Stage 5 integration and review handoff. Stage 5 remains unmerged and awaits Nitzan's review and its own later acceptance decision.

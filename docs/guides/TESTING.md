@@ -2,7 +2,7 @@
 
 ## Status
 
-The complete testing strategy is approved. Stages 1 and 2 are accepted and merged. Stage 3 source-level verification compiles DTO and Engine production and test source with Oracle Java 25, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, JUnit Platform Console Standalone 6.1.1, and exactly the five approved JAXB runtime JARs. Six suites are active through Stage 3; later-stage suites remain planned.
+The complete testing strategy is approved. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Through Stage 5, source-level verification compiles DTO, Engine, and UI production and test source with Oracle Java 25, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, JUnit Platform Console Standalone 6.1.1, and exactly the five approved JAXB runtime JARs. All eleven approved suites are implemented and passing; the current known strict Java 25 gate reports 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui` from the Stage 4 candidate and must be rebased onto `9a8c87c` before its final integration and review handoff. Packaging and exact-artifact checks remain planned Stage 6 and Stage 7 work.
 
 ## Vendored test dependency
 
@@ -38,7 +38,7 @@ The implementation plan must cover eleven behavior-centered test classes:
 
 UI tests use a handwritten fake Engine. Domain collaborators may use focused same-package tests. Production visibility must not be widened for tests, and tests must not inspect private fields through reflection.
 
-`GuessMarketEngineUseCaseTest` currently contains four tests for the public interface, exact error-code set, checked exception shape, and structured optional context. Stage 4 extends this same approved class with complete Engine operation behavior rather than creating another test class.
+`GuessMarketEngineUseCaseTest` now contains eleven tests for the public interface, exact error-code set, checked exception shape, structured optional context, loaded-state rules, ordered listing, details, purchases, closes, and failure atomicity. Stage 4 completed that approved class without creating another test class. The implemented UI suites cover console input, renderer output, and complete application conversations.
 
 ## Evidence layers
 
@@ -60,7 +60,7 @@ The real launcher and extracted JAR graph must run representative success and re
 
 ### Independent environment evidence
 
-During Stage 3, direct strict `javac` and JUnit Console commands are the verified source-level workflow. The later authoritative `build.bat`, GitHub Actions, IDE comparison, and clean-Windows exact-ZIP run remain separate Stage 6 and Stage 7 gates.
+Through Stage 5, direct strict `javac` and JUnit Console commands are the verified source-level workflow. The later authoritative `build.bat`, GitHub Actions, IDE comparison, and clean-Windows exact-ZIP run remain separate Stage 6 and Stage 7 gates.
 
 ### Manual evidence
 
