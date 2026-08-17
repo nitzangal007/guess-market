@@ -2,7 +2,7 @@
 
 ## Status
 
-The complete testing strategy is approved. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Through Stage 5, source-level verification compiles DTO, Engine, and UI production and test source with Oracle Java 25, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, JUnit Platform Console Standalone 6.1.1, and exactly the five approved JAXB runtime JARs. All eleven approved suites are implemented and passing; the current known strict Java 25 gate reports 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, successfully rebased directly onto `9a8c87c`, and published in draft pull request 5. It remains unmerged while awaiting Nitzan's Stage 5 review and acceptance. Packaging and exact-artifact checks remain planned Stage 6 and Stage 7 work.
+The complete testing strategy is approved. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Through Stage 5, source-level verification compiles DTO, Engine, and UI production and test source with Oracle Java 25, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, JUnit Platform Console Standalone 6.1.1, and exactly the five approved JAXB runtime JARs. All eleven approved suites are implemented and passing; the renewed D-073 strict Java 25 gate reports 144 successful tests with zero failures, skips, disabled tests, or aborts. Stage 5 is implemented on `codex/e1-console-ui` directly above `9a8c87c` and published in draft pull request 5. It remains unmerged while awaiting Nitzan's renewed Stage 5 review and acceptance. Packaging and exact-artifact checks remain planned Stage 6 and Stage 7 work.
 
 ## Vendored test dependency
 
@@ -40,6 +40,8 @@ UI tests use a handwritten fake Engine. Domain collaborators may use focused sam
 
 `GuessMarketEngineUseCaseTest` now contains eleven tests for the public interface, exact error-code set, checked exception shape, structured optional context, loaded-state rules, ordered listing, details, purchases, closes, and failure atomicity. Stage 4 completed that approved class without creating another test class. The implemented UI suites cover console input, renderer output, and complete application conversations.
 
+The D-073 correction adds seven UI tests without creating another test class. `ConsoleInputTest` has 8 tests, `ConsoleRendererTest` has 10, and `GuessMarketConsoleAppTest` has 14. They cover blank and whitespace-only return pauses, repeated nonblank retry, the revised menu, result-before-pause-before-menu ordering, checked recovery, empty results, invalid main-menu input, immediate exit, unchecked-defect visibility, and EOF at the main menu, return pause, event selection, both option prompts, quantity, XML path, save path, and restore path. The focused gate passes all 32 UI tests.
+
 ## Evidence layers
 
 ### Unit and integration evidence
@@ -61,6 +63,8 @@ The real launcher and extracted JAR graph must run representative success and re
 ### Independent environment evidence
 
 Through Stage 5, direct strict `javac` and JUnit Console commands are the verified source-level workflow. The later authoritative `build.bat`, GitHub Actions, IDE comparison, and clean-Windows exact-ZIP run remain separate Stage 6 and Stage 7 gates.
+
+D-073 real-process evidence uses the supplied `multiple.xml` with the real Engine. The complete workflow exits 0, renders all three event IDs, pauses before every menu return, completes purchase, close, save, and restore, and proves the restored event remains closed. A separate pre-load process preserves the structured `NO_SYSTEM_LOADED` recovery and pauses before return. An exact redirected-input process closes standard input at the return pause, exits 0 with empty standard error, prints `Input closed. Exiting.`, and does not redraw the menu. The audit found no concrete Engine defect and changed no Engine production source.
 
 ### Manual evidence
 

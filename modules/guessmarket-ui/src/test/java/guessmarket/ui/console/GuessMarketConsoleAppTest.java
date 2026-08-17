@@ -26,6 +26,7 @@ import java.util.Scanner;
 import org.junit.jupiter.api.Test;
 
 class GuessMarketConsoleAppTest {
+    private static final String RETURN_TO_MENU_PROMPT = "Press Enter to return to the main menu:\n";
     private static final String MENU = """
             ============================================================
                                    GUESS MARKET
@@ -45,13 +46,11 @@ class GuessMarketConsoleAppTest {
               7. Restore saved state
               8. Exit
 
-            Commands 2 through 6 require a loaded system.
-
             Choose a command [1-8]:
             """;
 
     @Test
-    void completeHappySessionRunsAllEightCommandsWithOneBlankLineBeforeEachFreshMenu() {
+    void completeHappySessionRunsAllEightCommandsAndPausesBeforeEachFreshMenu() {
         FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
         engine.loadedEventCount = 2;
         engine.restoredEventCount = 2;
@@ -74,20 +73,27 @@ class GuessMarketConsoleAppTest {
         String script = """
                 1
                 C:\\data files\\multiple.xml
+
                 2
+
                 3
                 2
+
                 4
                 1
                 2
                 5
+
                 5
                 2
                 1
+
                 6
                 C:\\state files\\market
+
                 7
                 C:\\state files\\market
+
                 8
                 """;
 
@@ -107,6 +113,8 @@ class GuessMarketConsoleAppTest {
                 "saveState(C:\\state files\\market)",
                 "restoreState(C:\\state files\\market)"), engine.calls);
         assertEquals(8, occurrences(output, MENU));
+        assertEquals(7, occurrences(output, RETURN_TO_MENU_PROMPT));
+        assertEquals(7, occurrences(output, RETURN_TO_MENU_PROMPT + "\n" + MENU));
         assertExactlyOneBlankLineBeforeEachRepeatedMenu(output);
         assertTrue(output.contains("System loaded successfully.\nLoaded events: 2"));
         assertTrue(output.contains("Purchase completed successfully."));
@@ -127,6 +135,7 @@ class GuessMarketConsoleAppTest {
         assertEquals(List.of(), engine.calls);
         assertEquals(4, occurrences(output, "Invalid menu choice. Enter a number from 1 to 8."));
         assertEquals(5, occurrences(output, MENU));
+        assertFalse(output.contains(RETURN_TO_MENU_PROMPT));
         assertExactlyOneBlankLineBeforeEachRepeatedMenu(output);
     }
 
@@ -137,7 +146,7 @@ class GuessMarketConsoleAppTest {
         engine.failWith(FakeGuessMarketEngine.LIST, noSystem);
         engine.failWith(FakeGuessMarketEngine.SAVE, noSystem);
 
-        String output = run(engine, "2\n3\n4\n5\n6\nC:\\state\\market\n8\n");
+        String output = run(engine, "2\n\n3\n\n4\n\n5\n\n6\nC:\\state\\market\n\n8\n");
 
         assertEquals(List.of(
                 "listEvents()", "listEvents()", "listEvents()", "listEvents()",
@@ -145,6 +154,9 @@ class GuessMarketConsoleAppTest {
         assertEquals(5, occurrences(output, "Error: No system is loaded."));
         assertEquals(5, occurrences(output, "Recovery: Load XML or restore saved state first."));
         assertEquals(6, occurrences(output, MENU));
+        assertEquals(5, occurrences(output, RETURN_TO_MENU_PROMPT));
+        assertEquals(5, occurrences(output, "Recovery: Load XML or restore saved state first.\n"
+                + RETURN_TO_MENU_PROMPT));
         assertExactlyOneBlankLineBeforeEachRepeatedMenu(output);
     }
 
@@ -182,7 +194,7 @@ class GuessMarketConsoleAppTest {
         engine.closeResult = details(-9, "First", EventStatus.CLOSED,
                 CommissionMode.ON_CLOSE, OptionalInt.of(2), List.of());
 
-        String output = run(engine, "3\n2\n4\n2\n1\n3\n5\n1\n2\n8\n");
+        String output = run(engine, "3\n2\n\n4\n2\n1\n3\n\n5\n1\n2\n\n8\n");
 
         assertEquals(List.of(
                 "listEvents()", "getEventDetails(80)",
@@ -201,12 +213,13 @@ class GuessMarketConsoleAppTest {
         FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
         engine.eventSummaries = List.of(summary(5, "Closed", EventStatus.CLOSED));
 
-        String output = run(engine, "4\n5\n8\n");
+        String output = run(engine, "4\n\n5\n\n8\n");
 
         assertEquals(List.of("listEvents()", "listEvents()"), engine.calls);
         assertTrue(output.contains("No open events are available for purchasing shares."));
         assertTrue(output.contains("No open events are available to close."));
         assertFalse(output.contains("Choose an event [1-"));
+        assertEquals(2, occurrences(output, RETURN_TO_MENU_PROMPT));
     }
 
     @Test
@@ -218,7 +231,7 @@ class GuessMarketConsoleAppTest {
         engine.failWith(FakeGuessMarketEngine.PURCHASE, failure(EngineErrorCode.INVALID_QUANTITY));
         engine.failWith(FakeGuessMarketEngine.CLOSE, failure(EngineErrorCode.EVENT_NOT_OPEN));
 
-        String output = run(engine, "4\n1\n1\n3\n5\n1\n2\n8\n");
+        String output = run(engine, "4\n1\n1\n3\n\n5\n1\n2\n\n8\n");
 
         assertEquals(List.of(
                 "listEvents()", "getEventDetails(7)", "purchaseShares(7,1,3)",
@@ -229,6 +242,74 @@ class GuessMarketConsoleAppTest {
         assertTrue(output.contains("Recovery: Choose an open event."));
         assertFalse(output.contains("Purchase completed successfully."));
         assertFalse(output.contains("Event closed successfully."));
+        assertEquals(2, occurrences(output, RETURN_TO_MENU_PROMPT));
+    }
+
+    @Test
+    void endOfInputAtMainMenuExitsOnceWithoutPauseOrRedraw() {
+        String output = run(new FakeGuessMarketEngine(), "");
+
+        assertEquals(1, occurrences(output, MENU));
+        assertEquals(1, occurrences(output, "Input closed. Exiting."));
+        assertFalse(output.contains(RETURN_TO_MENU_PROMPT));
+        assertTrue(output.endsWith("Input closed. Exiting.\n"));
+    }
+
+    @Test
+    void endOfInputAtReturnToMenuExitsWithoutRedrawingTheMenu() {
+        FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+
+        String output = run(engine, "2\n");
+
+        assertEquals(List.of("listEvents()"), engine.calls);
+        assertEquals(1, occurrences(output, MENU));
+        assertTrue(output.endsWith(RETURN_TO_MENU_PROMPT + "Input closed. Exiting.\n"));
+    }
+
+    @Test
+    void nonblankReturnInputIsRetriedAndNeverExecutedAsTheNextCommand() {
+        FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+
+        String output = run(engine, "2\n8\nword\n\n8\n");
+
+        assertEquals(List.of("listEvents()"), engine.calls);
+        assertEquals(2, occurrences(output, "Press Enter without typing a command."));
+        assertEquals(2, occurrences(output, MENU));
+        assertTrue(output.endsWith("Goodbye.\n"));
+    }
+
+    @Test
+    void exitDoesNotDisplayTheReturnToMenuPrompt() {
+        String output = run(new FakeGuessMarketEngine(), "8\n");
+
+        assertEquals(1, occurrences(output, MENU));
+        assertFalse(output.contains(RETURN_TO_MENU_PROMPT));
+        assertTrue(output.endsWith("Goodbye.\n"));
+    }
+
+    @Test
+    void endOfInputAtEveryCommandSpecificPromptExitsWithoutPauseOrRedraw() {
+        FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+        engine.eventSummaries = List.of(summary(17, "Only event", EventStatus.OPEN));
+        engine.detailsById.put(17, details(17, "Only event", EventStatus.OPEN,
+                CommissionMode.ON_PURCHASE, OptionalInt.empty(), List.of()));
+
+        List<String> scripts = List.of(
+                "1\n",
+                "3\n",
+                "4\n1\n",
+                "4\n1\n1\n",
+                "5\n1\n",
+                "6\n",
+                "7\n");
+
+        for (String script : scripts) {
+            String output = run(engine, script);
+            assertEquals(1, occurrences(output, MENU), script);
+            assertEquals(1, occurrences(output, "Input closed. Exiting."), script);
+            assertFalse(output.contains(RETURN_TO_MENU_PROMPT), script);
+            assertTrue(output.endsWith("Input closed. Exiting.\n"), script);
+        }
     }
 
     @Test

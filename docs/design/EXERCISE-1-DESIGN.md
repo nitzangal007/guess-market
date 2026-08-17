@@ -1,6 +1,6 @@
 # Exercise 1 Design
 
-Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation, is independently reviewed on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. Manual Stage 5 review found a viewport usability defect in the immediate menu redraw and a misleading permanent loaded-system note. D-073 records the proposed correction after Nitzan approved its direction; its exact written contract still awaits review. The branch is pushed and draft pull request 5 is open. Stage 5 remains unmerged.
+Status: approved through D-073. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation and D-073 readable command completion on `codex/e1-console-ui`, rebased directly onto `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate reports 144 successful tests. Real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Draft pull request 5 remains unmerged and awaits Nitzan's renewed Stage 5 review.
 
 Last updated: 2026-08-17
 
@@ -2666,7 +2666,7 @@ Nitzan separately approved D-072's Clean Sections console presentation on 2026-0
 
 ### D-073: Readable command completion and graceful input closure
 
-Status: proposed for Nitzan's written-spec review. Nitzan approved the correction direction on 2026-08-17 after reproducing the problem manually, but production code and tests must continue to follow D-072 until he approves this exact contract.
+Status: approved by Nitzan and implemented on 2026-08-17 after he reproduced the problem manually and reviewed this exact written contract.
 
 Problem and evidence:
 
@@ -2743,6 +2743,8 @@ Verification requirements:
 - The remaining command conversations must be audited for equivalent viewport, retry, error-recovery, and EOF defects. The full eleven-suite strict Java 25 gate must pass before the correction is committed as complete or pushed for renewed review.
 
 D-073 supersedes only D-072's permanent loaded-system sentence and immediate menu-redraw rule. All D-072 section grammar, exact command numbering, approved result shapes, Engine calls, selection translation, error mapping, numeric formatting, and architecture boundaries remain unchanged.
+
+Implementation evidence: `ConsoleInput.waitForMenuReturn()` owns the blank-line pause, nonblank retry, and existing checked EOF signal. `GuessMarketConsoleApp.run()` invokes it after handled command attempts 1 through 7, including empty results and checked Engine errors, while command 8 and invalid main-menu input remain pause-free. `ConsoleRenderer` removes only the misleading permanent loaded-system sentence. The RED compile failed with four expected missing-method errors. The focused GREEN gate passed 32 UI tests, and the renewed strict all-eleven-suite Java 25 gate passed all 144 tests with zero failures, skips, disabled tests, or aborts. Real Engine processes proved all three supplied events remain loaded, results stay visible until Enter, purchase, close, save, restore, and restored closed state succeed, pre-load recovery remains structured, and exact EOF at the pause exits with code 0 without a menu redraw. The audit found no concrete Engine defect and changed no Engine production source.
 
 ## Deliberately deferred Exercise 2 and Exercise 3 features
 
@@ -2823,6 +2825,6 @@ Current SHA-256 evidence:
 
 ## Exact next checkpoint
 
-The written design is approved through D-072. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, and D-072 controls the Stage 5 console presentation without changing Engine or DTO behavior. D-073 records a proposed manual-review correction for viewport readability and graceful input closure; its exact written contract awaits Nitzan's approval.
+The written design is approved through D-073. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, D-072 controls the Stage 5 Clean Sections presentation, and D-073 controls readable command completion and graceful input closure without changing Engine or DTO behavior.
 
-Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12, passed independent review on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Manual Stage 5 review then found the D-073 usability defect, so the earlier green gate does not complete Stage 5 acceptance. Do not modify the completed Stage 4 history. The branch is pushed and draft pull request 5 is open while Stage 5 remains unmerged pending the D-073 correction, renewed verification, and Nitzan's review.
+Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12 plus the approved D-073 Task 12A correction on `codex/e1-console-ui`, directly above `9a8c87c`. The renewed 144-test gate and real-process audits pass. Do not modify the completed Stage 4 history. Draft pull request 5 remains unmerged pending Nitzan's renewed manual review and explicit Stage 5 acceptance.

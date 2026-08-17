@@ -47,8 +47,6 @@ final class ConsoleRenderer {
         writeLine("  7. Restore saved state");
         writeLine("  8. Exit");
         writeLine("");
-        writeLine("Commands 2 through 6 require a loaded system.");
-        writeLine("");
         writeLine("Choose a command [1-8]:");
     }
 

@@ -41,8 +41,6 @@ class ConsoleInputTest {
                   7. Restore saved state
                   8. Exit
 
-                Commands 2 through 6 require a loaded system.
-
                 Choose a command [1-8]:
                 """;
         assertEquals(menu + """
@@ -123,6 +121,32 @@ class ConsoleInputTest {
     }
 
     @Test
+    void returnToMenuAcceptsBlankAndWhitespaceOnlyLines() throws Exception {
+        StringWriter blankText = new StringWriter();
+        input("\n", blankText).waitForMenuReturn();
+        assertEquals("Press Enter to return to the main menu:\n", blankText.toString());
+
+        StringWriter whitespaceText = new StringWriter();
+        input("   \n", whitespaceText).waitForMenuReturn();
+        assertEquals("Press Enter to return to the main menu:\n", whitespaceText.toString());
+    }
+
+    @Test
+    void returnToMenuRejectsEveryNonblankLineWithoutTreatingItAsACommand() throws Exception {
+        StringWriter text = new StringWriter();
+
+        input("2\nword\n\n", text).waitForMenuReturn();
+
+        assertEquals("""
+                Press Enter to return to the main menu:
+                Press Enter without typing a command.
+                Press Enter to return to the main menu:
+                Press Enter without typing a command.
+                Press Enter to return to the main menu:
+                """, text.toString());
+    }
+
+    @Test
     void endOfInputIsACheckedSignalAtAnyPrompt() {
         assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).readMenuChoice());
         assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).readEventSelection(1));
@@ -130,6 +154,9 @@ class ConsoleInputTest {
         assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).readWinningOption());
         assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).readPositiveQuantity());
         assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).readXmlPath());
+        assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).readSavePath());
+        assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).readRestorePath());
+        assertThrows(ConsoleInput.EndOfInputException.class, () -> input("", new StringWriter()).waitForMenuReturn());
     }
 
     private static ConsoleInput input(String script, StringWriter text) {

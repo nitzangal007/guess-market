@@ -36,25 +36,28 @@ final class GuessMarketConsoleApp {
                 returningToMenu = true;
 
                 int choice = input.readMenuChoice();
-                try {
-                    switch (choice) {
-                        case 1 -> loadEvents();
-                        case 2 -> displayAllEvents();
-                        case 3 -> displayEventDetails();
-                        case 4 -> purchaseShares();
-                        case 5 -> closeEvent();
-                        case 6 -> saveState();
-                        case 7 -> restoreState();
-                        case 8 -> {
-                            renderer.renderGoodbye();
-                            return;
+                if (choice == 8) {
+                    renderer.renderGoodbye();
+                    return;
+                }
+                if (choice >= 1 && choice <= 7) {
+                    try {
+                        switch (choice) {
+                            case 1 -> loadEvents();
+                            case 2 -> displayAllEvents();
+                            case 3 -> displayEventDetails();
+                            case 4 -> purchaseShares();
+                            case 5 -> closeEvent();
+                            case 6 -> saveState();
+                            case 7 -> restoreState();
+                            default -> {
+                                throw new AssertionError("Unexpected validated menu choice: " + choice);
+                            }
                         }
-                        default -> {
-                            // ConsoleInput already reported the invalid one-shot menu choice.
-                        }
+                    } catch (EngineOperationException exception) {
+                        renderer.renderError(exception);
                     }
-                } catch (EngineOperationException exception) {
-                    renderer.renderError(exception);
+                    input.waitForMenuReturn();
                 }
             }
         } catch (ConsoleInput.EndOfInputException exception) {

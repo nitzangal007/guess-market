@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 are implemented on `codex/e1-console-ui` and rebased directly onto `9a8c87c`. Manual review then found the D-073 viewport and misleading-menu-note defect. Nitzan approved D-073 on 2026-08-17, and Task 12A now controls the required test-first correction, complete UI audit, renewed verification, documentation, and pull request update. Stage 5 remains unmerged and unaccepted until that correction is reviewed.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 plus approved D-073 Task 12A are implemented on `codex/e1-console-ui` directly above `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate passes all 144 tests, and real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 5 remains unmerged and awaits Nitzan's renewed manual review and acceptance.
 
 ## Global Constraints
 
@@ -1008,7 +1008,7 @@ Historical D-072 completion record: current rebased Task 11 evidence is `bdb5abd
 - Produces: package-private `void ConsoleInput.waitForMenuReturn() throws EndOfInputException`, the revised static menu, and a command loop that pauses after every handled command attempt from 1 through 7.
 - Preserves: four UI production classes, seven Engine operations, current DTOs, command numbering, filtering and actual-ID translation, exact result blocks, and visibility of unchecked programming defects.
 
-- [ ] **Step 1: Write the D-073 input and menu tests**
+- [x] **Step 1: Write the D-073 input and menu tests**
 
 Add focused `ConsoleInputTest` methods with these exact calls and expectations:
 
@@ -1046,7 +1046,7 @@ void endOfInputAtReturnToMenuIsTheExistingCheckedSignal() {
 
 Revise both menu literals in `ConsoleInputTest` and `ConsoleRendererTest` so they contain one blank line between `8. Exit` and `Choose a command [1-8]:`, and add `assertFalse(output.contains("Commands 2 through 6 require a loaded system."));` to the renderer test.
 
-- [ ] **Step 2: Write application-level RED tests for ordering and edge cases**
+- [x] **Step 2: Write application-level RED tests for ordering and edge cases**
 
 Update the happy-path script by adding one blank line after each completed command from 1 through 7. Replace the old repeated-menu assertion with an ordering assertion that each command result is followed by the exact pause prompt before the next menu.
 
@@ -1097,7 +1097,7 @@ void exitDoesNotDisplayTheReturnToMenuPrompt() {
 
 Keep invalid main-menu input pause-free and update the pre-load, empty-open-event, failed purchase, failed close, details, save, restore, and complete-session scripts so every handled command from 1 through 7 supplies its explicit return Enter. Preserve the existing EOF-at-secondary-prompt and unchecked-defect assertions.
 
-- [ ] **Step 3: Compile the three UI suites and prove RED for the approved reasons**
+- [x] **Step 3: Compile the three UI suites and prove RED for the approved reasons**
 
 Use a new `build/d073-red` tree. Strictly compile DTO, Engine, UI, and all tests with Oracle Java 25.0.4, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, the JUnit 6.1.1 runner, and the five approved JAXB runtime JARs. Run:
 
@@ -1126,7 +1126,7 @@ $d073RedClasspath = @(
 
 Expected RED causes: `waitForMenuReturn()` is missing, the old static loaded-system sentence remains, and application transcripts redraw the menu without the approved pause. Any unrelated compiler or test failure must be diagnosed before production code changes.
 
-- [ ] **Step 4: Implement the minimal input and renderer correction**
+- [x] **Step 4: Implement the minimal input and renderer correction**
 
 Add this package-private method to `ConsoleInput`:
 
@@ -1151,7 +1151,7 @@ writeLine("");
 
 Keep the existing blank line after `8. Exit`, so the revised menu has exactly one blank line before its choice prompt.
 
-- [ ] **Step 5: Implement the minimal application-loop correction**
+- [x] **Step 5: Implement the minimal application-loop correction**
 
 Keep the existing outer `EndOfInputException` catch. After reading a valid choice, execute command 8 immediately. For each valid choice from 1 through 7, execute the existing handler inside the checked Engine-error boundary, render any checked error, then call `input.waitForMenuReturn()`. Choice 0 from invalid main-menu parsing skips the pause. Do not catch `RuntimeException` or `Error`.
 
@@ -1175,7 +1175,7 @@ if (choice >= 1 && choice <= 7) {
 
 If extracting `executeCommand(int choice)`, keep it private, use the existing numeric switch, and introduce no command abstraction or fifth production class.
 
-- [ ] **Step 6: Run focused GREEN and audit all UI conversations**
+- [x] **Step 6: Run focused GREEN and audit all UI conversations**
 
 Recompile into a new `build/d073-green` tree and run the same three exact UI suites. Then inspect every command path for success, checked error, empty result, invalid secondary input, EOF, and unchecked failure. Confirm:
 
@@ -1188,17 +1188,17 @@ Recompile into a new `build/d073-green` tree and run the same three exact UI sui
 - Runtime defects remain uncaught and visible.
 - No UI path adds or infers Engine loaded state.
 
-- [ ] **Step 7: Run real Engine and process-level audit scenarios**
+- [x] **Step 7: Run real Engine and process-level audit scenarios**
 
 Use the supplied `multiple.xml` fixture and compiled real `GuessMarketEngineImpl` to exercise load, list, details, purchase, close, save, restore, pre-load rejection, invalid input, EOF at pauses, and exit. Capture output under `build/d073-manual-audit`, which remains untracked. Verify the command 2 result contains all three event IDs and remains the final visible block until Enter. Search the transcript to prove the static loaded-system note is absent.
 
 If a concrete Engine defect appears, record the exact input, Engine call, expected result, actual result, and state-preservation evidence. Do not change Engine production code under Task 12A without a separate approved correction.
 
-- [ ] **Step 8: Run the renewed strict all-eleven-suite gate**
+- [x] **Step 8: Run the renewed strict all-eleven-suite gate**
 
 Compile all production and test sources into a fresh `build/d073-final` directory using the strict Java 25 flags. Include `modules/guessmarket-engine/src/main/resources` and `modules/guessmarket-engine/src/test/resources` on the JUnit runtime classpath. Run all eleven test suites with `--scan-class-path`, `--include-engine junit-jupiter`, and `--fail-if-no-tests`. Require zero failures, skips, disabled tests, aborts, warnings from compilation, or missing suite names.
 
-- [ ] **Step 9: Update the durable Stage 5 record**
+- [x] **Step 9: Update the durable Stage 5 record**
 
 Mark D-073 approved and implemented in the design ledger and brief. Record the new method, menu behavior, EOF contract, regression tests, audit scenarios, exact test count, and any separately reported Engine finding in the walkthrough and testing guide. Update `PROJECT_HANDOFF.md` so Stage 5 awaits renewed Nitzan review rather than claiming the earlier 137-test gate completes it.
 
@@ -1215,6 +1215,8 @@ git push origin codex/e1-console-ui
 The Stage 5 pull request remains a draft and unmerged until Nitzan completes the renewed manual review and explicitly accepts it.
 
 Task 12A approval record: Nitzan approved D-073 on 2026-08-17 and authorized its test-first implementation, full UI audit, separate Engine-defect reporting, renewed verification, documentation update, commit, and push to pull request 5.
+
+Task 12A completion record: the RED compile failed with four expected missing-method errors. Focused GREEN passed 32 UI tests. The renewed strict Java 25 all-eleven-suite gate passed all 144 tests with zero failures, skips, disabled tests, or aborts. Real Engine process audits passed the complete supplied-XML workflow, pre-load recovery, and exact EOF at the pause. No concrete Engine defect was found, and no Engine production source changed. Step 10 remains the final staged-path, commit, and push action.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 

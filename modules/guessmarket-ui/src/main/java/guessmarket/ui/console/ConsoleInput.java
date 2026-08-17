@@ -69,6 +69,16 @@ final class ConsoleInput {
         return readPath(RESTORE_PATH_PROMPT);
     }
 
+    void waitForMenuReturn() throws EndOfInputException {
+        while (true) {
+            writeLine("Press Enter to return to the main menu:");
+            if (readLine().trim().isEmpty()) {
+                return;
+            }
+            writeLine("Press Enter without typing a command.");
+        }
+    }
+
     private int readBoundedInteger(String prompt, int maximum, String invalidMessage)
             throws EndOfInputException {
         while (true) {

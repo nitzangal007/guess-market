@@ -35,7 +35,7 @@ class ConsoleRendererTest {
     }
 
     @Test
-    void menuIsTheCompleteD072Literal() {
+    void menuIsTheCompleteD073LiteralWithoutMisleadingLoadedSystemNote() {
         StringWriter text = new StringWriter();
         ConsoleRenderer renderer = renderer(text);
 
@@ -60,10 +60,9 @@ class ConsoleRendererTest {
                   7. Restore saved state
                   8. Exit
 
-                Commands 2 through 6 require a loaded system.
-
                 Choose a command [1-8]:
                 """, text.toString());
+        assertFalse(text.toString().contains("Commands 2 through 6 require a loaded system."));
     }
 
     @Test
