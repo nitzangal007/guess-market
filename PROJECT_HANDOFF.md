@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate, and follows the approved D-072 Clean Sections console presentation. Before its final integration and review handoff, Stage 5 must be rebased onto `9a8c87c`. Stage 5 is not merged, pushed, or accepted by Nitzan.
+Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, follows the approved D-072 Clean Sections console presentation, and has been successfully rebased directly onto `9a8c87c`. Stage 5 remains unmerged and unpushed, and now awaits Nitzan's Stage 5 review and acceptance.
 
 ## Current state
 
@@ -38,7 +38,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 - The final independent strict Java 25 gate uses exactly the five approved JAXB runtime JARs and all eight suites: 112 tests found, started, and successful, with zero failures, skips, disabled tests, or aborts. A final persistence re-review found no remaining Critical, Important, or Minor issue.
 - Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c` (`9a8c87c1a291fe58253a55140dafb710c34a5299`).
 - Nitzan approved D-072 on 2026-08-17 after comparing Clean Sections, Command Center, and Minimal Transcript console mockups. Clean Sections is the controlling Stage 5 presentation direction.
-- Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Task 11 commits are `681fd47` and `52ccd59`; Task 12 is commit `49627ea` (`feat: implement console application flows`). The current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 5 production UI is unchanged by the final renderer-coverage correction.
+- Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, successfully rebased directly onto `9a8c87c`. Current rebased Task 11 evidence is `bdb5abd` plus correction `3f3eec2`; current rebased Task 12 evidence is `9fd2d5d` (`feat: implement console application flows`). The current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 5 production UI is unchanged by the final renderer-coverage correction.
 - D-072 keeps the eight commands and existing Engine behavior, while grouping the menu under `DATA`, `TRADING`, and `STATE AND SESSION` and using named 60-character ASCII output sections.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 5 calculation, constructor, transition, observation, console conversation, and verification result.
@@ -64,4 +64,4 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 
 ## Exact next action
 
-Rebase `codex/e1-console-ui` onto `9a8c87c` before its final Stage 5 integration and review handoff. Stage 5 remains unmerged and awaits Nitzan's review and its own later acceptance decision.
+The Stage 5 branch is successfully rebased directly onto `9a8c87c`. Keep it unmerged and unpushed while Nitzan performs the Stage 5 review and decides whether to accept it.
