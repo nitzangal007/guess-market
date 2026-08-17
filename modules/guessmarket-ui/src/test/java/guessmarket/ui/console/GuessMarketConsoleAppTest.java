@@ -328,6 +328,22 @@ class GuessMarketConsoleAppTest {
     }
 
     @Test
+    void unexpectedEngineErrorRemainsVisible() {
+        FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+        AssertionError defect = new AssertionError("visible assertion defect");
+        engine.throwErrorOn(FakeGuessMarketEngine.LIST, defect);
+        StringWriter text = new StringWriter();
+        GuessMarketConsoleApp app = app(engine, "2\n", text);
+
+        AssertionError thrown = assertThrows(AssertionError.class, app::run);
+
+        assertSame(defect, thrown);
+        assertFalse(text.toString().contains("Error:"));
+        assertFalse(text.toString().contains("Recovery:"));
+        assertFalse(text.toString().contains(RETURN_TO_MENU_PROMPT));
+    }
+
+    @Test
     void consoleMainIsThePublicStaticVoidEntryPoint() throws Exception {
         Method main = ConsoleMain.class.getDeclaredMethod("main", String[].class);
 

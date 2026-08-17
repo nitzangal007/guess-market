@@ -24,6 +24,7 @@ final class FakeGuessMarketEngine implements GuessMarketEngine {
     final Map<Integer, MarketEventDetails> detailsById = new HashMap<>();
     private final Map<String, EngineOperationException> checkedFailures = new HashMap<>();
     private final Map<String, RuntimeException> runtimeDefects = new HashMap<>();
+    private final Map<String, Error> errorDefects = new HashMap<>();
 
     int loadedEventCount;
     int restoredEventCount;
@@ -37,6 +38,10 @@ final class FakeGuessMarketEngine implements GuessMarketEngine {
 
     void throwDefectOn(String operation, RuntimeException defect) {
         runtimeDefects.put(operation, defect);
+    }
+
+    void throwErrorOn(String operation, Error defect) {
+        errorDefects.put(operation, defect);
     }
 
     @Override
@@ -97,6 +102,10 @@ final class FakeGuessMarketEngine implements GuessMarketEngine {
         RuntimeException defect = runtimeDefects.get(operation);
         if (defect != null) {
             throw defect;
+        }
+        Error error = errorDefects.get(operation);
+        if (error != null) {
+            throw error;
         }
         EngineOperationException failure = checkedFailures.get(operation);
         if (failure != null) {

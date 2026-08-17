@@ -1,6 +1,6 @@
 # Exercise 1 Design Brief
 
-Status: approved through D-073. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements D-072 Clean Sections plus D-073 readable command completion on `codex/e1-console-ui`, directly above `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate reports 144 successful tests, and real-process audits pass. Draft pull request 5 remains unmerged pending Nitzan's renewed review and acceptance.
+Status: approved through D-073. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements D-072 Clean Sections plus D-073 readable command completion on `codex/e1-console-ui`, directly above `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate reports 145 successful tests, and real-process audits pass. Draft pull request 5 remains unmerged pending Nitzan's renewed review and acceptance.
 
 Last updated: 2026-08-17
 
@@ -368,6 +368,6 @@ The adversarial review and D-067 through D-071 correction pass are complete. D-0
 
 The standalone GitHub repository is the approved source repository. It remains private during active implementation and review, then must become public for grader access before submission as confirmed by Aviad on 2026-08-17. It must preserve the unchanged three-module layout, invoke the authoritative `build.bat` in any future CI rather than bypassing its mandatory JUnit verifier, track generated JAXB source, custom XML fixtures, and build inputs, exclude the private submission README and runtime `.ser` files, and treat a clean Windows 10 run of the exact final ZIP as mandatory evidence that CI cannot automatically replace.
 
-The detailed staged implementation plan is approved and active. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 follows D-072 and D-073; Tasks 11, 12, and 12A are implemented on `codex/e1-console-ui` directly above `9a8c87c`. The renewed strict gate passes all 144 tests, and real-process audits cover the complete workflow, pre-load recovery, and EOF at the pause. Draft pull request 5 remains unmerged while awaiting Nitzan's renewed review and acceptance.
+The detailed staged implementation plan is approved and active. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 follows D-072 and D-073; Tasks 11, 12, and 12A are implemented on `codex/e1-console-ui` directly above `9a8c87c`. The renewed strict gate passes all 145 tests, and real-process audits cover the complete workflow, pre-load recovery, and EOF at the pause. Draft pull request 5 remains unmerged while awaiting Nitzan's renewed review and acceptance.
 
 The earlier combined proposal using Section 10 labels D-054 through D-056 was not approved. New D-054, D-055, and D-056 decisions were later explained and approved separately for build authority, module-local roots, and package topology with supported API visibility.
