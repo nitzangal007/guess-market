@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Scanner;
 
 final class ConsoleInput {
-    private static final String MENU_PROMPT = "Choose a command [1-8]:";
     private static final String PURCHASE_OPTION_PROMPT = "Choose an option [1-2]:";
     private static final String WINNING_OPTION_PROMPT = "Choose the winning option [1-2]:";
     private static final String QUANTITY_PROMPT = "Enter shares to purchase (positive whole number):";
@@ -24,10 +23,16 @@ final class ConsoleInput {
     }
 
     int readMenuChoice() throws EndOfInputException {
-        return readBoundedInteger(
-                MENU_PROMPT,
-                8,
-                "Invalid menu choice. Enter a number from 1 to 8.");
+        try {
+            int choice = Integer.parseInt(readLine().trim());
+            if (choice >= 1 && choice <= 8) {
+                return choice;
+            }
+        } catch (NumberFormatException ignored) {
+            // The parser error below handles blank, non-numeric, and overflowing values alike.
+        }
+        writeLine("Invalid menu choice. Enter a number from 1 to 8.");
+        return 0;
     }
 
     int readEventSelection(int eventCount) throws EndOfInputException {

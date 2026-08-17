@@ -12,24 +12,42 @@ import org.junit.jupiter.api.Test;
 class ConsoleInputTest {
 
     @Test
-    void menuChoiceTrimsInputRetriesLocallyAndUsesTheApprovedPrompt() throws Exception {
+    void menuChoiceIsOneShotAndOnlyTheRendererOwnsTheMenuPrompt() throws Exception {
         StringWriter text = new StringWriter();
-        ConsoleInput input = input("  \nletters\n2147483648\n0\n9\n 4 \n", text);
+        PrintWriter output = new PrintWriter(text, true);
+        ConsoleRenderer renderer = new ConsoleRenderer(output);
+        ConsoleInput input = new ConsoleInput(new Scanner("  \n 4 \n"), output);
 
+        renderer.renderMenu();
+        assertEquals(0, input.readMenuChoice());
+        renderer.renderMenu();
         assertEquals(4, input.readMenuChoice());
-        assertEquals("""
+        String menu = """
+                ============================================================
+                                       GUESS MARKET
+                ============================================================
+
+                DATA
+                  1. Load events from XML
+                  2. Display all events
+                  3. View an event's trading status
+
+                TRADING
+                  4. Purchase shares
+                  5. Close an event
+
+                STATE AND SESSION
+                  6. Save current state
+                  7. Restore saved state
+                  8. Exit
+
+                Commands 2 through 6 require a loaded system.
+
                 Choose a command [1-8]:
+                """;
+        assertEquals(menu + """
                 Invalid menu choice. Enter a number from 1 to 8.
-                Choose a command [1-8]:
-                Invalid menu choice. Enter a number from 1 to 8.
-                Choose a command [1-8]:
-                Invalid menu choice. Enter a number from 1 to 8.
-                Choose a command [1-8]:
-                Invalid menu choice. Enter a number from 1 to 8.
-                Choose a command [1-8]:
-                Invalid menu choice. Enter a number from 1 to 8.
-                Choose a command [1-8]:
-                """, text.toString());
+                """ + menu, text.toString());
     }
 
     @Test

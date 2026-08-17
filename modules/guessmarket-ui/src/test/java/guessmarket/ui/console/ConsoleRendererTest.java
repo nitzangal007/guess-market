@@ -182,31 +182,44 @@ class ConsoleRendererTest {
     }
 
     @Test
-    void everyEngineCodeMapsToAsciiErrorAndRecoveryWithoutRawCauseOrAbsentContext() {
+    void everyEngineCodeUsesItsExactAbsentContextErrorAndRecoveryMapping() {
         StringWriter text = new StringWriter();
         ConsoleRenderer renderer = renderer(text);
-        for (EngineErrorCode code : EngineErrorCode.values()) {
-            renderer.renderError(new EngineOperationException(code, "raw low-level cause text", "raw recovery hint"));
+        for (ErrorExpectation expectation : absentContextExpectations()) {
+            renderer.renderError(new EngineOperationException(
+                    expectation.code(), "raw low-level cause text", "raw recovery hint"));
         }
-        renderer.renderError(new EngineOperationException(
-                EngineErrorCode.EVENT_NOT_FOUND,
-                "ignored raw cause",
-                "ignored raw hint",
-                Path.of("C:\\market files\\missing.xml"),
-                null,
-                -7,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                new IllegalStateException("hidden stack detail")));
+
+        assertEquals(absentContextOutput(), text.toString());
+    }
+
+    @Test
+    void presentOptionalContextIsRenderedAndAbsentContextIsNeverFabricatedOrLeaked() {
+        StringWriter text = new StringWriter();
+        ConsoleRenderer renderer = renderer(text);
+        renderer.renderError(exception(EngineErrorCode.EVENT_NOT_FOUND, Path.of("C:\\market files\\missing.xml"), -7, null, null, null, null, null));
+        renderer.renderError(exception(EngineErrorCode.EVENT_NOT_OPEN, null, -8, null, null, null, null, null));
+        renderer.renderError(exception(EngineErrorCode.INVALID_OPTION, null, null, 2, null, null, null, null));
+        renderer.renderError(exception(EngineErrorCode.XML_FILE_NOT_FOUND, Path.of("C:\\market files\\missing.xml"), null, null, null, null, null, null));
+        renderer.renderError(exception(EngineErrorCode.STATE_FILE_NOT_FOUND, Path.of("C:\\state files\\market.ser"), null, null, null, null, null, null));
+        renderer.renderError(exception(EngineErrorCode.XML_DATA_INVALID, null, null, null, 3, "commission", 7, 11));
 
         String output = text.toString();
-        assertEquals(17, occurrences(output, "Error: "));
-        assertEquals(17, occurrences(output, "Recovery: "));
-        assertTrue(output.contains("Event ID -7 does not exist."));
+        assertEquals("""
+                Error: Event ID -7 does not exist.
+                Recovery: Choose an event from the displayed list.
+                Error: Event ID -8 is closed.
+                Recovery: Choose an open event.
+                Error: Option 2 is invalid.
+                Recovery: Choose option 1 or 2.
+                Error: The XML file was not found at C:\\market files\\missing.xml.
+                Recovery: Check the path.
+                Error: The saved-state file was not found at C:\\state files\\market.ser.
+                Recovery: Check the path.
+                Error: The XML contains invalid market data in XML event 3, field commission, line 7, column 11.
+                Recovery: Correct the event data and try again.
+                """, output);
+        assertFalse(output.contains("selected"));
         assertFalse(output.contains("raw low-level cause text"));
         assertFalse(output.contains("raw recovery hint"));
         assertFalse(output.contains("hidden stack detail"));
@@ -254,6 +267,60 @@ class ConsoleRendererTest {
         return new TradeHistoryEntry(optionNumber, label, quantity, baseCost, commission, total);
     }
 
+    private static List<ErrorExpectation> absentContextExpectations() {
+        return List.of(
+                new ErrorExpectation(EngineErrorCode.INVALID_XML_PATH, "The XML path is invalid.", "Choose a regular .xml file."),
+                new ErrorExpectation(EngineErrorCode.XML_FILE_NOT_FOUND, "The XML file was not found.", "Check the path."),
+                new ErrorExpectation(EngineErrorCode.XML_FILE_ACCESS_FAILED, "The XML file could not be read.", "Check access and try again."),
+                new ErrorExpectation(EngineErrorCode.XML_STRUCTURE_INVALID, "The file is not valid Exercise 1 XML.", "Correct its XML or schema structure."),
+                new ErrorExpectation(EngineErrorCode.XML_DATA_INVALID, "The XML contains invalid market data.", "Correct the event data and try again."),
+                new ErrorExpectation(EngineErrorCode.ENGINE_CONFIGURATION_ERROR, "Internal XML configuration is unavailable.", "Verify Engine packaging and JAXB dependencies."),
+                new ErrorExpectation(EngineErrorCode.NO_SYSTEM_LOADED, "No system is loaded.", "Load XML or restore saved state first."),
+                new ErrorExpectation(EngineErrorCode.EVENT_NOT_FOUND, "The event does not exist.", "Choose an event from the displayed list."),
+                new ErrorExpectation(EngineErrorCode.EVENT_NOT_OPEN, "The event is closed.", "Choose an open event."),
+                new ErrorExpectation(EngineErrorCode.INVALID_OPTION, "The option is invalid.", "Choose option 1 or 2."),
+                new ErrorExpectation(EngineErrorCode.INVALID_QUANTITY, "The purchase quantity is invalid.", "Start the purchase again with a smaller positive whole number."),
+                new ErrorExpectation(EngineErrorCode.FINANCIAL_CALCULATION_FAILED, "The operation exceeded the supported financial range.", "Review event data and, for purchases, try a smaller quantity."),
+                new ErrorExpectation(EngineErrorCode.INVALID_STATE_PATH, "The saved-state path is invalid.", "Enter a valid base path and file name."),
+                new ErrorExpectation(EngineErrorCode.STATE_FILE_NOT_FOUND, "The saved-state file was not found.", "Check the path."),
+                new ErrorExpectation(EngineErrorCode.STATE_FILE_ACCESS_FAILED, "The saved-state file could not be read or written.", "Check access and try again."),
+                new ErrorExpectation(EngineErrorCode.SAVED_STATE_INVALID, "The saved-state file is invalid or incompatible.", "Choose a compatible valid file."));
+    }
+
+    private static String absentContextOutput() {
+        StringBuilder expected = new StringBuilder();
+        for (ErrorExpectation expectation : absentContextExpectations()) {
+            expected.append("Error: ").append(expectation.error()).append('\n');
+            expected.append("Recovery: ").append(expectation.recovery()).append('\n');
+        }
+        return expected.toString();
+    }
+
+    private static EngineOperationException exception(
+            EngineErrorCode code,
+            Path path,
+            Integer eventId,
+            Integer optionNumber,
+            Integer xmlEventNumber,
+            String fieldName,
+            Integer lineNumber,
+            Integer columnNumber) {
+        return new EngineOperationException(
+                code,
+                "raw low-level cause text",
+                "raw recovery hint",
+                path,
+                xmlEventNumber,
+                eventId,
+                fieldName,
+                optionNumber,
+                null,
+                null,
+                lineNumber,
+                columnNumber,
+                new IllegalStateException("hidden stack detail"));
+    }
+
     private static int occurrences(String value, String fragment) {
         int count = 0;
         int index = 0;
@@ -262,5 +329,8 @@ class ConsoleRendererTest {
             index += fragment.length();
         }
         return count;
+    }
+
+    private record ErrorExpectation(EngineErrorCode code, String error, String recovery) {
     }
 }

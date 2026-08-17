@@ -217,12 +217,20 @@ final class ConsoleRenderer {
             case NO_SYSTEM_LOADED -> new ErrorPresentation(
                     "No system is loaded.", "Load XML or restore saved state first.");
             case EVENT_NOT_FOUND -> new ErrorPresentation(
-                    "Event ID " + optionalEventId(exception) + " does not exist.",
+                    exception.getEventId().isPresent()
+                            ? "Event ID " + exception.getEventId().getAsInt() + " does not exist."
+                            : "The event does not exist.",
                     "Choose an event from the displayed list.");
             case EVENT_NOT_OPEN -> new ErrorPresentation(
-                    "Event ID " + optionalEventId(exception) + " is closed.", "Choose an open event.");
+                    exception.getEventId().isPresent()
+                            ? "Event ID " + exception.getEventId().getAsInt() + " is closed."
+                            : "The event is closed.",
+                    "Choose an open event.");
             case INVALID_OPTION -> new ErrorPresentation(
-                    "Option " + optionalOptionNumber(exception) + " is invalid.", "Choose option 1 or 2.");
+                    exception.getOptionNumber().isPresent()
+                            ? "Option " + exception.getOptionNumber().getAsInt() + " is invalid."
+                            : "The option is invalid.",
+                    "Choose option 1 or 2.");
             case INVALID_QUANTITY -> new ErrorPresentation(
                     "The purchase quantity is invalid.",
                     "Start the purchase again with a smaller positive whole number.");
@@ -251,14 +259,6 @@ final class ConsoleRenderer {
             case SAVED_STATE_INVALID -> new ErrorPresentation(
                     "The saved-state file is invalid or incompatible.", "Choose a compatible valid file.");
         };
-    }
-
-    private String optionalEventId(EngineOperationException exception) {
-        return exception.getEventId().isPresent() ? Integer.toString(exception.getEventId().getAsInt()) : "selected";
-    }
-
-    private String optionalOptionNumber(EngineOperationException exception) {
-        return exception.getOptionNumber().isPresent() ? Integer.toString(exception.getOptionNumber().getAsInt()) : "selected";
     }
 
     private String optionalPathSuffix(EngineOperationException exception) {
