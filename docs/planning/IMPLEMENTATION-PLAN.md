@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stage 1 is authorized to begin test-first on its milestone branch.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 plus approved D-073 Task 12A are implemented on `codex/e1-console-ui` directly above `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate passes all 145 tests, and real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 5 remains unmerged and awaits Nitzan's renewed manual review and acceptance.
 
 ## Global Constraints
 
@@ -23,6 +23,7 @@
 - Initialize each market-maker event account to `0.0`. Treat `b * ln(2)` only as a derived maximum-subsidy measure.
 - Use the D-068 cancellation-safe direct LMSR purchase delta. Never calculate a purchase delta by subtracting two independently rounded total costs.
 - Keep calculations as unrounded `double` values. Only `ConsoleRenderer` formats financial output to two decimal places with `Locale.US`.
+- Implement D-072's exact Clean Sections menu, prompt ranges, section grammar, and ASCII-only portability rules. Do not substitute the rejected Command Center or Minimal Transcript directions.
 - Every failed load, purchase, close, or restore preserves the previous valid Engine state.
 - Save and restore use one versioned direct-domain `SavedState` graph, a strict exact-class filter with `maxdepth = 32`, full semantic validation, and one live-map reference replacement.
 - Use all eleven exact approved test class names. Every class must execute at least one test with zero failures, skips, disabled tests, and aborts.
@@ -38,7 +39,7 @@
 
 Use these files in this order during implementation:
 
-1. `docs/design/EXERCISE-1-DESIGN.md`, with D-067 through D-071 superseding only the conflicting portions of earlier decisions.
+1. `docs/design/EXERCISE-1-DESIGN.md`, with D-067 through D-072 superseding only the conflicting portions of earlier decisions.
 2. `docs/design/EXERCISE-1-DESIGN-BRIEF.md` for the concise system map.
 3. `docs/reviews/DESIGN-REVIEW-RESOLUTIONS.md` for the corrected risk boundary.
 4. This implementation plan for task order, exact file ownership, tests, and checkpoints.
@@ -192,7 +193,7 @@ Milestone branch: `codex/e1-project-foundation`
 - Consumes: Oracle JDK 25 and the repository's approved dependency policy.
 - Produces: a locally vendored JUnit 6.1.1 test tool with recorded source, SHA-256, license evidence, and no production dependency.
 
-- [ ] **Step 1: Verify the repository boundary before creating files**
+- [x] **Step 1: Verify the repository boundary before creating files**
 
 Run:
 
@@ -203,7 +204,7 @@ git check-ignore -v provided private build sample.ser
 
 Expected: the branch is the milestone branch, the worktree has no unexplained changes, and every private or generated sample path is ignored by the intended rule.
 
-- [ ] **Step 2: Acquire and verify JUnit Platform Console Standalone 6.1.1**
+- [x] **Step 2: Acquire and verify JUnit Platform Console Standalone 6.1.1**
 
 Use the exact Maven Central artifact `org.junit.platform:junit-platform-console-standalone:6.1.1`, preserve its matching license and notice material, calculate SHA-256, and record the source URL, version, hash, and test-only role in `docs/guides/TESTING.md`.
 
@@ -216,7 +217,7 @@ Get-FileHash -Algorithm SHA256 tools\testing\junit-platform-console-standalone-6
 
 Expected: module description succeeds, the version is 6.1.1, and the recorded hash matches the file.
 
-- [ ] **Step 3: Confirm the dependency is test-only**
+- [x] **Step 3: Confirm the dependency is test-only**
 
 Run:
 
@@ -226,11 +227,11 @@ git status --short
 
 Expected: only the approved JUnit JAR, its legal files, and documentation changes appear. No production module contains a copied JUnit binary.
 
-- [ ] **Step 4: Update the walkthrough foundation entry**
+- [x] **Step 4: Update the walkthrough foundation entry**
 
 Record why JUnit is a development tool, why it is excluded from the runtime ZIP, and the verified SHA-256. Do not mark any Java method implemented in this task.
 
-- [ ] **Step 5: Commit the foundation evidence**
+- [x] **Step 5: Commit the foundation evidence**
 
 ```powershell
 git add tools/testing docs/guides/TESTING.md docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -303,7 +304,7 @@ public PurchaseReceipt(
 
 Every class exposes conventional `get...()` accessors, makes defensive copies with `List.copyOf`, and returns the immutable stored lists. DTO validation rejects null nested values, wrong option-list sizes, option numbers outside 1 or 2, negative quantities, non-finite financial values, an open event with a winner, and a closed event without a valid winner. Empty XML-provided strings and duplicate labels remain valid.
 
-- [ ] **Step 1: Write `DtoContractTest` with named contract cases**
+- [x] **Step 1: Write `DtoContractTest` with named contract cases**
 
 Include separate tests for:
 
@@ -318,25 +319,25 @@ purchaseReceiptKeepsSameOperationDetails
 allReturnedCollectionsRejectMutation
 ```
 
-- [ ] **Step 2: Compile the tests first and confirm the expected failure**
+- [x] **Step 2: Compile the tests first and confirm the expected failure**
 
 Expected: compilation fails because the DTO types do not exist.
 
-- [ ] **Step 3: Implement the seven immutable DTO types**
+- [x] **Step 3: Implement the seven immutable DTO types**
 
 Use explicit final classes with private final fields. Do not use console formatting, domain calculations, file APIs, JAXB types, or mutable collection exposure.
 
-- [ ] **Step 4: Run focused DTO tests**
+- [x] **Step 4: Run focused DTO tests**
 
 Run JUnit selecting `guessmarket.dto.DtoContractTest`.
 
 Expected: all DTO tests pass with no skipped, disabled, or aborted test.
 
-- [ ] **Step 5: Update the walkthrough**
+- [x] **Step 5: Update the walkthrough**
 
 Add one row for every DTO constructor and getter group. Explain defensive copying, immutable snapshots, and why a DTO is not a domain object.
 
-- [ ] **Step 6: Commit the DTO slice**
+- [x] **Step 6: Commit the DTO slice**
 
 ```powershell
 git add modules/guessmarket-dto docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -397,29 +398,29 @@ SAVED_STATE_INVALID
 
 `EngineOperationException` stores `code`, `detail`, `recoveryHint`, optional `Path`, XML event number, event ID, field name, option number, quantity, current event status, line, and column. Use typed getters based on `Optional`, `OptionalInt`, and DTO `EventStatus`. Provide one concise constructor for failures with no context and one complete constructor for Engine and XML collaborators. Retain a low-level cause only for developer diagnosis.
 
-- [ ] **Step 1: Write the public contract cases in `GuessMarketEngineUseCaseTest`**
+- [x] **Step 1: Write the public contract cases in `GuessMarketEngineUseCaseTest`**
 
 Cover the seven interface operations, the exact error-code set, and both structured exception constructors. Compile the test first and confirm that it fails because the three Engine contract types do not exist. This starts one of the eleven approved final test classes early instead of adding a temporary twelfth class.
 
-- [ ] **Step 2: Create the three approved contract types**
+- [x] **Step 2: Create the three approved contract types**
 
 Keep the interface and error enum public. Keep exception construction and getters typed, with no formatted console message or dependency on an implementation class.
 
-- [ ] **Step 3: Compile DTO, the three Engine contract files, and focused contract tests**
+- [x] **Step 3: Compile DTO, the three Engine contract files, and focused contract tests**
 
 Expected: compilation succeeds with Engine depending on compiled DTO and no JAXB or UI classpath.
 
-- [ ] **Step 4: Inspect public signatures**
+- [x] **Step 4: Inspect public signatures**
 
 Run `javap -public` on all three compiled types.
 
 Expected: the seven operations and structured checked failure types match this task, and no Engine implementation, JAXB, console, or persistence type appears in a supported signature.
 
-- [ ] **Step 5: Update the walkthrough**
+- [x] **Step 5: Update the walkthrough**
 
 Explain interface-based programming, one checked exception category, structured context, and why the UI must not parse `getMessage()`.
 
-- [ ] **Step 6: Run the Stage 1 gate**
+- [x] **Step 6: Run the Stage 1 gate**
 
 Verify DTO tests, JDK-only DTO compilation, Engine-to-DTO compilation, import direction, Git status, and walkthrough completeness. Then open one milestone pull request for Nitzan's review.
 
@@ -459,9 +460,17 @@ The critical direct-delta implementation follows this structure:
 long difference = (long) selectedQuantity - otherQuantity;
 double z = difference / (double) b;
 double h = purchaseQuantity / (double) b;
-double logP = -softplus(-z);
-double logExpm1 = logExpm1(h);
-double t = logP + logExpm1;
+double t;
+if (difference < 0) {
+    long combinedDifference = difference + purchaseQuantity;
+    t = combinedDifference / (double) b
+            - softplus(z)
+            + logOneMinusExpOfNegative(h);
+} else {
+    double logP = -softplus(-z);
+    double logExpm1 = logExpm1(h);
+    t = logP + logExpm1;
+}
 
 double cost;
 if (t < -37.0) {
@@ -471,25 +480,25 @@ if (t < -37.0) {
 }
 ```
 
-`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. `logExpm1(h)` uses `log(expm1(h))` in the safe branch and `h + log1p(-exp(-h))` for large positive `h`. All quantity differences are formed in `long`. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
+`softplus(x)` uses `max(x, 0) + log1p(exp(-abs(x)))`. For every negative quantity difference, the combined branch forms `difference + purchaseQuantity` in `long` before conversion and uses the exact identity `t = (difference + purchaseQuantity) / b - softplus(z) + log(1 - exp(-h))`. `logOneMinusExpOfNegative(h)` evaluates the final correction as `log(-expm1(-h))` when `h <= ln(2)` and `log1p(-exp(-h))` otherwise. For a nonnegative difference, the ordinary branch evaluates `t = logP + logExpm1(h)`, where `logExpm1(h)` uses `log(expm1(h))` before the large-value boundary and `h + log(1 - exp(-h))` after it. Invalid arguments, non-finite outputs, and a required-positive purchase cost that becomes zero fail before any domain mutation.
 
-- [ ] **Step 1: Write `LmsrCalculatorTest` first**
+- [x] **Step 1: Write `LmsrCalculatorTest` first**
 
 Include the approved initial price, price sum, monotonicity, larger-`b`, maximum-subsidy, `b = 100` worked example, simulator oracle values, very large quantities, representable `6.392138950083687E-44` delta, price underflow with representable aggregate delta, unrepresentable positive delta, `int` boundary arithmetic, and invalid input cases.
 
-- [ ] **Step 2: Run the focused test and confirm failures**
+- [x] **Step 2: Run the focused test and confirm failures**
 
 Expected: the class or methods are missing.
 
-- [ ] **Step 3: Implement the minimal final calculator**
+- [x] **Step 3: Implement the minimal final calculator**
 
 Keep the class final and stateless. Do not import DTO, XML, persistence, console, or commission types.
 
-- [ ] **Step 4: Run focused tests and simulator reconciliation**
+- [x] **Step 4: Run focused tests and simulator reconciliation**
 
 Expected: every named numerical category passes within its documented tolerance, and no case returns `NaN`, infinity, or free positive shares.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 Explain log-sum-exp, softmax, cancellation, underflow, and why the direct delta is separate from display price.
 
@@ -537,21 +546,21 @@ Purchase must calculate the new quantity, base cost, any on-purchase commission,
 
 Close must calculate gross payout, on-close commission, net payout, new balance, and new commission total before committing winner and `CLOSED`. For on-close commission, subtract only the net payout and do not credit the same commission twice.
 
-- [ ] **Step 1: Write `MarketEventTest` first**
+- [x] **Step 1: Write `MarketEventTest` first**
 
 Cover both commission modes, 0 and 90 percent boundaries, multiple purchases, newest-first public conversion order, quantity overflow, closed-event rejection, repeated close, profit, subsidy, exact break-even, no-purchase close, disfavored tiny purchase, numerical rejection, and before-after equality for every rejected operation.
 
-- [ ] **Step 2: Confirm the focused test fails for missing domain types**
+- [x] **Step 2: Confirm the focused test fails for missing domain types**
 
-- [ ] **Step 3: Implement the five domain types**
+- [x] **Step 3: Implement the five domain types**
 
 Every custom serializable class required by D-070 declares `private static final long serialVersionUID = 1L`. The reachable DTO enums use Java's normal enum serialization identity. Do not make `GuessMarketEngineImpl`, `LmsrCalculator`, DTO classes, XML types, or technical file types serializable.
 
-- [ ] **Step 4: Run `LmsrCalculatorTest` and `MarketEventTest` together**
+- [x] **Step 4: Run `LmsrCalculatorTest` and `MarketEventTest` together**
 
 Expected: both pass and rejected operations leave every observable domain value unchanged.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 Record every meaningful constructor and transition method, the state it owns, its preconditions, its atomic commit point, and the test that proves it.
 
@@ -560,7 +569,7 @@ git add modules/guessmarket-engine docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: implement market event transitions"
 ```
 
-- [ ] **Step 6: Run the Stage 2 gate**
+- [x] **Step 6: Run the Stage 2 gate**
 
 Review numerical evidence, accounting examples, serializable-type boundary, domain visibility, full regression tests, and the updated walkthrough before merging the milestone.
 
@@ -584,19 +593,19 @@ Milestone branch: `codex/e1-engine-xml`
 - Consumes: immutable canonical files under local `provided/assignment-1/test-files` and the intact approved XJC wrapper.
 - Produces: hash-verified derived resources and retained generated Java in `guessmarket.engine.xml.generated`.
 
-- [ ] **Step 1: Recheck canonical hashes before copying**
+- [x] **Step 1: Recheck canonical hashes before copying**
 
 Calculate SHA-256 for the canonical XSD and all four XML fixtures and compare them with `provided/assignment-1/test-files/README.md`.
 
-- [ ] **Step 2: Copy derived resources without changing canonical bytes**
+- [x] **Step 2: Copy derived resources without changing canonical bytes**
 
 Recalculate hashes at every destination. Supplied copies must match their canonical sources byte-for-byte.
 
-- [ ] **Step 3: Create custom D-069 fixtures**
+- [x] **Step 3: Create custom D-069 fixtures**
 
 Include valid zero, negative, minimum, and maximum IDs; duplicate nonpositive IDs; empty description and option labels; duplicate labels; one-option invalid business data; commission 0 and 90; positive `b`; paths or filenames containing spaces; and missing-versus-empty schema cases. Use clear filenames that state the boundary.
 
-- [ ] **Step 4: Run XJC through the exact course wrapper**
+- [x] **Step 4: Run XJC through the exact course wrapper**
 
 From `tools/jaxb-ri-4.0.5`, use:
 
@@ -606,11 +615,11 @@ xjc-run.bat -p guessmarket.engine.xml.generated GM-EX1-Schema.xsd
 
 Copy the complete generated package tree into the Engine production source root, inspect every package declaration, compile with the five runtime JAXB JARs, and then remove only the verified temporary XSD and staging tree beside the wrapper.
 
-- [ ] **Step 5: Record generated ownership**
+- [x] **Step 5: Record generated ownership**
 
 List the exact generated filenames, generation command, source XSD hash, JAXB version, and the rule that generated files are never hand-edited.
 
-- [ ] **Step 6: Commit generated and resource inputs**
+- [x] **Step 6: Commit generated and resource inputs**
 
 ```powershell
 git add modules/guessmarket-engine/src/main/java/guessmarket/engine/xml/generated modules/guessmarket-engine/src/main/resources modules/guessmarket-engine/src/test/resources docs/guides/JAXB-AND-XML.md docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -641,19 +650,19 @@ final class JaxbMarketMapper {
 
 The mapper joins `xs:list` name tokens with one space, trims description and option outer whitespace, accepts empty text and duplicate option labels, requires exactly two options, accepts all unique `int` IDs, maps `on-purchase` and `on-close`, requires commission `0..90`, requires positive `b`, and constructs every event with zero quantities, zero balance, no winner, and empty history.
 
-- [ ] **Step 1: Write `JaxbMarketMapperTest` first**
+- [x] **Step 1: Write `JaxbMarketMapperTest` first**
 
 Cover every supplied business-invalid fixture and every custom D-069 boundary with precise event, field, and option context assertions.
 
-- [ ] **Step 2: Confirm mapping tests fail**
+- [x] **Step 2: Confirm mapping tests fail**
 
-- [ ] **Step 3: Implement the mapper without file or JAXB-context mechanics**
+- [x] **Step 3: Implement the mapper without file or JAXB-context mechanics**
 
 Do not cache or retain the candidate. Do not mutate live Engine state. Do not invent nonblank, positivity, case-normalization, unique-label, or length rules.
 
-- [ ] **Step 4: Run mapper, DTO, math, and domain regression tests**
+- [x] **Step 4: Run mapper, DTO, math, and domain regression tests**
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-engine/src/main/java/guessmarket/engine/xml/JaxbMarketMapper.java modules/guessmarket-engine/src/test/java/guessmarket/engine/xml/JaxbMarketMapperTest.java docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -684,26 +693,26 @@ public final class XmlMarketLoader {
 
 Validate null, case-insensitive `.xml`, existence, regular-file status, and readability. Load the XSD only from classpath resource `guessmarket/engine/xml/GM-EX1-Schema.xsd`. Configure schema parsing against the trusted resource, close streams with try-with-resources, retain safe line and column details when available, and translate only expected I/O, schema, JAXB, and mapping failures. Do not catch all `Exception` or `RuntimeException`.
 
-- [ ] **Step 1: Write `XmlMarketLoaderTest` first**
+- [x] **Step 1: Write `XmlMarketLoaderTest` first**
 
 Cover null, directory, wrong suffix, uppercase suffix, missing, inaccessible where the OS permits, malformed, schema-invalid, business-invalid, valid path with spaces, trusted-resource loading, safe cause retention, resource closure, and programming-defect visibility.
 
-- [ ] **Step 2: Confirm loader tests fail**
+- [x] **Step 2: Confirm loader tests fail**
 
-- [ ] **Step 3: Implement loader mechanics and six XML error categories**
+- [x] **Step 3: Implement loader mechanics and six XML error categories**
 
-- [ ] **Step 4: Run all five current test classes**
+- [x] **Step 4: Run all six current test classes**
 
-Expected: DTO, LMSR, domain, mapper, and loader tests pass together. The public Engine integration classes are added in Stage 4.
+Expected: `DtoContractTest`, `GuessMarketEngineUseCaseTest`, `LmsrCalculatorTest`, `MarketEventTest`, `JaxbMarketMapperTest`, and `XmlMarketLoaderTest` pass together. Complete Engine integration behavior is added in Stage 4.
 
-- [ ] **Step 5: Update the walkthrough, inspect imports, and commit**
+- [x] **Step 5: Update the walkthrough, inspect imports, and commit**
 
 ```powershell
 git add modules/guessmarket-engine/src/main/java/guessmarket/engine/xml/XmlMarketLoader.java modules/guessmarket-engine/src/test/java/guessmarket/engine/xml/XmlMarketLoaderTest.java docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: load markets with trusted XML schema"
 ```
 
-- [ ] **Step 6: Run the Stage 3 gate**
+- [x] **Step 6: Run the Stage 3 gate**
 
 Verify hashes, generated-source tracking, five-JAR compilation, trusted-resource use, full-range IDs, text rules, error context, state isolation, and walkthrough entries before merging.
 
@@ -752,21 +761,21 @@ The store appends `.ser` case-insensitively, requires an existing parent directo
 
 The restore filter allows only `SavedState`, the exact domain graph, required JDK collection or array types, strings, and enums, with `maxdepth = 32`. Validation proves nonempty ordered events, exact runtime types, distinct mutable identity, unique full-range IDs, text and option rules, nonnegative quantities, lifecycle and winner consistency, finite financial history, chronological quantity sums, commission totals, D-067 account arithmetic, and closed payout consistency. It never replays purchases or recomputes historical accepted costs.
 
-- [ ] **Step 1: Write store and validator persistence tests first**
+- [x] **Step 1: Write store and validator persistence tests first**
 
 Cover suffix rules, paths with dots and spaces, first save, overwrite, both publication paths, cleanup, missing and corrupt files, wrong root, wrong version, filtered class, empty state, duplicate object or ID, semantic inconsistency reachable through a serialized candidate, full-range IDs, and numerical-boundary history. Task 10 adds the public Engine round trip, prior-live-state preservation, and continued-operation cases to the same approved test class after `GuessMarketEngineImpl` exists.
 
-- [ ] **Step 2: Confirm focused persistence tests fail**
+- [x] **Step 2: Confirm focused persistence tests fail**
 
-- [ ] **Step 3: Implement state root, strict filter, validator, and store**
+- [x] **Step 3: Implement state root, strict filter, validator, and store**
 
 Do not serialize DTOs, Engine implementation, XML classes, calculators, paths, or streams. Do not claim a failed move preserves an old disk target.
 
-- [ ] **Step 4: Run persistence and domain tests together**
+- [x] **Step 4: Run persistence and domain tests together**
 
 Expected: round trips preserve exact stored binary64 values and all semantic rejection cases preserve the caller's previous live map when tested through the Engine in Task 10.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-engine docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -809,32 +818,32 @@ saveState: validate loaded state; stateStore.save(path, events.values())
 
 Empty `events` means no loaded system. Full and filtered console positioning never enters this class. DTO conversion creates newest-first history values on demand and exposes no domain or JAXB object.
 
-- [ ] **Step 1: Write public use-case and XML-load tests first, then complete public persistence cases**
+- [x] **Step 1: Write public use-case and XML-load tests first, then complete public persistence cases**
 
 Exercise the implementation through a `GuessMarketEngine` reference. Cover no-loaded-state rules, ordered listing, full-range actual-ID lookup, details, successful and failed purchase, successful and failed close, checked error context, atomic replacement after load and restore, a save and restore through a completely new Engine instance, continued operations after restore, and prior-state preservation after every failure.
 
-- [ ] **Step 2: Confirm the new tests fail because the implementation is missing**
+- [x] **Step 2: Confirm the new tests fail because the implementation is missing**
 
-- [ ] **Step 3: Implement `GuessMarketEngineImpl` and DTO conversion helpers**
+- [x] **Step 3: Implement `GuessMarketEngineImpl` and DTO conversion helpers**
 
 Use `@Override` on all interface methods. Do not print, parse console text, expose a filtering method, or return internal collections.
 
-- [ ] **Step 4: Run every Engine and DTO test class**
+- [x] **Step 4: Run every Engine and DTO test class**
 
 Expected: eight exact classes now exist and pass: one DTO class plus seven Engine classes.
 
-- [ ] **Step 5: Run source-boundary inspection**
+- [x] **Step 5: Run source-boundary inspection**
 
 Confirm Engine production imports contain no `guessmarket.ui` or `java.util.Scanner`, and public signatures contain only JDK, DTO, and approved Engine contract types.
 
-- [ ] **Step 6: Update the walkthrough and commit**
+- [x] **Step 6: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-engine docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: implement complete Guess Market engine"
 ```
 
-- [ ] **Step 7: Run the Stage 4 gate**
+- [x] **Step 7: Run the Stage 4 gate**
 
 Demonstrate XML replacement, purchase, close, save, restart restore, failure atomicity, direct-domain filtering, and actual-ID behavior. Review the complete Engine public boundary and walkthrough before merging.
 
@@ -853,11 +862,39 @@ Milestone branch: `codex/e1-console-ui`
 **Interfaces:**
 
 - Consumes: borrowed `Scanner` and `PrintWriter`, DTOs, `EngineErrorCode`, and `EngineOperationException`.
-- Produces: prompt-local parsing and deterministic English presentation.
+- Produces: prompt-local parsing and deterministic Clean Sections English presentation.
 
-Keep both classes package-private. `ConsoleInput` reads only complete lines and provides separate methods for one-shot menu choice, repeated range selection, option selection, positive quantity, and full path. A nested checked `EndOfInputException` distinguishes normal input closure from invalid text without adding a fifth production class.
+Keep both classes package-private. `ConsoleInput` reads only complete lines and provides separate methods for one-shot menu choice, repeated range selection, option selection, positive quantity, and full path. A nested checked `EndOfInputException` distinguishes normal input closure from invalid text without adding a fifth production class. Its production prompts are the exact D-072 strings, including `Choose a command [1-8]:`, the dynamic `Choose an event [1-N]:`, both `[1-2]` option prompts, and the positive-whole-number quantity prompt.
 
-`ConsoleRenderer` owns the exact menu, prompts, summary blocks, details, receipts, newest-first history, empty-open-set messages, success messages, `Error` and `Recovery` mapping, and one shared formatter:
+`ConsoleRenderer` owns the exact menu, prompts, summary blocks, details, receipts, newest-first history, empty-open-set messages, success messages, `Error` and `Recovery` mapping, and one shared formatter. Its exact menu literal is:
+
+```text
+============================================================
+                       GUESS MARKET
+============================================================
+
+DATA
+  1. Load events from XML
+  2. Display all events
+  3. View an event's trading status
+
+TRADING
+  4. Purchase shares
+  5. Close an event
+
+STATE AND SESSION
+  6. Save current state
+  7. Restore saved state
+  8. Exit
+
+Commands 2 through 6 require a loaded system.
+
+Choose a command [1-8]:
+```
+
+Use one shared 60-character hyphen separator for top-level output blocks. Render only the D-072 top-level headings that correspond to present content: `EVENTS`, `OPEN EVENTS`, `EVENT DETAILS`, `PURCHASE SUMMARY`, `UPDATED EVENT STATUS`, and `FINAL EVENT STATUS`. Render `OPTIONS`, `ACCOUNT`, and `PURCHASE HISTORY` as uppercase subsections inside event details without surrounding separators. Preserve variable-length labeled blocks and exact XML option labels without table truncation or console-width logic. The menu and every output byte remain plain ASCII except user or XML text that is preserved as data.
+
+The shared financial formatter remains:
 
 ```java
 String formatFinancial(double value)
@@ -865,19 +902,19 @@ String formatFinancial(double value)
 
 The formatter uses `String.format(Locale.US, "%.2f", value)`, converts rendered `-0.00` to `0.00`, and treats non-finite input as a programming defect. Closed details derive `Profit`, `Subsidy`, or `Break-even` from the unrounded sign.
 
-- [ ] **Step 1: Write `ConsoleInputTest` and `ConsoleRendererTest` first**
+- [x] **Step 1: Write `ConsoleInputTest` and `ConsoleRendererTest` first**
 
-Cover every D-044 parsing message, whitespace, integer overflow, prompt-local retry, path spaces, end-of-input, exact eight-command menu, full and filtered summary numbering, details, winner, both commission modes, multiple history rows, all sixteen error codes, omitted absent context, no raw cause text, no ANSI or clear-screen sequence, and positive, negative, tiny, signed-zero formatting.
+Cover every unchanged D-044 parsing message, every revised D-072 prompt, whitespace, integer overflow, prompt-local retry, path spaces, end-of-input, the complete D-072 menu literal, exact 60-character separators, all approved section headings, full and filtered summary numbering, long variable-length descriptions without truncation, details, winner, both commission modes, profit, subsidy, break-even, multiple history rows, all sixteen error codes, omitted absent context, no raw cause text, no ANSI, Unicode box drawing, or clear-screen sequence, and positive, negative, tiny, signed-zero formatting.
 
-- [ ] **Step 2: Confirm focused UI tests fail**
+- [x] **Step 2: Confirm focused UI tests fail**
 
-- [ ] **Step 3: Implement input and renderer with injected streams**
+- [x] **Step 3: Implement D-072 input and rendering with injected streams**
 
-Do not close borrowed streams. Do not import domain, XML, or persistence classes.
+Use named constants for the 60-character equals and hyphen separators so menu and block widths cannot drift independently. Keep output methods focused by block, but do not add another production class or a generic layout framework. Do not close borrowed streams. Do not import domain, XML, or persistence classes.
 
-- [ ] **Step 4: Run the two focused UI test classes**
+- [x] **Step 4: Run the two focused UI test classes**
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-ui docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -903,19 +940,19 @@ git commit -m "feat: add console input and rendering"
 
 Purchase and close call `listEvents()`, filter `OPEN` summaries in load order, assign fresh positions, translate the selected position to the actual event ID, and then use that actual ID. Purchase renders the receipt's resulting details without another query. Close renders the returned final details without another query.
 
-- [ ] **Step 1: Implement the handwritten fake and write `GuessMarketConsoleAppTest` first**
+- [x] **Step 1: Implement the handwritten fake and write `GuessMarketConsoleAppTest` first**
 
 The fake records every call and can return configured values, throw a configured checked failure, or throw a configured unexpected runtime defect.
 
-Cover all fifteen D-046 scenarios, all D-071 UI-owned filtering and ID-translation proofs, and one complete happy session across all eight commands.
+Cover all fifteen D-046 scenarios, all D-071 UI-owned filtering and ID-translation proofs, and D-072's menu-return and revised-prompt requirements. The complete happy session across all eight commands must assert that each completed command is separated from a fresh Clean Sections menu by one blank line. Include a recoverable Engine failure that prints the existing `Error` and `Recovery` lines and then returns to that same menu.
 
-- [ ] **Step 2: Confirm application tests fail**
+- [x] **Step 2: Confirm application tests fail**
 
-- [ ] **Step 3: Implement app handlers and `ConsoleMain`**
+- [x] **Step 3: Implement app handlers and `ConsoleMain`**
 
 Use four production UI classes only. Do not add a command framework, reflection dispatch, color, screen clearing, cancellation grammar, automatic save, or confirmation prompt.
 
-- [ ] **Step 4: Run all eleven exact JUnit classes**
+- [x] **Step 4: Run all eleven exact JUnit classes**
 
 Expected class names:
 
@@ -933,20 +970,253 @@ ConsoleRendererTest
 GuessMarketConsoleAppTest
 ```
 
-- [ ] **Step 5: Perform a temporary classpath console smoke test**
+- [x] **Step 5: Perform a temporary classpath console smoke test**
 
-Run load, list, details, purchase, close, save, restore, and exit through compiled class directories. This is development evidence only and does not replace packaged-process proof.
+Run load, list, details, purchase, close, save, restore, and exit through compiled class directories. Use the supplied `multiple.xml` data so the transcript includes real variable-length descriptions and option labels. Inspect the transcript for the exact grouped menu, named sections, one-blank-line menu return, readable long text without truncation, no ANSI or screen clearing, and unchanged success and recovery meaning. This is development evidence only and does not replace packaged-process proof.
 
-- [ ] **Step 6: Update the walkthrough and commit**
+- [x] **Step 6: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-ui docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: implement console application flows"
 ```
 
-- [ ] **Step 7: Run the Stage 5 gate**
+- [x] **Step 7: Run the Stage 5 gate**
 
-Review input recovery, exact messages, same-operation result use, filtering ownership, runtime-defect visibility, all eleven tests, and walkthrough entries before merging.
+Review input recovery, the exact D-072 menu and prompts, all named block shapes, same-operation result use, filtering ownership, runtime-defect visibility, ASCII-only decoration, long supplied text, all eleven tests, the smoke transcript, and walkthrough entries before merging.
+
+Historical D-072 completion record: current rebased Task 11 evidence is `bdb5abd` plus correction `3f3eec2`. Current rebased Task 12 evidence is `9fd2d5d` (`feat: implement console application flows`). The strict Java 25 gate passed 137 tests before manual review found D-073. That earlier green result remains valid historical evidence for D-072 but no longer completes the Stage 5 acceptance gate.
+
+### Task 12A: Correct command completion pacing and audit every console conversation
+
+**Files:**
+
+- Modify: `modules/guessmarket-ui/src/main/java/guessmarket/ui/console/ConsoleInput.java`
+- Modify: `modules/guessmarket-ui/src/main/java/guessmarket/ui/console/ConsoleRenderer.java`
+- Modify: `modules/guessmarket-ui/src/main/java/guessmarket/ui/console/GuessMarketConsoleApp.java`
+- Modify: `modules/guessmarket-ui/src/test/java/guessmarket/ui/console/ConsoleInputTest.java`
+- Modify: `modules/guessmarket-ui/src/test/java/guessmarket/ui/console/ConsoleRendererTest.java`
+- Modify: `modules/guessmarket-ui/src/test/java/guessmarket/ui/console/GuessMarketConsoleAppTest.java`
+- Modify after verification: `docs/design/EXERCISE-1-DESIGN-BRIEF.md`
+- Modify after verification: `docs/guides/TESTING.md`
+- Modify after verification: `docs/guides/IMPLEMENTATION-WALKTHROUGH.md`
+- Modify after verification: `PROJECT_HANDOFF.md`
+
+**Interfaces:**
+
+- Consumes: D-073, the existing full-line `Scanner` input boundary, the existing `ConsoleInput.EndOfInputException`, D-072 rendering, and checked `EngineOperationException` recovery.
+- Produces: package-private `void ConsoleInput.waitForMenuReturn() throws EndOfInputException`, the revised static menu, and a command loop that pauses after every handled command attempt from 1 through 7.
+- Preserves: four UI production classes, seven Engine operations, current DTOs, command numbering, filtering and actual-ID translation, exact result blocks, and visibility of unchecked programming defects.
+
+- [x] **Step 1: Write the D-073 input and menu tests**
+
+Add focused `ConsoleInputTest` methods with these exact calls and expectations:
+
+```java
+@Test
+void returnToMenuAcceptsBlankAndWhitespaceOnlyLines() throws Exception {
+    StringWriter blankText = new StringWriter();
+    input("\n", blankText).waitForMenuReturn();
+    assertEquals("Press Enter to return to the main menu:\n", blankText.toString());
+
+    StringWriter whitespaceText = new StringWriter();
+    input("   \n", whitespaceText).waitForMenuReturn();
+    assertEquals("Press Enter to return to the main menu:\n", whitespaceText.toString());
+}
+
+@Test
+void returnToMenuRejectsEveryNonblankLineWithoutTreatingItAsACommand() throws Exception {
+    StringWriter text = new StringWriter();
+    input("2\nword\n\n", text).waitForMenuReturn();
+    assertEquals("""
+            Press Enter to return to the main menu:
+            Press Enter without typing a command.
+            Press Enter to return to the main menu:
+            Press Enter without typing a command.
+            Press Enter to return to the main menu:
+            """, text.toString());
+}
+
+@Test
+void endOfInputAtReturnToMenuIsTheExistingCheckedSignal() {
+    assertThrows(ConsoleInput.EndOfInputException.class,
+            () -> input("", new StringWriter()).waitForMenuReturn());
+}
+```
+
+Revise both menu literals in `ConsoleInputTest` and `ConsoleRendererTest` so they contain one blank line between `8. Exit` and `Choose a command [1-8]:`, and add `assertFalse(output.contains("Commands 2 through 6 require a loaded system."));` to the renderer test.
+
+- [x] **Step 2: Write application-level RED tests for ordering and edge cases**
+
+Update the happy-path script by adding one blank line after each completed command from 1 through 7. Replace the old repeated-menu assertion with an ordering assertion that each command result is followed by the exact pause prompt before the next menu.
+
+Add focused tests equivalent to these exact cases:
+
+```java
+@Test
+void recoverableEngineFailureWaitsForEnterBeforeRedrawingTheMenu() {
+    FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+    engine.failWith(FakeGuessMarketEngine.LIST, failure(EngineErrorCode.NO_SYSTEM_LOADED));
+
+    String output = run(engine, "2\n\n8\n");
+
+    assertTrue(output.contains("Recovery: Load XML or restore saved state first.\n"
+            + "Press Enter to return to the main menu:\n\n" + MENU));
+}
+
+@Test
+void endOfInputAtReturnToMenuExitsWithoutRedrawingTheMenu() {
+    FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+
+    String output = run(engine, "2\n");
+
+    assertEquals(1, occurrences(output, MENU));
+    assertTrue(output.endsWith("Press Enter to return to the main menu:\n"
+            + "Input closed. Exiting.\n"));
+}
+
+@Test
+void nonblankReturnInputIsRetriedAndNeverExecutedAsTheNextCommand() {
+    FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+
+    String output = run(engine, "2\n8\n\n8\n");
+
+    assertEquals(List.of("listEvents()"), engine.calls);
+    assertTrue(output.contains("Press Enter without typing a command."));
+    assertEquals(2, occurrences(output, MENU));
+}
+
+@Test
+void exitDoesNotDisplayTheReturnToMenuPrompt() {
+    String output = run(new FakeGuessMarketEngine(), "8\n");
+
+    assertFalse(output.contains("Press Enter to return to the main menu:"));
+    assertTrue(output.endsWith("Goodbye.\n"));
+}
+```
+
+Keep invalid main-menu input pause-free and update the pre-load, empty-open-event, failed purchase, failed close, details, save, restore, and complete-session scripts so every handled command from 1 through 7 supplies its explicit return Enter. Preserve the existing EOF-at-secondary-prompt and unchecked-defect assertions.
+
+- [x] **Step 3: Compile the three UI suites and prove RED for the approved reasons**
+
+Use a new `build/d073-red` tree. Strictly compile DTO, Engine, UI, and all tests with Oracle Java 25.0.4, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, the JUnit 6.1.1 runner, and the five approved JAXB runtime JARs. Run:
+
+```powershell
+$d073RedClasspath = @(
+  'build\d073-red\classes\test'
+  'build\d073-red\classes\dto'
+  'build\d073-red\classes\engine'
+  'build\d073-red\classes\ui'
+  'modules\guessmarket-engine\src\main\resources'
+  'modules\guessmarket-engine\src\test\resources'
+  'tools\jaxb-ri-4.0.5\mod\angus-activation.jar'
+  'tools\jaxb-ri-4.0.5\mod\jakarta.activation-api.jar'
+  'tools\jaxb-ri-4.0.5\mod\jakarta.xml.bind-api.jar'
+  'tools\jaxb-ri-4.0.5\mod\jaxb-core.jar'
+  'tools\jaxb-ri-4.0.5\mod\jaxb-impl.jar'
+)
+& 'C:\Program Files\Java\jdk-25.0.4\bin\java.exe' `
+  -jar tools\testing\junit-platform-console-standalone-6.1.1.jar execute `
+  --class-path ($d073RedClasspath -join [IO.Path]::PathSeparator) `
+  --select-class guessmarket.ui.console.ConsoleInputTest `
+  --select-class guessmarket.ui.console.ConsoleRendererTest `
+  --select-class guessmarket.ui.console.GuessMarketConsoleAppTest `
+  --fail-if-no-tests --disable-banner --disable-ansi-colors --details=summary
+```
+
+Expected RED causes: `waitForMenuReturn()` is missing, the old static loaded-system sentence remains, and application transcripts redraw the menu without the approved pause. Any unrelated compiler or test failure must be diagnosed before production code changes.
+
+- [x] **Step 4: Implement the minimal input and renderer correction**
+
+Add this package-private method to `ConsoleInput`:
+
+```java
+void waitForMenuReturn() throws EndOfInputException {
+    while (true) {
+        writeLine("Press Enter to return to the main menu:");
+        if (readLine().trim().isEmpty()) {
+            return;
+        }
+        writeLine("Press Enter without typing a command.");
+    }
+}
+```
+
+In `ConsoleRenderer.renderMenu()`, delete only:
+
+```java
+writeLine("Commands 2 through 6 require a loaded system.");
+writeLine("");
+```
+
+Keep the existing blank line after `8. Exit`, so the revised menu has exactly one blank line before its choice prompt.
+
+- [x] **Step 5: Implement the minimal application-loop correction**
+
+Keep the existing outer `EndOfInputException` catch. After reading a valid choice, execute command 8 immediately. For each valid choice from 1 through 7, execute the existing handler inside the checked Engine-error boundary, render any checked error, then call `input.waitForMenuReturn()`. Choice 0 from invalid main-menu parsing skips the pause. Do not catch `RuntimeException` or `Error`.
+
+The control shape must remain equivalent to:
+
+```java
+int choice = input.readMenuChoice();
+if (choice == 8) {
+    renderer.renderGoodbye();
+    return;
+}
+if (choice >= 1 && choice <= 7) {
+    try {
+        executeCommand(choice);
+    } catch (EngineOperationException exception) {
+        renderer.renderError(exception);
+    }
+    input.waitForMenuReturn();
+}
+```
+
+If extracting `executeCommand(int choice)`, keep it private, use the existing numeric switch, and introduce no command abstraction or fifth production class.
+
+- [x] **Step 6: Run focused GREEN and audit all UI conversations**
+
+Recompile into a new `build/d073-green` tree and run the same three exact UI suites. Then inspect every command path for success, checked error, empty result, invalid secondary input, EOF, and unchecked failure. Confirm:
+
+- Commands 1 through 7 pause after handled success, empty result, or checked Engine failure.
+- Command 8 never pauses.
+- Invalid menu input redraws without a pause.
+- Invalid secondary input repeats only its own prompt.
+- EOF at the menu, return pause, event selection, option selection, quantity, XML path, save path, and restore path prints one `Input closed. Exiting.` and exits normally.
+- Nonblank pause input never becomes a command.
+- Runtime defects remain uncaught and visible.
+- No UI path adds or infers Engine loaded state.
+
+- [x] **Step 7: Run real Engine and process-level audit scenarios**
+
+Use the supplied `multiple.xml` fixture and compiled real `GuessMarketEngineImpl` to exercise load, list, details, purchase, close, save, restore, pre-load rejection, invalid input, EOF at pauses, and exit. Capture output under `build/d073-manual-audit`, which remains untracked. Verify the command 2 result contains all three event IDs and remains the final visible block until Enter. Search the transcript to prove the static loaded-system note is absent.
+
+If a concrete Engine defect appears, record the exact input, Engine call, expected result, actual result, and state-preservation evidence. Do not change Engine production code under Task 12A without a separate approved correction.
+
+- [x] **Step 8: Run the renewed strict all-eleven-suite gate**
+
+Compile all production and test sources into a fresh `build/d073-final` directory using the strict Java 25 flags. Include `modules/guessmarket-engine/src/main/resources` and `modules/guessmarket-engine/src/test/resources` on the JUnit runtime classpath. Run all eleven test suites with `--scan-class-path`, `--include-engine junit-jupiter`, and `--fail-if-no-tests`. Require zero failures, skips, disabled tests, aborts, warnings from compilation, or missing suite names.
+
+- [x] **Step 9: Update the durable Stage 5 record**
+
+Mark D-073 approved and implemented in the design ledger and brief. Record the new method, menu behavior, EOF contract, regression tests, audit scenarios, exact test count, and any separately reported Engine finding in the walkthrough and testing guide. Update `PROJECT_HANDOFF.md` so Stage 5 awaits renewed Nitzan review rather than claiming the earlier 137-test gate completes it.
+
+- [x] **Step 10: Verify, commit, and push for renewed pull request review**
+
+Run `git diff --check`, inspect every staged path, confirm `.superpowers/` and every `build/` output remain untracked or ignored, and scan the staged diff for secrets or private absolute paths. Commit only the reviewed source, tests, and durable public documentation:
+
+```powershell
+git add modules/guessmarket-ui docs PROJECT_HANDOFF.md
+git commit -m "fix: keep console results visible before menu return"
+git push origin codex/e1-console-ui
+```
+
+The Stage 5 pull request remains a draft and unmerged until Nitzan completes the renewed manual review and explicitly accepts it.
+
+Task 12A approval record: Nitzan approved D-073 on 2026-08-17 and authorized its test-first implementation, full UI audit, separate Engine-defect reporting, renewed verification, documentation update, commit, and push to pull request 5.
+
+Task 12A completion record: the RED compile failed with four expected missing-method errors. Focused GREEN passed 33 UI tests, including the final review regression proving direct `AssertionError` visibility. The renewed strict Java 25 all-eleven-suite gate passed all 145 tests with zero failures, skips, disabled tests, or aborts. Real Engine process audits passed the complete supplied-XML workflow, pre-load recovery, and exact EOF at the pause. No concrete Engine defect was found, and no Engine production source changed. The main correction is `9366bea`, the independent-review fix is `d737087`, and both are pushed to `origin/codex/e1-console-ui` in draft pull request 5. Task 12A is complete and awaits Nitzan's renewed manual review.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 
@@ -1087,11 +1357,11 @@ Record the OS evidence, Java version, exact ZIP SHA-256, extraction location, la
 
 - [ ] **Step 5: Perform the README-led grader walkthrough**
 
-Start from another fresh copy of the same hash, follow only the README and `run.bat`, inspect exact contents, verify GitHub accessibility as intended, and record the result.
+Start from another fresh copy of the same hash, follow only the README and `run.bat`, inspect exact contents, verify the documented GitHub link, and record the result.
 
-- [ ] **Step 6: Run final source and privacy review**
+- [ ] **Step 6: Run final source, privacy, and public-access review**
 
-Inspect tracked files, ignored private paths, runtime `.ser` exclusion, generated source tracking, custom fixture tracking, build inputs, meaningful commits, secrets scan, full diff, and clean status.
+Inspect tracked files, ignored private paths, runtime `.ser` exclusion, generated source tracking, custom fixture tracking, build inputs, meaningful commits, secrets scan, full diff, and clean status. After this public-safety review passes, stop for Nitzan to change the repository visibility manually from private to public. Then verify that the GitHub link and intended `main` branch content open from a logged-out or otherwise unauthenticated view.
 
 - [ ] **Step 7: Update the walkthrough from planned to completed behavior**
 
@@ -1103,12 +1373,13 @@ Present the exact ZIP hash and all evidence. Only after Nitzan explicitly approv
 
 ## 12. Plan self-review checklist
 
-- [x] Every D-001 through D-071 implementation requirement maps to a task or final gate.
+- [x] Every D-001 through D-072 implementation requirement maps to a task or final gate.
 - [x] D-067 zero-based account and profit, subsidy, or break-even output map to domain, renderer, persistence, and final tests.
 - [x] D-068 direct delta and binary64 limits map to calculator, domain atomicity, and simulator evidence.
 - [x] D-069 full-range IDs and text rules map to custom fixtures, mapper, Engine, UI translation, and persistence.
 - [x] D-070 direct-domain graph, filter, alias checks, move behavior, and honest guarantees map to Task 9.
 - [x] D-071 UI proof ownership, all eleven classes, mandatory verifier, and clean Windows 10 evidence map to Tasks 10 through 14.
+- [x] D-072 Clean Sections menu, prompts, section grammar, portability limits, transcript proof, and rejected-direction boundaries map to Tasks 11 and 12 plus the Stage 5 gate.
 - [x] All seven Engine methods and all sixteen error codes have an implementation and automated proof owner.
 - [x] No Exercise 2 or Exercise 3 feature entered the file map.
 - [x] No unapproved framework, module, fat JAR, public API wrapper, or console-specific Engine method entered the plan.

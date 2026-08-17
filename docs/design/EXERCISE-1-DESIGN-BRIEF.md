@@ -1,15 +1,15 @@
 # Exercise 1 Design Brief
 
-Status: adversarial review corrections complete through D-071 on 2026-08-15. No blocking design finding remains, the written design is ready for implementation planning, and implementation has not started.
+Status: approved through D-073. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements D-072 Clean Sections plus D-073 readable command completion on `codex/e1-console-ui`, directly above `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate reports 145 successful tests, and real-process audits pass. Draft pull request 5 remains unmerged pending Nitzan's renewed review and acceptance.
 
-Last updated: 2026-08-15
+Last updated: 2026-08-17
 
 ## How to use this brief
 
 Read this file first when you need the overall design without all of the decision history.
 
 - `EXERCISE-1-DESIGN.md` is the authoritative design ledger. It contains the reasoning, alternatives, approval history, reviewed corrections, and remaining pre-implementation gates.
-- `../README.md` maps the public documentation. The detailed implementation plan will be added under `../planning/` and approved before coding.
+- `../README.md` maps the public documentation. The approved detailed implementation plan lives under `../planning/` and controls the staged execution order.
 - This brief introduces no new decisions. If it conflicts with the design ledger, the ledger controls.
 
 ## Current scope
@@ -19,7 +19,7 @@ Read this file first when you need the overall design without all of the decisio
 - Keep clean boundaries that can evolve in Exercises 2 and 3, but do not implement their features now.
 - Use Java 25.
 - Produce three separate application JARs: Console UI, Engine, and DTO.
-- No Java source tree, generated JAXB source, IntelliJ project, build output, or GitHub remote has been created yet. Module names, conventional source roots, package topology, the supported caller boundary, and JAXB-derived file and development dependency paths are approved as design only.
+- The standalone repository is currently private and contains the implemented Stage 1 through Stage 5 Java source, generated JAXB source, tests, and documentation. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`; Stage 5 includes the approved D-073 manual-review correction but is not integrated or accepted. Aviad confirmed that the repository must become public for grader access before submission. Nitzan will make that change manually after implementation and the final public-safety review.
 
 ## Whole-system mental model
 
@@ -75,6 +75,19 @@ guessmarket-ui
 ```
 
 The supported production UI boundary is narrow: UI code imports the Engine interface, structured Engine failure types, and DTOs. `ConsoleMain` may additionally construct `GuessMarketEngineImpl` once. Domain, LMSR, account, internal-history, persistence, handwritten XML, and generated JAXB types are not supported UI API even when a specific Engine collaboration requires technical public visibility.
+
+## Approved console presentation
+
+D-072 selects the Clean Sections direction for Stage 5. The console remains plain, deterministic, and portable, but it uses stronger hierarchy than the earlier transcript-style sketch:
+
+- a 60-character equals-sign title band around `GUESS MARKET`;
+- the stable eight commands grouped, without renumbering, under `DATA`, `TRADING`, and `STATE AND SESSION`;
+- `Choose a command [1-8]:` and similarly explicit bracketed ranges for event and option prompts;
+- 60-character hyphen separators around top-level blocks such as `EVENTS` and `EVENT DETAILS`, with restrained `OPTIONS`, `ACCOUNT`, and `PURCHASE HISTORY` subsections inside details;
+- readable labeled event blocks rather than a fragile fixed-width table;
+- no color, ANSI, Unicode box drawing, screen clearing, width detection, animation, extra confirmation, or cancellation grammar.
+
+The complete section grammar, prompts, superseded historical shapes, and test ownership are recorded in D-072. D-073 removes the misleading permanent loaded-system note and pauses after handled commands 1 through 7 so a result remains visible until Enter. Blank or whitespace-only Enter returns to a fresh menu, nonblank pause input retries locally, EOF exits normally from every prompt, and command 8 exits immediately. These presentation decisions change only the console layer. They add no Engine method, DTO field, production class, dependency, or Exercise 2 behavior.
 
 ## Test architecture
 
@@ -349,12 +362,12 @@ This applies to XML replacement, purchases, closing, save, and restore. Failed o
 - Tomcat, servlets, HTTP, polling, Gson, and WAR packaging.
 - Exercise 3 identity rules and concurrency.
 
-## Ready for implementation planning
+## Current implementation boundary
 
-The adversarial review and approved correction pass through D-071 are complete. The requirement and lecturer-checklist audits have no remaining blocking design finding. The written design is ready to be converted into a detailed implementation plan, but no implementation plan or implementation artifact has been created in this correction pass.
+The adversarial review and D-067 through D-071 correction pass are complete. D-072 records the approved Stage 5 Clean Sections presentation, and D-073 records the approved readable command-completion and graceful-input correction. The requirement and lecturer-checklist audits have no remaining blocking design finding.
 
-The private standalone GitHub repository is the approved source repository. It must preserve the unchanged three-module layout, invoke the authoritative `build.bat` in any future CI rather than bypassing its mandatory JUnit verifier, track generated JAXB source, custom XML fixtures, and build inputs, exclude the private submission README and runtime `.ser` files, and treat a clean Windows 10 run of the exact final ZIP as mandatory evidence that CI cannot automatically replace.
+The standalone GitHub repository is the approved source repository. It remains private during active implementation and review, then must become public for grader access before submission as confirmed by Aviad on 2026-08-17. It must preserve the unchanged three-module layout, invoke the authoritative `build.bat` in any future CI rather than bypassing its mandatory JUnit verifier, track generated JAXB source, custom XML fixtures, and build inputs, exclude the private submission README and runtime `.ser` files, and treat a clean Windows 10 run of the exact final ZIP as mandatory evidence that CI cannot automatically replace.
 
-After the standalone repository migration is verified, the next project action is to write and obtain approval for the detailed implementation plan. Java implementation begins only after that plan is approved.
+The detailed staged implementation plan is approved and active. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 follows D-072 and D-073; Tasks 11, 12, and 12A are implemented on `codex/e1-console-ui` directly above `9a8c87c`. The renewed strict gate passes all 145 tests, and real-process audits cover the complete workflow, pre-load recovery, and EOF at the pause. Draft pull request 5 remains unmerged while awaiting Nitzan's renewed review and acceptance.
 
 The earlier combined proposal using Section 10 labels D-054 through D-056 was not approved. New D-054, D-055, and D-056 decisions were later explained and approved separately for build authority, module-local roots, and package topology with supported API visibility.

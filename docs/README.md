@@ -6,7 +6,7 @@ The documentation is grouped by purpose so readers can move from product intent 
 
 - [Architecture](design/ARCHITECTURE.md): module boundaries, dependencies, packages, and runtime flows.
 - [Exercise 1 design brief](design/EXERCISE-1-DESIGN-BRIEF.md): concise map of the approved Exercise 1 design.
-- [Complete Exercise 1 design](design/EXERCISE-1-DESIGN.md): authoritative decisions D-001 through D-071, including alternatives and approvals.
+- [Complete Exercise 1 design](design/EXERCISE-1-DESIGN.md): authoritative decisions D-001 through D-072, including alternatives and approvals.
 
 ## Planning
 

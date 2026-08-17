@@ -4,7 +4,7 @@ Guess Market is a Java 25 prediction-market simulator designed around LMSR prici
 
 ## Current status
 
-Exercise 1 design is complete through decision D-071 and passed a full pre-implementation review with no blocking design findings. The private standalone repository is established, and the seven-stage implementation plan is approved. Stage 1 is now in progress. No verified Java implementation, build script, generated JAXB project source, or release artifact exists yet.
+Exercise 1 design is approved through decision D-073 and passed a full pre-implementation review with no blocking design findings. Stages 1 through 3 are accepted and merged. Stage 4 persistence and complete Engine orchestration are independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Clean Sections console UI plus its D-073 readable command-completion correction are implemented on `codex/e1-console-ui` directly above `9a8c87c`. The renewed strict Java 25 all-eleven-suite result is 145 successful tests, and real-process UI and Engine audits pass. Draft pull request 5 remains unmerged pending Nitzan's renewed Stage 5 review and acceptance. The authoritative build and release artifacts remain later stages.
 
 ## Planned architecture
 
@@ -36,7 +36,7 @@ Each module will produce a separate non-fat JAR. The UI JAR will be the only exe
 - Oracle JDK 25
 - Windows for the authoritative `build.bat` and final package verification
 - Repository-vendored JAXB 4.0.5 dependencies
-- Repository-vendored JUnit Platform Console Standalone dependency after the implementation foundation milestone
+- Repository-vendored JUnit Platform Console Standalone 6.1.1 dependency for tests only
 
 The authoritative build does not download dependencies.
 
@@ -60,6 +60,8 @@ The detailed plan was approved on 2026-08-15. Implementation proceeds through se
 ## Repository boundaries
 
 Course handouts, private submission documents, runtime `.ser` files, generated build output, and identity-bearing submission ZIP files remain outside Git. The repository includes only project-owned source and documentation, required test fixtures, reproducible build inputs, and the minimal vendored dependency set with its license material.
+
+The repository remains private during active implementation and review. Aviad confirmed that it must become public for grader access before submission. Nitzan will make that visibility change manually only after the final public-safety, documentation, and link checks pass.
 
 ## License
 

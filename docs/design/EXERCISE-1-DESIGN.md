@@ -1,8 +1,8 @@
 # Exercise 1 Design
 
-Status: adversarial review corrections approved through D-071 on 2026-08-15. The written design is complete and ready for implementation planning. Implementation has not started.
+Status: approved through D-073. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation and D-073 readable command completion on `codex/e1-console-ui`, rebased directly onto `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate reports 145 successful tests. Real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Draft pull request 5 remains unmerged and awaits Nitzan's renewed Stage 5 review.
 
-Last updated: 2026-08-15
+Last updated: 2026-08-17
 
 Evidence status: reconciled through the 2026-08-15 adversarial review against the current V2 handout, supplied schema and fixtures, lecturer checklist and learning guide, current forum guidance including Aviad Cohen's market-maker account clarification, the supplied simulator, Java 25 and JUnit primary documentation, and the complete decision history through D-066.
 
@@ -14,7 +14,7 @@ After every approval round, update this file before advancing to the next design
 
 ## Current boundary
 
-- The written design is complete. Implementation planning is the next project stage, but no Java source tree, module project, generated JAXB classes, or implementation is approved yet.
+- The written design is complete. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation exist on `codex/e1-console-ui`, successfully rebased directly onto that merge. The branch is pushed and draft pull request 5 is open while Stage 5 remains unmerged pending Nitzan's review and acceptance.
 - Exercise 1 is the implementation scope.
 - Exercise 2 and Exercise 3 are compatibility evidence only. Their features will not be designed or implemented early.
 - The target is every base requirement plus the 5-point save-and-restore bonus.
@@ -1861,7 +1861,7 @@ Engine module in `guessmarket.engine.xml`:
 UI module in `guessmarket.ui.console`:
 
 - `ConsoleInputTest` covers full-line parsing, blank and whitespace-only input, non-numeric input, integer overflow, zero, negatives, out-of-range menu and selection values, invalid quantities, paths containing spaces, prompt-local retries, and end-of-input at the main menu or a secondary prompt.
-- `ConsoleRendererTest` covers the stable menu, empty-set responses, summaries, complete details, purchase receipts, history, lifecycle and winner display, all approved `EngineErrorCode` responses, omission of absent optional context, absence of raw exception text, and fixed two-decimal `Locale.US` formatting for positive, negative, tiny, and negative-zero values.
+- `ConsoleRendererTest` covers the stable menu, empty-set responses, summaries, complete details, purchase receipts, history, lifecycle and winner display, all approved `EngineErrorCode` responses, omission of absent optional context, absence of raw exception text, and fixed two-decimal `Locale.US` formatting for positive, negative, tiny, and negative-zero values. It also proves that ON_CLOSE receipt and history output omit `Purchase commission`, while ON_PURCHASE at 0 percent retains the exact `Purchase commission: 0.00` line.
 - `GuessMarketConsoleAppTest` covers all eight command conversations with scripted input and a handwritten fake Engine. It verifies commands before loading, menu recovery, event-position-to-ID translation, open and closed filtering, no-open-event behavior, successful and failed purchase and close flows, save and restore flows, explicit exit, graceful end-of-input, one complete happy path, and the rule that an unexpected runtime defect remains visible rather than being swallowed.
 - `FakeGuessMarketEngine` is a test helper, not a test class. It records calls and returns configured DTOs, checked failures, or unexpected runtime failures so UI behavior can be verified independently of Engine internals.
 
@@ -2540,6 +2540,107 @@ The exact final extracted ZIP remains the runtime verification target. IntelliJ 
 
 This decision supersedes only the contradictory proof ownership in D-060 and D-061, the incomplete proof matrix, D-065's insufficient exit-code inference, and D-066 Gate 8's preferred wording. It does not add a twelfth test class, a new module, a CI dependency, or an implementation artifact.
 
+### D-072: Clean Sections console presentation
+
+Decision: Stage 5 uses the approved Clean Sections console direction. Nitzan selected it after comparing three realistic browser mockups on 2026-08-17. The choice improves grader-facing hierarchy and scanning while preserving the eight-command behavior, four-class UI boundary, deterministic English output, and modest Exercise 1 implementation scope.
+
+The exact main menu is:
+
+```text
+============================================================
+                       GUESS MARKET
+============================================================
+
+DATA
+  1. Load events from XML
+  2. Display all events
+  3. View an event's trading status
+
+TRADING
+  4. Purchase shares
+  5. Close an event
+
+STATE AND SESSION
+  6. Save current state
+  7. Restore saved state
+  8. Exit
+
+Commands 2 through 6 require a loaded system.
+
+Choose a command [1-8]:
+```
+
+Presentation grammar:
+
+- A top-level output block begins with a 60-character hyphen separator, an uppercase title, and another 60-character hyphen separator.
+- Approved top-level titles are `EVENTS`, `OPEN EVENTS`, `EVENT DETAILS`, `PURCHASE SUMMARY`, `UPDATED EVENT STATUS`, and `FINAL EVENT STATUS` where their corresponding content is present.
+- `OPTIONS`, `ACCOUNT`, and `PURCHASE HISTORY` are uppercase subsection titles inside an event-details block. They do not receive their own surrounding separators, matching the approved mockup's restrained hierarchy.
+- Event summary blocks retain the labeled, variable-length structure from D-039 beneath `EVENTS` or `OPEN EVENTS`. They are not converted into a fixed-width table, truncated, or padded to the longest supplied value.
+- Detailed event output begins with `EVENT DETAILS`, then displays `ID`, `Name`, `Description`, `Status`, and one combined `Commission` line before the `OPTIONS`, `ACCOUNT`, and `PURCHASE HISTORY` sections. An open event omits a winner. A closed event adds `Winner: N - label` after `Status`.
+- Each option uses its own numbered line, followed by one indented line containing `Price` and `Shares purchased`. The option labels remain exact XML-provided text.
+- `ACCOUNT` shows `Event account balance` and `Total commission collected`. A closed event also shows D-067's exact `Final market-maker result` line, derived from the unrounded final-balance sign.
+- `PURCHASE HISTORY` prints `No purchases have been made.` for an empty history. Nonempty newest-first rows retain the complete D-041 financial breakdown.
+- Existing success sentences, the two-line `Error` and `Recovery` mapping, empty-open-set messages, end-of-input message, and two-decimal `Locale.US` rules remain unchanged unless this decision gives a more specific label or prompt.
+
+Canonical open-event details use this shape with real supplied data:
+
+```text
+------------------------------------------------------------
+EVENT DETAILS
+------------------------------------------------------------
+ID: 2
+Name: World Cap Winner
+Description: Who do you think will win the world cap ?
+Status: OPEN
+Commission: 15% on close
+
+OPTIONS
+  1. Argentina
+     Price: 0.50   Shares purchased: 0
+  2. Spain
+     Price: 0.50   Shares purchased: 0
+
+ACCOUNT
+  Event account balance: 0.00
+  Total commission collected: 0.00
+
+PURCHASE HISTORY
+  No purchases have been made.
+```
+
+The renderer preserves the exact supplied description, including its punctuation and spacing. `ON_PURCHASE` renders as `N% on purchase`; `ON_CLOSE` renders as `N% on close`. Closed details add `Winner: N - label` after `Status` and the exact D-067 `Final market-maker result` line inside `ACCOUNT`.
+
+The exact revised interactive prompts are:
+
+```text
+Choose a command [1-8]:
+Choose an event [1-N]:
+Choose an option [1-2]:
+Choose the winning option [1-2]:
+Enter shares to purchase (positive whole number):
+Enter the full path to the XML file:
+Enter the full path and file name to save, without an extension:
+Enter the full path and file name to restore, without an extension:
+```
+
+`N` is the current displayed collection size. D-044's invalid-input messages remain exact and continue to repeat only the current prompt. Engine rejections still abandon the command and return to a fresh menu.
+
+Restraint and portability rules:
+
+- Use plain ASCII separators and ordinary spaces only. Do not add Unicode box drawing, emoji, icons, colors, ANSI sequences, cursor movement, or screen clearing.
+- Do not surround the full application or every event with a box. That more decorative Command Center direction was reviewed and not selected.
+- Do not add a console-width query, dynamic wrapping algorithm, fixed-width event table, confirmation screen, cancellation grammar, progress animation, or JavaFX behavior.
+- Reprint the complete menu after each completed or recoverable command, separated from the prior output by one blank line, as already required by D-044.
+
+Verification ownership:
+
+- `ConsoleRendererTest` asserts the complete menu literal, every section heading, 60-character separators, open and closed detail shapes, summaries, receipt and history composition, and the absence of ANSI and clear-screen sequences.
+- `ConsoleInputTest` asserts the revised prompts together with the existing parsing and prompt-local retry rules.
+- `GuessMarketConsoleAppTest` asserts at least one complete multi-command transcript that returns to the Clean Sections menu after every completed or recoverable command.
+- The Stage 5 smoke test and later packaged-process transcript include a long supplied description and real XML option labels to confirm readable variable-length output without truncation.
+
+This decision supersedes D-044's exact menu literal, the conflicting prompt literals in D-035 through D-038, and the conflicting rendering shapes in D-039 through D-041. It does not change command numbering, command availability, Engine calls, DTO fields, selection translation, ordering, recovery boundaries, financial formatting, public APIs, or the deferred JavaFX boundary.
+
 ### Resolution index for historical forward references
 
 The original wording remains historical. The following later decisions close statements that still used future or pending language:
@@ -2561,6 +2662,90 @@ The original wording remains historical. The following later decisions close sta
 
 Nitzan approved the only choice-bearing correction, D-070's direct-domain representation, on 2026-08-15. The remaining D-067 through D-071 content follows current assignment or lecturer evidence or mechanically resolves contradictions found by the approved adversarial review. No Java source, build script, generated class, test, IDE configuration, JAR, ZIP, environment change, GitHub remote, staging action, or commit was created by this correction pass.
 
+Nitzan separately approved D-072's Clean Sections console presentation on 2026-08-17 after reviewing Clean Sections, Command Center, and Minimal Transcript mockups. D-072 is a post-review presentation decision and does not reopen the reviewed Engine or DTO architecture.
+
+### D-073: Readable command completion and graceful input closure
+
+Status: approved by Nitzan and implemented on 2026-08-17 after he reproduced the problem manually and reviewed this exact written contract.
+
+Problem and evidence:
+
+- After a command finishes, D-072 immediately redraws the complete menu. In a short PowerShell or IDE terminal, a long result such as the three-event list scrolls above the visible viewport before the user has time to read it.
+- The main menu permanently says `Commands 2 through 6 require a loaded system.` even after XML loading or state restoration succeeds. This sentence is not a live error and does not prove that the Engine lost its loaded state, but its position makes it look like a current failure.
+- The reproduced command 2 transcript contains all three supplied events and later commands can use them. The observed defect is therefore console pacing and status wording, not evidence of an Engine state-loss defect.
+
+Decision:
+
+- Remove `Commands 2 through 6 require a loaded system.` from the main menu. Pre-load attempts already produce the existing structured response `Error: No system is loaded.` followed by `Recovery: Load XML or restore saved state first.`
+- After every handled command attempt from 1 through 7, keep its success output, result block, empty-set message, or recoverable Engine error visible and print `Press Enter to return to the main menu:`.
+- Redraw the complete menu only after the user submits an empty line at that pause.
+- Command 8 remains immediate: print `Goodbye.` and exit without a return-to-menu pause.
+- Do not clear the screen, query terminal size, truncate output, or introduce cursor control. The user remains free to scroll through long results before pressing Enter.
+
+The revised complete main menu is:
+
+```text
+============================================================
+                       GUESS MARKET
+============================================================
+
+DATA
+  1. Load events from XML
+  2. Display all events
+  3. View an event's trading status
+
+TRADING
+  4. Purchase shares
+  5. Close an event
+
+STATE AND SESSION
+  6. Save current state
+  7. Restore saved state
+  8. Exit
+
+Choose a command [1-8]:
+```
+
+Return-to-menu input contract:
+
+- The exact pause prompt is `Press Enter to return to the main menu:`.
+- An empty line completes the pause and permits one fresh menu redraw.
+- A nonblank line at the pause is not treated as the next menu command. Print `Press Enter without typing a command.` and repeat only the pause prompt. This prevents a typed `2`, for example, from being silently discarded or executed without the user seeing the menu.
+- End-of-input at the pause prints the existing `Input closed. Exiting.` message exactly once, exits normally, and does not redraw the menu.
+- End-of-input at the main menu or at any command-specific prompt keeps the same graceful result: print `Input closed. Exiting.` exactly once and exit normally without another menu or pause.
+
+Command and recovery matrix:
+
+| Situation | Required behavior before any next menu |
+| --- | --- |
+| Command 1 through 7 succeeds | Render the complete success or result output, then wait at the return-to-menu prompt. |
+| Command 1 through 7 reaches an approved empty result such as no open events | Render the empty-result message, then wait at the return-to-menu prompt. |
+| Command 1 through 7 receives a checked `EngineOperationException` | Render the existing `Error` and `Recovery` lines, then wait at the return-to-menu prompt. |
+| Invalid main-menu line | Render `Invalid menu choice. Enter a number from 1 to 8.` and redraw the menu without a pause because no command began. |
+| Invalid command-specific input | Keep the existing prompt-local retry. Do not return to the menu and do not show the pause yet. |
+| Command 8 | Render `Goodbye.` and exit immediately. |
+| Unexpected unchecked exception or assertion failure | Keep it visible to the developer. Do not convert it into a user recovery message or a pause. |
+
+Implementation boundaries:
+
+- `ConsoleInput` owns the new full-line return-to-menu prompt, blank-line validation, nonblank retry, and end-of-input signal, consistent with its ownership of all other prompt-local input.
+- `GuessMarketConsoleApp` invokes the pause only after a handled command attempt from 1 through 7 and keeps one outer graceful end-of-input boundary.
+- `ConsoleRenderer` owns the revised static menu literal and otherwise preserves D-072 output formatting.
+- No new production class, public method, Engine method, DTO field, loaded-state flag, dependency, or terminal-specific behavior is introduced.
+- A UI audit may report a concrete Engine defect, but D-073 does not authorize changing Engine behavior. Any such defect must be documented with reproduction evidence and reviewed separately before an Engine correction.
+
+Verification requirements:
+
+- `ConsoleRendererTest` must reject the removed loaded-system note and assert the revised complete menu literal.
+- `ConsoleInputTest` must cover blank return, whitespace-only return, nonblank retry, repeated nonblank retry, and end-of-input at the pause.
+- `GuessMarketConsoleAppTest` must prove output ordering: command result, return-to-menu prompt, accepted Enter, then exactly one new menu. It must also cover checked Engine recovery, empty results, command 8 without a pause, invalid menu input without a pause, and EOF at the main menu, pause, and every command-specific prompt category.
+- A real-process transcript using supplied XML must prove that the events remain loaded, command 2 renders all supplied events, the result remains visible until Enter, and the misleading static note is absent.
+- The remaining command conversations must be audited for equivalent viewport, retry, error-recovery, and EOF defects. The full eleven-suite strict Java 25 gate must pass before the correction is committed as complete or pushed for renewed review.
+
+D-073 supersedes only D-072's permanent loaded-system sentence and immediate menu-redraw rule. All D-072 section grammar, exact command numbering, approved result shapes, Engine calls, selection translation, error mapping, numeric formatting, and architecture boundaries remain unchanged.
+
+Implementation evidence: `ConsoleInput.waitForMenuReturn()` owns the blank-line pause, nonblank retry, and existing checked EOF signal. `GuessMarketConsoleApp.run()` invokes it after handled command attempts 1 through 7, including empty results and checked Engine errors, while command 8 and invalid main-menu input remain pause-free. `ConsoleRenderer` removes only the misleading permanent loaded-system sentence. The RED compile failed with four expected missing-method errors. The focused GREEN gate passed 33 UI tests, including direct `RuntimeException` and `AssertionError` visibility, and the renewed strict all-eleven-suite Java 25 gate passed all 145 tests with zero failures, skips, disabled tests, or aborts. Real Engine processes proved all three supplied events remain loaded, results stay visible until Enter, purchase, close, save, restore, and restored closed state succeed, pre-load recovery remains structured, and exact EOF at the pause exits with code 0 without a menu redraw. The audit found no concrete Engine defect and changed no Engine production source.
+
 ## Deliberately deferred Exercise 2 and Exercise 3 features
 
 - JavaFX screens, controls, tasks, and progress indicators.
@@ -2573,9 +2758,9 @@ Nitzan approved the only choice-bearing correction, D-070's direct-domain repres
 
 The approved Exercise 1 boundaries should make later refactoring reasonable, but none of these features belong in the current implementation.
 
-## Remaining pre-implementation gates
+## Historical pre-implementation gates
 
-Sections 10 and 11, the consolidated written-design review, and the approved correction pass through D-071 are complete. These gates remain before Java implementation:
+Sections 10 and 11, the consolidated written-design review, the D-067 through D-071 correction pass, and the detailed implementation plan were completed before Java implementation began. The original gates were:
 
 1. Create the detailed implementation plan from the reviewed design and obtain Nitzan's approval of that plan.
 2. Keep the separate GitHub repository name and visibility decision synchronized with the parallel GitHub-preparation stream. No remote may be created without explicit approval, and the private submission README and runtime `.ser` files must never enter the public repository.
@@ -2584,7 +2769,7 @@ Sections 10 and 11, the consolidated written-design review, and the approved cor
 
 ## 2026-08-12 session closeout
 
-Historical snapshot only: this subsection records the boundary as it existed on 2026-08-12. It does not override the current reviewed D-071 checkpoint.
+Historical snapshot only: this subsection records the boundary as it existed on 2026-08-12. It does not override the current D-072 checkpoint.
 
 - The durable design boundary is D-053. Sections 7, 8, and 9 are complete.
 - No Java source tree, IntelliJ module, artifact configuration, generated JAXB source, build script, GitHub remote, or implementation was created.
@@ -2640,6 +2825,6 @@ Current SHA-256 evidence:
 
 ## Exact next checkpoint
 
-The written design is complete and ready for implementation planning. D-001 through D-066 remain intact as history, D-067 through D-071 contain the approved corrections, the adversarial report has no remaining blocking design finding, and every lecturer-checklist item is classified as satisfied by design, future implementation evidence, or not applicable.
+The written design is approved through D-073. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, D-072 controls the Stage 5 Clean Sections presentation, and D-073 controls readable command completion and graceful input closure without changing Engine or DTO behavior.
 
-The next action is to create and review the implementation plan. Do not begin implementation during that planning step. The GitHub repository name and visibility remain a separate approval decision and must be synchronized with the parallel GitHub-preparation stream. No Java source, build script, generated JAXB source, test fixture, IntelliJ artifact, GitHub remote, environment change, build output, or packaging artifact was created by the review or correction pass.
+Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12 plus the approved D-073 Task 12A correction on `codex/e1-console-ui`, directly above `9a8c87c`. The renewed 145-test gate and real-process audits pass. Do not modify the completed Stage 4 history. Draft pull request 5 remains unmerged pending Nitzan's renewed manual review and explicit Stage 5 acceptance.
