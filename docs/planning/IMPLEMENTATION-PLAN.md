@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 5 are reviewed, accepted, and merged. Stage 5 Tasks 11 and 12 plus approved D-073 Task 12A merged into `main` as `d8ef980` after the strict Java 25 all-eleven-suite gate passed all 145 tests and real-process audits covered the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 6 begins on `codex/e1-packaging`.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 5 are reviewed, accepted, and merged. Stage 5 Tasks 11 and 12 plus approved D-073 Task 12A merged into `main` as `d8ef980` after the strict Java 25 all-eleven-suite gate passed all 145 tests and real-process audits covered the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 6 Task 13 is implemented on `codex/e1-packaging` and awaits final Stage 6 review; it is not accepted or merged.
 
 ## Global Constraints
 
@@ -171,7 +171,7 @@ README.md
 PROJECT_HANDOFF.md
 ```
 
-`private/submission/assignment-1/README.pdf` remains ignored and local. Its creation and final contents require a separate private-document review during Stage 7.
+`private/submission/assignment-1/README.pdf` exists locally and remains ignored. Its approved private-document review is complete; Stage 7 reopens it only for the final README-led grader walkthrough and exact-artifact acceptance.
 
 ## 5. Stage 1: Foundation, DTOs, and supported Engine contract
 
@@ -1285,38 +1285,38 @@ success summary
 
 The JUnit invocation uses `execute`, `--scan-class-path`, `--include-engine junit-jupiter`, `--fail-if-no-tests`, disabled ANSI output, deterministic ASCII details, reports under `build/reports/junit`, and captured combined output. The post-test verifier fails unless all eleven exact class names executed at least one test and failures, container failures, skips, disabled tests, and aborts are all zero.
 
-- [ ] **Step 1: Create and review the private README build input**
+- [x] **Step 1: Create and review the private README build input**
 
 Use the `documents` and `pdf` skills during execution. Create the Nitzan-approved 1-to-3-page PDF with run instructions, key classes, important decisions and assumptions, student details, GitHub link, and explicit bonus declaration. Visually verify it, then confirm Git ignores the file before allowing `build.bat` to consume it.
 
-- [ ] **Step 2: Add verifier failure probes before trusting it**
+- [x] **Step 2: Add verifier failure probes before trusting it**
 
 Run controlled probes for missing class, zero tests, one failing test, one disabled test, and one aborted test. Each probe must make the verifier fail. Remove probe source and output before the real build.
 
-- [ ] **Step 3: Implement and run the clean build through the test phase**
+- [x] **Step 3: Implement and run the clean build through the test phase**
 
 Expected: clean compilation, all eleven suites, valid reports, and successful mandatory verifier before any staging file exists.
 
-- [ ] **Step 4: Implement JAR creation and inspection**
+- [x] **Step 4: Implement JAR creation and inspection**
 
 Expected: DTO owns DTO only, Engine owns Engine plus generated XML and trusted XSD, UI owns UI plus exact manifest, and no application JAR contains tests, JUnit, or unpacked vendor classes.
 
-- [ ] **Step 5: Implement exact staging, ZIP, inventory, extraction, and process checks**
+- [x] **Step 5: Implement exact staging, ZIP, inventory, extraction, and process checks**
 
 Expected ZIP root: `run.bat`, `README.pdf`, `guessmarket-ui.jar`, and `lib/`. Expected `lib` contents: two application library JARs and five runtime JAXB JARs only.
 
-- [ ] **Step 6: Update public guides and walkthrough**
+- [x] **Step 6: Update public guides and walkthrough**
 
 Document exact build and run commands, dependency roles, generated outputs, report locations, and why staging is not the final verification target.
 
-- [ ] **Step 7: Commit the build slice**
+- [x] **Step 7: Commit the build slice**
 
 ```powershell
 git add build.bat packaging docs/guides README.md
 git commit -m "build: add authoritative Exercise 1 pipeline"
 ```
 
-- [ ] **Step 8: Run the Stage 6 gate**
+- [x] **Step 8: Run the Stage 6 gate**
 
 Show a fresh successful `build.bat`, the JUnit proof summary, JAR inventories, manifest, ZIP inventory, extracted-process transcripts, privacy scan, and walkthrough before merging.
 

@@ -17,7 +17,8 @@ if /I "%~1"=="--verify-reports" (
     )
     set "REPORT_DIRECTORY=%~f2"
     call :verify_junit_reports
-    exit /b %ERRORLEVEL%
+    if errorlevel 1 goto :failure
+    exit /b 0
 )
 
 if /I "%~1"=="--verify-manifest" (
@@ -27,7 +28,8 @@ if /I "%~1"=="--verify-manifest" (
     )
     set "MANIFEST_FILE=%~f2"
     call :verify_manifest_source
-    exit /b %ERRORLEVEL%
+    if errorlevel 1 goto :failure
+    exit /b 0
 )
 
 call :phase "preflight"
@@ -246,8 +248,9 @@ if errorlevel 1 (
 exit /b 0
 
 :verify_junit_reports
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; $reportDirectory = [IO.Path]::GetFullPath($env:REPORT_DIRECTORY); $expected = @('guessmarket.dto.DtoContractTest','guessmarket.engine.LmsrCalculatorTest','guessmarket.engine.MarketEventTest','guessmarket.engine.GuessMarketEngineUseCaseTest','guessmarket.engine.GuessMarketEngineXmlLoadTest','guessmarket.engine.xml.JaxbMarketMapperTest','guessmarket.engine.xml.XmlMarketLoaderTest','guessmarket.engine.GuessMarketEnginePersistenceTest','guessmarket.ui.console.ConsoleInputTest','guessmarket.ui.console.ConsoleRendererTest','guessmarket.ui.console.GuessMarketConsoleAppTest'); $files = @(Get-ChildItem -LiteralPath $reportDirectory -Filter 'TEST-*.xml' -File); if ($files.Count -eq 0) { throw 'No JUnit XML reports were found.' }; $documents = @($files | ForEach-Object { [xml](Get-Content -LiteralPath $_.FullName -Raw) }); foreach ($className in $expected) { $tests = @($documents | ForEach-Object { $_.SelectNodes(\"//testcase[@classname='$className']\") }); if ($tests.Count -eq 0) { throw \"Required JUnit class did not execute a test: $className\" } }; $badElements = @($documents | ForEach-Object { $_.SelectNodes('//failure|//error|//skipped|//aborted|//disabled') }); if ($badElements.Count -ne 0) { throw \"JUnit reports contain failure, error, skipped, aborted, or disabled elements: $($badElements.Count)\" }; $badAttributes = @($documents | ForEach-Object { $_.SelectNodes('//testsuite') } | Where-Object { foreach ($attributeName in @('failures','errors','skipped','disabled','aborted')) { if ($_.GetAttribute($attributeName) -match '^[1-9]') { return $true } }; return $false }); if ($badAttributes.Count -ne 0) { throw \"JUnit reports contain nonzero aggregate failure, error, skipped, disabled, or aborted counts: $($badAttributes.Count)\" }; $testCount = @($documents | ForEach-Object { $_.SelectNodes('//testcase') }).Count; if ($testCount -lt 1) { throw 'JUnit reports contain zero executed tests.' }; $summary = \"JUnit proof passed: $($expected.Count) required classes, $testCount executed tests, 0 failures, 0 container failures, 0 skips, 0 disabled tests, 0 aborts.\"; $summary | Set-Content -LiteralPath (Join-Path $reportDirectory 'junit-proof.txt') -Encoding ascii; Write-Output $summary"
-exit /b %ERRORLEVEL%
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $reportDirectory = [IO.Path]::GetFullPath($env:REPORT_DIRECTORY); $expected = @('guessmarket.dto.DtoContractTest','guessmarket.engine.LmsrCalculatorTest','guessmarket.engine.MarketEventTest','guessmarket.engine.GuessMarketEngineUseCaseTest','guessmarket.engine.GuessMarketEngineXmlLoadTest','guessmarket.engine.xml.JaxbMarketMapperTest','guessmarket.engine.xml.XmlMarketLoaderTest','guessmarket.engine.GuessMarketEnginePersistenceTest','guessmarket.ui.console.ConsoleInputTest','guessmarket.ui.console.ConsoleRendererTest','guessmarket.ui.console.GuessMarketConsoleAppTest'); $files = @(Get-ChildItem -LiteralPath $reportDirectory -Filter 'TEST-*.xml' -File); if ($files.Count -eq 0) { throw 'No JUnit XML reports were found.' }; $documents = @($files | ForEach-Object { [xml](Get-Content -LiteralPath $_.FullName -Raw) }); foreach ($className in $expected) { $tests = @($documents | ForEach-Object { $_.SelectNodes(\"//testcase[@classname='$className']\") }); if ($tests.Count -eq 0) { throw \"Required JUnit class did not execute a test: $className\" } }; $badElements = @($documents | ForEach-Object { $_.SelectNodes('//failure|//error|//skipped|//aborted|//disabled') }); if ($badElements.Count -ne 0) { throw \"JUnit reports contain failure, error, skipped, aborted, or disabled elements: $($badElements.Count)\" }; $badAttributes = @($documents | ForEach-Object { $_.SelectNodes('//testsuite') } | Where-Object { foreach ($attributeName in @('failures','errors','skipped','disabled','aborted')) { if ($_.GetAttribute($attributeName) -match '^[1-9]') { return $true } }; return $false }); if ($badAttributes.Count -ne 0) { throw \"JUnit reports contain nonzero aggregate failure, error, skipped, disabled, or aborted counts: $($badAttributes.Count)\" }; $testCount = @($documents | ForEach-Object { $_.SelectNodes('//testcase') }).Count; if ($testCount -lt 1) { throw 'JUnit reports contain zero executed tests.' }; $summary = \"JUnit proof passed: $($expected.Count) required classes, $testCount executed tests, 0 failures, 0 container failures, 0 skips, 0 disabled tests, 0 aborts.\"; $summary | Set-Content -LiteralPath (Join-Path $reportDirectory 'junit-proof.txt') -Encoding ascii; Write-Output $summary"
+if errorlevel 1 exit /b 1
+exit /b 0
 
 :create_jars
 "%JAR_EXE%" --create --file "%BUILD_DIR%\jars\guessmarket-dto.jar" -C "%BUILD_DIR%\classes\dto" .
@@ -285,19 +288,21 @@ popd
 set "MANIFEST_FILE=%PROJECT_ROOT%\packaging\guessmarket-ui.mf"
 call :verify_manifest_source
 if errorlevel 1 exit /b 1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$lines = @(Get-Content -LiteralPath '%BUILD_DIR%\inspection\ui-manifest\META-INF\MANIFEST.MF'); if ($lines -notcontains 'Main-Class: guessmarket.ui.console.ConsoleMain') { throw 'UI JAR Main-Class is incorrect.' }; $index = [Array]::FindIndex([string[]]$lines, [Predicate[string]]{ param($line) $line.StartsWith('Class-Path: ') }); if ($index -lt 0) { throw 'UI JAR is missing Class-Path.' }; $classPath = $lines[$index].Substring('Class-Path: '.Length); while ($index + 1 -lt $lines.Count -and $lines[$index + 1].StartsWith(' ')) { $index++; $classPath += $lines[$index].Substring(1) }; $expected = 'lib/guessmarket-engine.jar lib/guessmarket-dto.jar lib/jakarta.activation-api.jar lib/angus-activation.jar lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-impl.jar'; if ($classPath -ne $expected) { throw ('UI JAR Class-Path mismatch: ' + $classPath) }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $lines = @(Get-Content -LiteralPath '%BUILD_DIR%\inspection\ui-manifest\META-INF\MANIFEST.MF'); if ($lines -notcontains 'Main-Class: guessmarket.ui.console.ConsoleMain') { throw 'UI JAR Main-Class is incorrect.' }; $index = [Array]::FindIndex([string[]]$lines, [Predicate[string]]{ param($line) $line.StartsWith('Class-Path: ') }); if ($index -lt 0) { throw 'UI JAR is missing Class-Path.' }; $classPath = $lines[$index].Substring('Class-Path: '.Length); while ($index + 1 -lt $lines.Count -and $lines[$index + 1].StartsWith(' ')) { $index++; $classPath += $lines[$index].Substring(1) }; $expected = 'lib/guessmarket-engine.jar lib/guessmarket-dto.jar lib/jakarta.activation-api.jar lib/angus-activation.jar lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-impl.jar'; if ($classPath -ne $expected) { throw ('UI JAR Class-Path mismatch: ' + $classPath) }"
 if errorlevel 1 exit /b 1
 exit /b 0
 
 :verify_manifest_source
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$raw = [IO.File]::ReadAllText($env:MANIFEST_FILE); $actual = $raw.Replace(\"`r`n\", \"`n\"); if ($actual.Contains(\"`r\")) { throw 'The source manifest uses a bare carriage return.' }; $expected = (@('Manifest-Version: 1.0','Main-Class: guessmarket.ui.console.ConsoleMain','Class-Path: lib/guessmarket-engine.jar lib/guessmarket-dto.jar','  lib/jakarta.activation-api.jar lib/angus-activation.jar','  lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-impl.jar','') -join \"`n\") + \"`n\"; if ($actual -cne $expected) { throw 'The source manifest does not match the required logical text and final blank line.' }; Write-Output 'Source manifest logical text passed.'"
-exit /b %ERRORLEVEL%
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $raw = [IO.File]::ReadAllText($env:MANIFEST_FILE); $actual = $raw.Replace(\"`r`n\", \"`n\"); if ($actual.Contains(\"`r\")) { throw 'The source manifest uses a bare carriage return.' }; $expected = (@('Manifest-Version: 1.0','Main-Class: guessmarket.ui.console.ConsoleMain','Class-Path: lib/guessmarket-engine.jar lib/guessmarket-dto.jar','  lib/jakarta.activation-api.jar lib/angus-activation.jar','  lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-impl.jar','') -join \"`n\") + \"`n\"; if ($actual -cne $expected) { throw 'The source manifest does not match the required logical text and final blank line.' }; Write-Output 'Source manifest logical text passed.'"
+if errorlevel 1 exit /b 1
+exit /b 0
 
 :inventory_jar
 "%JAR_EXE%" --list --file "%~1" > "%~2"
 if errorlevel 1 exit /b 1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$entries = Get-Content -LiteralPath '%~2'; $prefix = '%~3'; $parts = $prefix.TrimEnd('/').Split('/'); $parents = for ($index = 1; $index -lt $parts.Count; $index++) { (($parts[0..($index - 1)] -join '/') + '/') }; $invalid = @($entries | Where-Object { $_ -ne 'META-INF/' -and $_ -ne 'META-INF/MANIFEST.MF' -and $_ -notin $parents -and -not $_.StartsWith($prefix) }); if ($invalid.Count -ne 0) { throw ('Unexpected JAR entry: ' + ($invalid -join ', ')) }"
-exit /b %ERRORLEVEL%
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $entries = Get-Content -LiteralPath '%~2'; $prefix = '%~3'; $parts = $prefix.TrimEnd('/').Split('/'); $parents = for ($index = 1; $index -lt $parts.Count; $index++) { (($parts[0..($index - 1)] -join '/') + '/') }; $invalid = @($entries | Where-Object { $_ -ne 'META-INF/' -and $_ -ne 'META-INF/MANIFEST.MF' -and $_ -notin $parents -and -not $_.StartsWith($prefix) }); if ($invalid.Count -ne 0) { throw ('Unexpected JAR entry: ' + ($invalid -join ', ')) }"
+if errorlevel 1 exit /b 1
+exit /b 0
 
 :stage_distribution
 set "STAGING_DIR=%BUILD_DIR%\staging"
@@ -327,8 +332,9 @@ exit /b 0
 :verify_zip
 "%JAR_EXE%" --list --file "%BUILD_DIR%\distributions\guess-market-exercise-1.zip" > "%BUILD_DIR%\inspection\guess-market-exercise-1-zip.txt"
 if errorlevel 1 exit /b 1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$actual = @(Get-Content -LiteralPath '%BUILD_DIR%\inspection\guess-market-exercise-1-zip.txt' | Where-Object { $_ -ne '' }); $expected = @('run.bat','README.pdf','guessmarket-ui.jar','lib/','lib/guessmarket-engine.jar','lib/guessmarket-dto.jar','lib/jakarta.activation-api.jar','lib/angus-activation.jar','lib/jakarta.xml.bind-api.jar','lib/jaxb-core.jar','lib/jaxb-impl.jar'); $difference = Compare-Object -ReferenceObject $expected -DifferenceObject $actual; if ($difference) { throw ('ZIP membership mismatch: ' + (($difference | ForEach-Object { $_.InputObject }) -join ', ')) }"
-exit /b %ERRORLEVEL%
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $actual = @(Get-Content -LiteralPath '%BUILD_DIR%\inspection\guess-market-exercise-1-zip.txt' | Where-Object { $_ -ne '' }); $expected = @('run.bat','README.pdf','guessmarket-ui.jar','lib/','lib/guessmarket-engine.jar','lib/guessmarket-dto.jar','lib/jakarta.activation-api.jar','lib/angus-activation.jar','lib/jakarta.xml.bind-api.jar','lib/jaxb-core.jar','lib/jaxb-impl.jar'); $difference = Compare-Object -ReferenceObject $expected -DifferenceObject $actual; if ($difference) { throw ('ZIP membership mismatch: ' + (($difference | ForEach-Object { $_.InputObject }) -join ', ')) }"
+if errorlevel 1 exit /b 1
+exit /b 0
 
 :extract_zip
 set "EXTRACTION_DIR=%BUILD_DIR%\verification\Fresh Extraction With Spaces"
@@ -349,7 +355,8 @@ exit /b 0
 set "EXTRACTION_DIR=%BUILD_DIR%\verification\Fresh Extraction With Spaces"
 copy /y "%ENGINE_MODULE%\src\test\resources\guessmarket\engine\xml\fixtures\supplied\multiple.xml" "%BUILD_DIR%\process-input\multiple.xml" >nul || exit /b 1
 copy /y "%ENGINE_MODULE%\src\test\resources\guessmarket\engine\xml\fixtures\supplied\error-3.xml" "%BUILD_DIR%\process-input\error-3.xml" >nul || exit /b 1
-> "%BUILD_DIR%\process-input\inside-exit.txt" echo 8
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $encoding = [Text.UTF8Encoding]::new($false); [IO.File]::WriteAllLines((Join-Path $env:BUILD_DIR 'process-input\inside-exit.txt'), @('8'), $encoding)"
+if errorlevel 1 exit /b 1
 pushd "%EXTRACTION_DIR%"
 call ".\run.bat" < "%BUILD_DIR%\process-input\inside-exit.txt" > "%BUILD_DIR%\reports\packaged-inside-exit.txt" 2>&1
 if errorlevel 1 (
@@ -359,26 +366,8 @@ if errorlevel 1 (
 popd
 call "%EXTRACTION_DIR%\run.bat" < "%BUILD_DIR%\process-input\inside-exit.txt" > "%BUILD_DIR%\reports\packaged-outside-exit.txt" 2>&1
 if errorlevel 1 exit /b 1
-(
-    echo 1
-    echo %BUILD_DIR%\process-input\multiple.xml
-    echo.
-    echo 2
-    echo.
-    echo 4
-    echo 1
-    echo 1
-    echo 1
-    echo.
-    echo 5
-    echo 1
-    echo 1
-    echo.
-    echo 6
-    echo %BUILD_DIR%\process-state\session
-    echo.
-    echo 8
-) > "%BUILD_DIR%\process-input\integration.txt"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $encoding = [Text.UTF8Encoding]::new($false); $multiple = Join-Path $env:BUILD_DIR 'process-input\multiple.xml'; $state = Join-Path $env:BUILD_DIR 'process-state\session'; $lines = @('1',$multiple,'','2','','4','1','1','1','','5','1','1','','6',$state,'','8'); [IO.File]::WriteAllLines((Join-Path $env:BUILD_DIR 'process-input\integration.txt'), $lines, $encoding)"
+if errorlevel 1 exit /b 1
 pushd "%EXTRACTION_DIR%"
 call ".\run.bat" < "%BUILD_DIR%\process-input\integration.txt" > "%BUILD_DIR%\reports\packaged-integration.txt" 2>&1
 if errorlevel 1 (
@@ -386,15 +375,8 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-(
-    echo 7
-    echo %BUILD_DIR%\process-state\session
-    echo.
-    echo 3
-    echo 1
-    echo.
-    echo 8
-) > "%BUILD_DIR%\process-input\restore.txt"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $encoding = [Text.UTF8Encoding]::new($false); $state = Join-Path $env:BUILD_DIR 'process-state\session'; $lines = @('7',$state,'','3','1','','8'); [IO.File]::WriteAllLines((Join-Path $env:BUILD_DIR 'process-input\restore.txt'), $lines, $encoding)"
+if errorlevel 1 exit /b 1
 pushd "%EXTRACTION_DIR%"
 call ".\run.bat" < "%BUILD_DIR%\process-input\restore.txt" > "%BUILD_DIR%\reports\packaged-restore.txt" 2>&1
 if errorlevel 1 (
@@ -402,12 +384,8 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-(
-    echo 1
-    echo %BUILD_DIR%\process-input\error-3.xml
-    echo.
-    echo 8
-) > "%BUILD_DIR%\process-input\invalid-xml.txt"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $encoding = [Text.UTF8Encoding]::new($false); $invalidXml = Join-Path $env:BUILD_DIR 'process-input\error-3.xml'; $lines = @('1',$invalidXml,'','8'); [IO.File]::WriteAllLines((Join-Path $env:BUILD_DIR 'process-input\invalid-xml.txt'), $lines, $encoding)"
+if errorlevel 1 exit /b 1
 pushd "%EXTRACTION_DIR%"
 call ".\run.bat" < "%BUILD_DIR%\process-input\invalid-xml.txt" > "%BUILD_DIR%\reports\packaged-invalid-xml.txt" 2>&1
 if errorlevel 1 (
@@ -415,7 +393,7 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$checks = @(@('%BUILD_DIR%\reports\packaged-inside-exit.txt','Goodbye.'),@('%BUILD_DIR%\reports\packaged-outside-exit.txt','Goodbye.'),@('%BUILD_DIR%\reports\packaged-integration.txt','System loaded successfully.'),@('%BUILD_DIR%\reports\packaged-integration.txt','PURCHASE SUMMARY'),@('%BUILD_DIR%\reports\packaged-integration.txt','Event closed successfully.'),@('%BUILD_DIR%\reports\packaged-integration.txt','System state saved successfully.'),@('%BUILD_DIR%\reports\packaged-restore.txt','System state restored successfully.'),@('%BUILD_DIR%\reports\packaged-restore.txt','Status: CLOSED'),@('%BUILD_DIR%\reports\packaged-invalid-xml.txt','Error: The XML contains invalid market data in XML event 2, field comision.')); foreach ($check in $checks) { if (-not (Select-String -LiteralPath $check[0] -Pattern $check[1] -SimpleMatch -Quiet)) { throw ('Packaged-process transcript is missing: ' + $check[1]) } }; if (Select-String -LiteralPath '%BUILD_DIR%\reports\packaged-invalid-xml.txt' -Pattern 'Exception' -SimpleMatch -Quiet) { throw 'Expected XML recovery exposed an exception type.' }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $checks = @(@('%BUILD_DIR%\reports\packaged-inside-exit.txt','Goodbye.'),@('%BUILD_DIR%\reports\packaged-outside-exit.txt','Goodbye.'),@('%BUILD_DIR%\reports\packaged-integration.txt','System loaded successfully.'),@('%BUILD_DIR%\reports\packaged-integration.txt','PURCHASE SUMMARY'),@('%BUILD_DIR%\reports\packaged-integration.txt','Event closed successfully.'),@('%BUILD_DIR%\reports\packaged-integration.txt','System state saved successfully.'),@('%BUILD_DIR%\reports\packaged-restore.txt','System state restored successfully.'),@('%BUILD_DIR%\reports\packaged-restore.txt','Status: CLOSED'),@('%BUILD_DIR%\reports\packaged-invalid-xml.txt','Error: The XML contains invalid market data in XML event 2, field comision.')); foreach ($check in $checks) { if (-not (Select-String -LiteralPath $check[0] -Pattern $check[1] -SimpleMatch -Quiet)) { throw ('Packaged-process transcript is missing: ' + $check[1]) } }; if (Select-String -LiteralPath '%BUILD_DIR%\reports\packaged-invalid-xml.txt' -Pattern 'Exception' -SimpleMatch -Quiet) { throw 'Expected XML recovery exposed an exception type.' }"
 if errorlevel 1 exit /b 1
 exit /b 0
 

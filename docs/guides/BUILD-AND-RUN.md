@@ -13,10 +13,17 @@
 
 ## Authoritative build command
 
-From the repository root in `cmd.exe` or PowerShell:
+From the repository root in `cmd.exe`:
 
 ```bat
 set "JAVA_HOME=C:\Program Files\Java\jdk-25.0.4"
+.\build.bat
+```
+
+From the repository root in PowerShell:
+
+```powershell
+$env:JAVA_HOME = 'C:\Program Files\Java\jdk-25.0.4'
 .\build.bat
 ```
 
