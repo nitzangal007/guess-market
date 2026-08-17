@@ -1124,13 +1124,13 @@ Configure three separate artifacts and confirm logical class, resource, manifest
 
 Record the OS evidence, Java version, exact ZIP SHA-256, extraction location, launcher command, central transcript, and result. A CI runner, development machine, or Windows 11 result cannot silently replace this requirement.
 
-- [ ] **Step 5: Perform the README-led grader walkthrough and public-access check**
+- [ ] **Step 5: Perform the README-led grader walkthrough**
 
-Start from another fresh copy of the same hash, follow only the README and `run.bat`, inspect exact contents, and record the result. After the final public-safety review passes, stop for Nitzan to change the repository visibility manually from private to public. Then verify that the GitHub link and intended `main` branch content open from a logged-out or otherwise unauthenticated view.
+Start from another fresh copy of the same hash, follow only the README and `run.bat`, inspect exact contents, verify the documented GitHub link, and record the result.
 
-- [ ] **Step 6: Run final source and privacy review**
+- [ ] **Step 6: Run final source, privacy, and public-access review**
 
-Inspect tracked files, ignored private paths, runtime `.ser` exclusion, generated source tracking, custom fixture tracking, build inputs, meaningful commits, secrets scan, full diff, and clean status.
+Inspect tracked files, ignored private paths, runtime `.ser` exclusion, generated source tracking, custom fixture tracking, build inputs, meaningful commits, secrets scan, full diff, and clean status. After this public-safety review passes, stop for Nitzan to change the repository visibility manually from private to public. Then verify that the GitHub link and intended `main` branch content open from a logged-out or otherwise unauthenticated view.
 
 - [ ] **Step 7: Update the walkthrough from planned to completed behavior**
 
