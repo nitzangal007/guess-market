@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 and 2 were reviewed, accepted, and merged through pull requests 1 and 2. Stage 3 Tasks 6 through 8 are implemented and verified on `codex/e1-engine-xml` and await Nitzan's Stage 3 review and approval. Stage 4 has not started.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are implemented, independently reviewed, and verified on `codex/e1-engine-core-persistence`; they await Nitzan's Stage 4 review and approval. Stage 5 has not started.
 
 ## Global Constraints
 

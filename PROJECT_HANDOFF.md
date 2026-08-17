@@ -2,7 +2,7 @@
 
 ## Mode
 
-Review. Stages 1 through 3 are accepted and merged. Stage 3 was squash-merged as `15c8c8f70d21b4a2e8021ef6b7d3dfb88bac2caf`. Stage 4 Tasks 9 and 10 are implemented and verified. Final Stage 4 review and a draft pull request for Nitzan remain; Stage 5 has not started and is not authorized.
+Review. Stages 1 through 3 are accepted and merged. Stage 3 was squash-merged as `15c8c8f70d21b4a2e8021ef6b7d3dfb88bac2caf`. Stage 4 Tasks 9 and 10 are implemented, independently reviewed, and verified. Stage 4 awaits Nitzan's review through its draft pull request; Stage 5 has not started and is not authorized.
 
 ## Current state
 
@@ -34,7 +34,8 @@ Review. Stages 1 through 3 are accepted and merged. Stage 3 was squash-merged as
 - Stage 4 Task 9 implemented direct-domain persistence in commits `5eb202b` and `6b722ac`.
 - Stage 4 Task 10 defined complete public Engine behavior in RED commit `706df9a` and implemented it in `f536bdb`.
 - Task 10 review fixes centralize complete DTO equality with exact binary64 comparisons and prove load and restore replacement atomicity for injected `XML_FILE_ACCESS_FAILED`, `ENGINE_CONFIGURATION_ERROR`, and `STATE_FILE_ACCESS_FAILED` failures.
-- The current strict Java 25 gate uses exactly the five approved JAXB runtime JARs and all eight suites: 106 tests found, started, and successful, with zero failures, skips, disabled tests, or aborts.
+- The final Stage 4 persistence review fix `acf3c36` validates raw saved graph elements before casting, correctly separates stream-opening access failures from serialization-format failures, rejects trailing `null` data as `SAVED_STATE_INVALID`, and records the completed Task 9 and Task 10 plan steps.
+- The final independent strict Java 25 gate uses exactly the five approved JAXB runtime JARs and all eight suites: 112 tests found, started, and successful, with zero failures, skips, disabled tests, or aborts. A final persistence re-review found no remaining Critical, Important, or Minor issue.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 4 calculation, constructor, transition, observation, and verification result.
 
@@ -59,4 +60,4 @@ Review. Stages 1 through 3 are accepted and merged. Stage 3 was squash-merged as
 
 ## Exact next action
 
-Complete the final Stage 4 review and prepare the Stage 4 draft pull request for Nitzan. Do not begin Stage 5 before Nitzan explicitly accepts Stage 4.
+Nitzan reviews the Stage 4 draft pull request. Do not begin Stage 5 before Nitzan explicitly accepts Stage 4.
