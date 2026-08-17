@@ -7,12 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static guessmarket.engine.EngineDtoAssertions.assertDetailsEqual;
 
 import guessmarket.dto.CommissionMode;
 import guessmarket.dto.EventStatus;
 import guessmarket.dto.MarketEventDetails;
 import guessmarket.dto.MarketEventSummary;
-import guessmarket.dto.TradeHistoryEntry;
 import guessmarket.engine.xml.XmlMarketLoader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -22,6 +22,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -392,6 +393,60 @@ class GuessMarketEnginePersistenceTest {
         assertDetailsEqual(before, engine.getEventDetails(41));
     }
 
+    @Test
+    void stateFileAccessFailureFromInjectedStorePreservesTheCompletePriorPublicState()
+            throws Exception {
+        Path attemptedPath = temporaryDirectory.resolve("inaccessible-state.ser");
+        EngineOperationException injectedFailure = new EngineOperationException(
+                EngineErrorCode.STATE_FILE_ACCESS_FAILED,
+                "Simulated restore access failure",
+                "Use an accessible saved state file",
+                attemptedPath,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        MarketEvent prior = event(51, CommissionMode.ON_PURCHASE, 9, 100);
+        LinkedHashMap<Integer, MarketEvent> initialEvents = new LinkedHashMap<>();
+        initialEvents.put(prior.getEventId(), prior);
+        GuessMarketEngine engine = new GuessMarketEngineImpl(
+                path -> {
+                    throw new AssertionError("Unexpected XML load");
+                },
+                new GuessMarketEngineImpl.StateStore() {
+                    @Override
+                    public void save(Path path, java.util.Collection<MarketEvent> events) {
+                        throw new AssertionError("Unexpected save");
+                    }
+
+                    @Override
+                    public Map<Integer, MarketEvent> restore(Path path)
+                            throws EngineOperationException {
+                        throw injectedFailure;
+                    }
+                },
+                initialEvents);
+        engine.purchaseShares(51, 1, 4);
+        MarketEventDetails before = engine.getEventDetails(51);
+
+        EngineOperationException actual = assertThrows(
+                EngineOperationException.class,
+                () -> engine.restoreState(attemptedPath));
+
+        assertAll(
+                () -> assertEquals(EngineErrorCode.STATE_FILE_ACCESS_FAILED, actual.getCode()),
+                () -> assertEquals(attemptedPath, actual.getPath().orElseThrow()),
+                () -> assertIterableEquals(
+                        List.of(51),
+                        engine.listEvents().stream().map(MarketEventSummary::getEventId).toList()));
+        assertDetailsEqual(before, engine.getEventDetails(51));
+    }
+
     private static MarketEvent event(int eventId, CommissionMode mode, int percentage, int b) {
         return new MarketEvent(eventId, "", "", mode, percentage, b, "same", "same");
     }
@@ -415,49 +470,6 @@ class GuessMarketEnginePersistenceTest {
     private static void assertFailure(EngineErrorCode expected, ThrowingOperation operation) {
         EngineOperationException exception = assertThrows(EngineOperationException.class, operation::run);
         assertEquals(expected, exception.getCode());
-    }
-
-    private static void assertDetailsEqual(MarketEventDetails expected, MarketEventDetails actual) {
-        assertEquals(expected.getEventId(), actual.getEventId());
-        assertEquals(expected.getName(), actual.getName());
-        assertEquals(expected.getDescription(), actual.getDescription());
-        assertEquals(expected.getCommissionMode(), actual.getCommissionMode());
-        assertEquals(expected.getCommissionPercentage(), actual.getCommissionPercentage());
-        assertEquals(expected.getStatus(), actual.getStatus());
-        assertEquals(expected.getOptions().size(), actual.getOptions().size());
-        for (int index = 0; index < expected.getOptions().size(); index++) {
-            assertEquals(expected.getOptions().get(index).getOptionNumber(),
-                    actual.getOptions().get(index).getOptionNumber());
-            assertEquals(expected.getOptions().get(index).getLabel(),
-                    actual.getOptions().get(index).getLabel());
-            assertEquals(expected.getOptions().get(index).getShareQuantity(),
-                    actual.getOptions().get(index).getShareQuantity());
-            assertEquals(Double.doubleToLongBits(expected.getOptions().get(index).getCurrentPrice()),
-                    Double.doubleToLongBits(actual.getOptions().get(index).getCurrentPrice()));
-        }
-        assertEquals(Double.doubleToLongBits(expected.getEventAccountBalance()),
-                Double.doubleToLongBits(actual.getEventAccountBalance()));
-        assertEquals(Double.doubleToLongBits(expected.getTotalCommissionCollected()),
-                Double.doubleToLongBits(actual.getTotalCommissionCollected()));
-        assertEquals(expected.getWinningOptionNumber(), actual.getWinningOptionNumber());
-        assertEquals(expected.getPurchaseHistory().size(), actual.getPurchaseHistory().size());
-        assertIterableEquals(
-                expected.getPurchaseHistory().stream()
-                        .map(GuessMarketEnginePersistenceTest::historyValues)
-                        .toList(),
-                actual.getPurchaseHistory().stream()
-                        .map(GuessMarketEnginePersistenceTest::historyValues)
-                        .toList());
-    }
-
-    private static List<Object> historyValues(TradeHistoryEntry entry) {
-        return List.of(
-                entry.getOptionNumber(),
-                entry.getOptionLabel(),
-                entry.getShareQuantity(),
-                entry.getBaseShareCost(),
-                entry.getPurchaseCommission(),
-                entry.getTotalPaid());
     }
 
     @FunctionalInterface

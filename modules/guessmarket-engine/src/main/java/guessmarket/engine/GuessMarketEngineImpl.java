@@ -6,14 +6,15 @@ import guessmarket.dto.PurchaseReceipt;
 import guessmarket.engine.xml.XmlMarketLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public final class GuessMarketEngineImpl implements GuessMarketEngine {
-    private final XmlMarketLoader xmlLoader;
-    private final SavedStateStore stateStore;
+    private final EventLoader eventLoader;
+    private final StateStore stateStore;
     private Map<Integer, MarketEvent> events = new LinkedHashMap<>();
 
     public GuessMarketEngineImpl() {
@@ -24,14 +25,24 @@ public final class GuessMarketEngineImpl implements GuessMarketEngine {
             XmlMarketLoader xmlLoader,
             SavedStateStore stateStore,
             Map<Integer, MarketEvent> initialEvents) {
-        this.xmlLoader = Objects.requireNonNull(xmlLoader, "xmlLoader");
+        this(
+                Objects.requireNonNull(xmlLoader, "xmlLoader")::load,
+                adapt(Objects.requireNonNull(stateStore, "stateStore")),
+                initialEvents);
+    }
+
+    GuessMarketEngineImpl(
+            EventLoader eventLoader,
+            StateStore stateStore,
+            Map<Integer, MarketEvent> initialEvents) {
+        this.eventLoader = Objects.requireNonNull(eventLoader, "eventLoader");
         this.stateStore = Objects.requireNonNull(stateStore, "stateStore");
         events = new LinkedHashMap<>(Objects.requireNonNull(initialEvents, "initialEvents"));
     }
 
     @Override
     public int loadEventsFromXml(Path path) throws EngineOperationException {
-        Map<Integer, MarketEvent> candidate = xmlLoader.load(path);
+        Map<Integer, MarketEvent> candidate = eventLoader.load(path);
         events = candidate;
         return candidate.size();
     }
@@ -116,5 +127,32 @@ public final class GuessMarketEngineImpl implements GuessMarketEngine {
                     "No system is loaded",
                     "Load XML or restore saved state first");
         }
+    }
+
+    private static StateStore adapt(SavedStateStore stateStore) {
+        return new StateStore() {
+            @Override
+            public void save(Path path, Collection<MarketEvent> events)
+                    throws EngineOperationException {
+                stateStore.save(path, events);
+            }
+
+            @Override
+            public Map<Integer, MarketEvent> restore(Path path)
+                    throws EngineOperationException {
+                return stateStore.restore(path);
+            }
+        };
+    }
+
+    @FunctionalInterface
+    interface EventLoader {
+        Map<Integer, MarketEvent> load(Path path) throws EngineOperationException;
+    }
+
+    interface StateStore {
+        void save(Path path, Collection<MarketEvent> events) throws EngineOperationException;
+
+        Map<Integer, MarketEvent> restore(Path path) throws EngineOperationException;
     }
 }

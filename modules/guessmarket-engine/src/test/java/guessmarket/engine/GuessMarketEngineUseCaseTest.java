@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static guessmarket.engine.EngineDtoAssertions.assertDetailsEqual;
 
 import guessmarket.dto.CommissionMode;
 import guessmarket.dto.EventStatus;
@@ -362,53 +363,6 @@ class GuessMarketEngineUseCaseTest {
                 100,
                 "first",
                 "second");
-    }
-
-    private static void assertDetailsEqual(MarketEventDetails expected, MarketEventDetails actual) {
-        assertAll(
-                () -> assertEquals(expected.getEventId(), actual.getEventId()),
-                () -> assertEquals(expected.getName(), actual.getName()),
-                () -> assertEquals(expected.getDescription(), actual.getDescription()),
-                () -> assertEquals(expected.getCommissionMode(), actual.getCommissionMode()),
-                () -> assertEquals(expected.getCommissionPercentage(), actual.getCommissionPercentage()),
-                () -> assertEquals(expected.getStatus(), actual.getStatus()),
-                () -> assertEquals(expected.getEventAccountBalance(), actual.getEventAccountBalance()),
-                () -> assertEquals(
-                        expected.getTotalCommissionCollected(),
-                        actual.getTotalCommissionCollected()),
-                () -> assertEquals(expected.getWinningOptionNumber(), actual.getWinningOptionNumber()),
-                () -> assertIterableEquals(
-                        expected.getOptions().stream()
-                                .map(option -> List.of(
-                                        option.getOptionNumber(),
-                                        option.getLabel(),
-                                        option.getShareQuantity(),
-                                        option.getCurrentPrice()))
-                                .toList(),
-                        actual.getOptions().stream()
-                                .map(option -> List.of(
-                                        option.getOptionNumber(),
-                                        option.getLabel(),
-                                        option.getShareQuantity(),
-                                        option.getCurrentPrice()))
-                                .toList()),
-                () -> assertIterableEquals(
-                        expected.getPurchaseHistory().stream()
-                                .map(GuessMarketEngineUseCaseTest::historyValues)
-                                .toList(),
-                        actual.getPurchaseHistory().stream()
-                                .map(GuessMarketEngineUseCaseTest::historyValues)
-                                .toList()));
-    }
-
-    private static List<Object> historyValues(TradeHistoryEntry entry) {
-        return List.of(
-                entry.getOptionNumber(),
-                entry.getOptionLabel(),
-                entry.getShareQuantity(),
-                entry.getBaseShareCost(),
-                entry.getPurchaseCommission(),
-                entry.getTotalPaid());
     }
 
     @FunctionalInterface
