@@ -4,7 +4,7 @@ Guess Market is a Java 25 prediction-market simulator designed around LMSR prici
 
 ## Current status
 
-Exercise 1 design is approved through decision D-073 and passed a full pre-implementation review with no blocking design findings. Stages 1 through 5 are accepted and merged, with Stage 5 Clean Sections console UI plus its D-073 readable command-completion correction merged into `main` as `d8ef980`. The merged tree passed the strict Java 25 all-eleven-suite gate with 145 successful tests, and real-process UI and Engine audits pass. Stage 6 now prepares the authoritative build and candidate release artifact; final release verification remains Stage 7 work.
+Exercise 1 design is approved through decision D-073 and passed a full pre-implementation review with no blocking design findings. Stages 1 through 5 are accepted and merged, with Stage 5 Clean Sections console UI plus its D-073 readable command-completion correction merged into `main` as `d8ef980`. Stage 6 adds the authoritative Java 25 build pipeline, mandatory JUnit proof verifier, three non-fat JARs, exact runtime ZIP, fresh extraction, and packaged-process checks. Stage 7 final acceptance, including the required independent clean Windows 10 run and grader walkthrough, remains pending.
 
 ## Planned architecture
 
@@ -39,6 +39,14 @@ Each module will produce a separate non-fat JAR. The UI JAR will be the only exe
 - Repository-vendored JUnit Platform Console Standalone 6.1.1 dependency for tests only
 
 The authoritative build does not download dependencies.
+
+From the repository root on Windows, set `JAVA_HOME` to one Oracle JDK 25 installation and run:
+
+```bat
+.\build.bat
+```
+
+The build writes only ignored output below `build/`, including JUnit XML reports, JAR inventories, extracted-process transcripts, and `build/distributions/guess-market-exercise-1.zip`. See [Build and run](docs/guides/BUILD-AND-RUN.md) for the complete artifact layout and verification contract.
 
 ## Documentation
 

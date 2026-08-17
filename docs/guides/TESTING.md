@@ -2,7 +2,7 @@
 
 ## Status
 
-The complete testing strategy is approved. Stages 1 through 5 are accepted and merged. Through Stage 5, source-level verification compiles DTO, Engine, and UI production and test source with Oracle Java 25, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, JUnit Platform Console Standalone 6.1.1, and exactly the five approved JAXB runtime JARs. All eleven approved suites are implemented and passing; the merged Stage 5 Java 25 gate reports 145 successful tests with zero failures, skips, disabled tests, or aborts. Stage 6 now adds the authoritative build, JAR, ZIP, extraction, and packaged-process checks; Stage 7 verifies the exact final candidate.
+The complete testing strategy is approved. Stages 1 through 5 are accepted and merged. The authoritative Stage 6 `build.bat` compiles DTO, Engine, UI, and their tests with Oracle Java 25, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, JUnit Platform Console Standalone 6.1.1, and exactly the five approved JAXB runtime JARs. It then proves the reports, application JARs, runtime ZIP, fresh extraction, and packaged processes. Stage 7 verifies the exact candidate in the remaining external environment and walkthrough gates.
 
 ## Vendored test dependency
 
@@ -50,7 +50,7 @@ JUnit Jupiter covers DTO immutability, mathematical behavior, state transitions,
 
 ### Authoritative build evidence
 
-The build must prove that all eleven required classes executed with at least one test each and that the complete report contains zero failures, skips, disabled tests, and aborts. The verifier itself must be tested against deliberately incomplete or failing reports.
+The build invokes `execute --scan-class-path --include-engine junit-jupiter --fail-if-no-tests --disable-ansi-colors --details=flat --reports-dir build/reports/junit` and captures combined output in `build/reports/junit-console.txt`. Its mandatory report verifier writes `build/reports/junit/junit-proof.txt` only when all eleven exact classes executed at least one test and failures, container failures, skips, disabled tests, and aborts are all zero. Controlled missing-class, zero-test, failing-test, disabled-test, and aborted-test report probes must all fail the verifier before it is trusted.
 
 ### Artifact evidence
 
@@ -58,7 +58,7 @@ The build inspects JAR ownership, manifests, resources, third-party exclusions, 
 
 ### Packaged-system evidence
 
-The real launcher and extracted JAR graph must run representative success and recovery conversations from the extracted package, not from development classes.
+The real launcher and extracted JAR graph run deterministic redirected-input conversations from the extracted ZIP package, not development classes. The build proves inside-package and outside-package launch, valid load-list-purchase-close-save behavior, cross-process restore of closed state, and invalid XML recovery without an exposed exception type. Their transcripts are under `build/reports/packaged-*.txt`.
 
 ### Independent environment evidence
 
