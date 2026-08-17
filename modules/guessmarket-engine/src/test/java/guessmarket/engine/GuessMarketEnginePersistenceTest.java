@@ -274,12 +274,12 @@ class GuessMarketEnginePersistenceTest {
     void publicEngineRoundTripRestoresCompleteStateIntoANewInstanceAndContinues()
             throws Exception {
         MarketEvent minimum = event(Integer.MIN_VALUE, CommissionMode.ON_PURCHASE, 5, 100);
-        minimum.purchase(1, 3);
-        minimum.purchase(2, 2);
         MarketEvent maximum = event(Integer.MAX_VALUE, CommissionMode.ON_CLOSE, 90, 5);
-        maximum.purchase(1, 7);
-        maximum.close(1);
         GuessMarketEngine source = engineWithEvents(new SavedStateStore(), minimum, maximum);
+        source.purchaseShares(Integer.MIN_VALUE, 1, 3);
+        source.purchaseShares(Integer.MIN_VALUE, 2, 2);
+        source.purchaseShares(Integer.MAX_VALUE, 1, 7);
+        source.closeEvent(Integer.MAX_VALUE, 1);
         Path statePath = temporaryDirectory.resolve("public restart state");
 
         source.saveState(statePath);
@@ -318,8 +318,8 @@ class GuessMarketEnginePersistenceTest {
         savedSource.saveState(statePath);
 
         MarketEvent prior = event(11, CommissionMode.ON_PURCHASE, 5, 5);
-        prior.purchase(1, 2);
         GuessMarketEngine target = engineWithEvents(new SavedStateStore(), prior);
+        target.purchaseShares(11, 1, 2);
 
         int count = target.restoreState(statePath);
 
@@ -337,8 +337,8 @@ class GuessMarketEnginePersistenceTest {
     @Test
     void everyFailedPublicRestorePreservesTheCompletePriorLiveSystem() throws Exception {
         MarketEvent prior = event(31, CommissionMode.ON_PURCHASE, 5, 100);
-        prior.purchase(1, 6);
         GuessMarketEngine engine = engineWithEvents(new SavedStateStore(), prior);
+        engine.purchaseShares(31, 1, 6);
         MarketEventDetails before = engine.getEventDetails(31);
 
         Path corrupt = temporaryDirectory.resolve("corrupt-public.ser");
@@ -380,8 +380,8 @@ class GuessMarketEnginePersistenceTest {
             throw new IOException("simulated publication failure");
         });
         MarketEvent prior = event(41, CommissionMode.ON_CLOSE, 0, 5);
-        prior.purchase(2, 3);
         GuessMarketEngine engine = engineWithEvents(failingStore, prior);
+        engine.purchaseShares(41, 2, 3);
         MarketEventDetails before = engine.getEventDetails(41);
 
         EngineOperationException exception = assertThrows(
