@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, and have been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`; the current known strict Java 25 all-eleven-suite result is 137 successful tests. The branch is pushed and draft pull request 5 is open for Nitzan's Stage 5 review and acceptance. Stage 5 remains unmerged.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 are implemented on `codex/e1-console-ui` and rebased directly onto `9a8c87c`. Manual review then found the D-073 viewport and misleading-menu-note defect. Nitzan approved D-073 on 2026-08-17, and Task 12A now controls the required test-first correction, complete UI audit, renewed verification, documentation, and pull request update. Stage 5 remains unmerged and unaccepted until that correction is reviewed.
 
 ## Global Constraints
 
@@ -985,7 +985,236 @@ git commit -m "feat: implement console application flows"
 
 Review input recovery, the exact D-072 menu and prompts, all named block shapes, same-operation result use, filtering ownership, runtime-defect visibility, ASCII-only decoration, long supplied text, all eleven tests, the smoke transcript, and walkthrough entries before merging.
 
-Completion record: current rebased Task 11 evidence is `bdb5abd` plus correction `3f3eec2`. Current rebased Task 12 evidence is `9fd2d5d` (`feat: implement console application flows`). The Stage 5 branch is independently reviewed and the current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. The final renderer coverage correction changes no production code and does not repeat the historical real XML smoke. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`; Stage 5 has been successfully rebased directly onto that merge. The branch is pushed and draft pull request 5 is open. No Stage 5 merge or Nitzan acceptance is recorded; it now awaits Nitzan's Stage 5 review and acceptance.
+Historical D-072 completion record: current rebased Task 11 evidence is `bdb5abd` plus correction `3f3eec2`. Current rebased Task 12 evidence is `9fd2d5d` (`feat: implement console application flows`). The strict Java 25 gate passed 137 tests before manual review found D-073. That earlier green result remains valid historical evidence for D-072 but no longer completes the Stage 5 acceptance gate.
+
+### Task 12A: Correct command completion pacing and audit every console conversation
+
+**Files:**
+
+- Modify: `modules/guessmarket-ui/src/main/java/guessmarket/ui/console/ConsoleInput.java`
+- Modify: `modules/guessmarket-ui/src/main/java/guessmarket/ui/console/ConsoleRenderer.java`
+- Modify: `modules/guessmarket-ui/src/main/java/guessmarket/ui/console/GuessMarketConsoleApp.java`
+- Modify: `modules/guessmarket-ui/src/test/java/guessmarket/ui/console/ConsoleInputTest.java`
+- Modify: `modules/guessmarket-ui/src/test/java/guessmarket/ui/console/ConsoleRendererTest.java`
+- Modify: `modules/guessmarket-ui/src/test/java/guessmarket/ui/console/GuessMarketConsoleAppTest.java`
+- Modify after verification: `docs/design/EXERCISE-1-DESIGN-BRIEF.md`
+- Modify after verification: `docs/guides/TESTING.md`
+- Modify after verification: `docs/guides/IMPLEMENTATION-WALKTHROUGH.md`
+- Modify after verification: `PROJECT_HANDOFF.md`
+
+**Interfaces:**
+
+- Consumes: D-073, the existing full-line `Scanner` input boundary, the existing `ConsoleInput.EndOfInputException`, D-072 rendering, and checked `EngineOperationException` recovery.
+- Produces: package-private `void ConsoleInput.waitForMenuReturn() throws EndOfInputException`, the revised static menu, and a command loop that pauses after every handled command attempt from 1 through 7.
+- Preserves: four UI production classes, seven Engine operations, current DTOs, command numbering, filtering and actual-ID translation, exact result blocks, and visibility of unchecked programming defects.
+
+- [ ] **Step 1: Write the D-073 input and menu tests**
+
+Add focused `ConsoleInputTest` methods with these exact calls and expectations:
+
+```java
+@Test
+void returnToMenuAcceptsBlankAndWhitespaceOnlyLines() throws Exception {
+    StringWriter blankText = new StringWriter();
+    input("\n", blankText).waitForMenuReturn();
+    assertEquals("Press Enter to return to the main menu:\n", blankText.toString());
+
+    StringWriter whitespaceText = new StringWriter();
+    input("   \n", whitespaceText).waitForMenuReturn();
+    assertEquals("Press Enter to return to the main menu:\n", whitespaceText.toString());
+}
+
+@Test
+void returnToMenuRejectsEveryNonblankLineWithoutTreatingItAsACommand() throws Exception {
+    StringWriter text = new StringWriter();
+    input("2\nword\n\n", text).waitForMenuReturn();
+    assertEquals("""
+            Press Enter to return to the main menu:
+            Press Enter without typing a command.
+            Press Enter to return to the main menu:
+            Press Enter without typing a command.
+            Press Enter to return to the main menu:
+            """, text.toString());
+}
+
+@Test
+void endOfInputAtReturnToMenuIsTheExistingCheckedSignal() {
+    assertThrows(ConsoleInput.EndOfInputException.class,
+            () -> input("", new StringWriter()).waitForMenuReturn());
+}
+```
+
+Revise both menu literals in `ConsoleInputTest` and `ConsoleRendererTest` so they contain one blank line between `8. Exit` and `Choose a command [1-8]:`, and add `assertFalse(output.contains("Commands 2 through 6 require a loaded system."));` to the renderer test.
+
+- [ ] **Step 2: Write application-level RED tests for ordering and edge cases**
+
+Update the happy-path script by adding one blank line after each completed command from 1 through 7. Replace the old repeated-menu assertion with an ordering assertion that each command result is followed by the exact pause prompt before the next menu.
+
+Add focused tests equivalent to these exact cases:
+
+```java
+@Test
+void recoverableEngineFailureWaitsForEnterBeforeRedrawingTheMenu() {
+    FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+    engine.failWith(FakeGuessMarketEngine.LIST, failure(EngineErrorCode.NO_SYSTEM_LOADED));
+
+    String output = run(engine, "2\n\n8\n");
+
+    assertTrue(output.contains("Recovery: Load XML or restore saved state first.\n"
+            + "Press Enter to return to the main menu:\n\n" + MENU));
+}
+
+@Test
+void endOfInputAtReturnToMenuExitsWithoutRedrawingTheMenu() {
+    FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+
+    String output = run(engine, "2\n");
+
+    assertEquals(1, occurrences(output, MENU));
+    assertTrue(output.endsWith("Press Enter to return to the main menu:\n"
+            + "Input closed. Exiting.\n"));
+}
+
+@Test
+void nonblankReturnInputIsRetriedAndNeverExecutedAsTheNextCommand() {
+    FakeGuessMarketEngine engine = new FakeGuessMarketEngine();
+
+    String output = run(engine, "2\n8\n\n8\n");
+
+    assertEquals(List.of("listEvents()"), engine.calls);
+    assertTrue(output.contains("Press Enter without typing a command."));
+    assertEquals(2, occurrences(output, MENU));
+}
+
+@Test
+void exitDoesNotDisplayTheReturnToMenuPrompt() {
+    String output = run(new FakeGuessMarketEngine(), "8\n");
+
+    assertFalse(output.contains("Press Enter to return to the main menu:"));
+    assertTrue(output.endsWith("Goodbye.\n"));
+}
+```
+
+Keep invalid main-menu input pause-free and update the pre-load, empty-open-event, failed purchase, failed close, details, save, restore, and complete-session scripts so every handled command from 1 through 7 supplies its explicit return Enter. Preserve the existing EOF-at-secondary-prompt and unchecked-defect assertions.
+
+- [ ] **Step 3: Compile the three UI suites and prove RED for the approved reasons**
+
+Use a new `build/d073-red` tree. Strictly compile DTO, Engine, UI, and all tests with Oracle Java 25.0.4, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, the JUnit 6.1.1 runner, and the five approved JAXB runtime JARs. Run:
+
+```powershell
+$d073RedClasspath = @(
+  'build\d073-red\classes\test'
+  'build\d073-red\classes\dto'
+  'build\d073-red\classes\engine'
+  'build\d073-red\classes\ui'
+  'modules\guessmarket-engine\src\main\resources'
+  'modules\guessmarket-engine\src\test\resources'
+  'tools\jaxb-ri-4.0.5\mod\angus-activation.jar'
+  'tools\jaxb-ri-4.0.5\mod\jakarta.activation-api.jar'
+  'tools\jaxb-ri-4.0.5\mod\jakarta.xml.bind-api.jar'
+  'tools\jaxb-ri-4.0.5\mod\jaxb-core.jar'
+  'tools\jaxb-ri-4.0.5\mod\jaxb-impl.jar'
+)
+& 'C:\Program Files\Java\jdk-25.0.4\bin\java.exe' `
+  -jar tools\testing\junit-platform-console-standalone-6.1.1.jar execute `
+  --class-path ($d073RedClasspath -join [IO.Path]::PathSeparator) `
+  --select-class guessmarket.ui.console.ConsoleInputTest `
+  --select-class guessmarket.ui.console.ConsoleRendererTest `
+  --select-class guessmarket.ui.console.GuessMarketConsoleAppTest `
+  --fail-if-no-tests --disable-banner --disable-ansi-colors --details=summary
+```
+
+Expected RED causes: `waitForMenuReturn()` is missing, the old static loaded-system sentence remains, and application transcripts redraw the menu without the approved pause. Any unrelated compiler or test failure must be diagnosed before production code changes.
+
+- [ ] **Step 4: Implement the minimal input and renderer correction**
+
+Add this package-private method to `ConsoleInput`:
+
+```java
+void waitForMenuReturn() throws EndOfInputException {
+    while (true) {
+        writeLine("Press Enter to return to the main menu:");
+        if (readLine().trim().isEmpty()) {
+            return;
+        }
+        writeLine("Press Enter without typing a command.");
+    }
+}
+```
+
+In `ConsoleRenderer.renderMenu()`, delete only:
+
+```java
+writeLine("Commands 2 through 6 require a loaded system.");
+writeLine("");
+```
+
+Keep the existing blank line after `8. Exit`, so the revised menu has exactly one blank line before its choice prompt.
+
+- [ ] **Step 5: Implement the minimal application-loop correction**
+
+Keep the existing outer `EndOfInputException` catch. After reading a valid choice, execute command 8 immediately. For each valid choice from 1 through 7, execute the existing handler inside the checked Engine-error boundary, render any checked error, then call `input.waitForMenuReturn()`. Choice 0 from invalid main-menu parsing skips the pause. Do not catch `RuntimeException` or `Error`.
+
+The control shape must remain equivalent to:
+
+```java
+int choice = input.readMenuChoice();
+if (choice == 8) {
+    renderer.renderGoodbye();
+    return;
+}
+if (choice >= 1 && choice <= 7) {
+    try {
+        executeCommand(choice);
+    } catch (EngineOperationException exception) {
+        renderer.renderError(exception);
+    }
+    input.waitForMenuReturn();
+}
+```
+
+If extracting `executeCommand(int choice)`, keep it private, use the existing numeric switch, and introduce no command abstraction or fifth production class.
+
+- [ ] **Step 6: Run focused GREEN and audit all UI conversations**
+
+Recompile into a new `build/d073-green` tree and run the same three exact UI suites. Then inspect every command path for success, checked error, empty result, invalid secondary input, EOF, and unchecked failure. Confirm:
+
+- Commands 1 through 7 pause after handled success, empty result, or checked Engine failure.
+- Command 8 never pauses.
+- Invalid menu input redraws without a pause.
+- Invalid secondary input repeats only its own prompt.
+- EOF at the menu, return pause, event selection, option selection, quantity, XML path, save path, and restore path prints one `Input closed. Exiting.` and exits normally.
+- Nonblank pause input never becomes a command.
+- Runtime defects remain uncaught and visible.
+- No UI path adds or infers Engine loaded state.
+
+- [ ] **Step 7: Run real Engine and process-level audit scenarios**
+
+Use the supplied `multiple.xml` fixture and compiled real `GuessMarketEngineImpl` to exercise load, list, details, purchase, close, save, restore, pre-load rejection, invalid input, EOF at pauses, and exit. Capture output under `build/d073-manual-audit`, which remains untracked. Verify the command 2 result contains all three event IDs and remains the final visible block until Enter. Search the transcript to prove the static loaded-system note is absent.
+
+If a concrete Engine defect appears, record the exact input, Engine call, expected result, actual result, and state-preservation evidence. Do not change Engine production code under Task 12A without a separate approved correction.
+
+- [ ] **Step 8: Run the renewed strict all-eleven-suite gate**
+
+Compile all production and test sources into a fresh `build/d073-final` directory using the strict Java 25 flags. Include `modules/guessmarket-engine/src/main/resources` and `modules/guessmarket-engine/src/test/resources` on the JUnit runtime classpath. Run all eleven test suites with `--scan-class-path`, `--include-engine junit-jupiter`, and `--fail-if-no-tests`. Require zero failures, skips, disabled tests, aborts, warnings from compilation, or missing suite names.
+
+- [ ] **Step 9: Update the durable Stage 5 record**
+
+Mark D-073 approved and implemented in the design ledger and brief. Record the new method, menu behavior, EOF contract, regression tests, audit scenarios, exact test count, and any separately reported Engine finding in the walkthrough and testing guide. Update `PROJECT_HANDOFF.md` so Stage 5 awaits renewed Nitzan review rather than claiming the earlier 137-test gate completes it.
+
+- [ ] **Step 10: Verify, commit, and push for renewed pull request review**
+
+Run `git diff --check`, inspect every staged path, confirm `.superpowers/` and every `build/` output remain untracked or ignored, and scan the staged diff for secrets or private absolute paths. Commit only the reviewed source, tests, and durable public documentation:
+
+```powershell
+git add modules/guessmarket-ui docs PROJECT_HANDOFF.md
+git commit -m "fix: keep console results visible before menu return"
+git push origin codex/e1-console-ui
+```
+
+The Stage 5 pull request remains a draft and unmerged until Nitzan completes the renewed manual review and explicitly accepts it.
+
+Task 12A approval record: Nitzan approved D-073 on 2026-08-17 and authorized its test-first implementation, full UI audit, separate Engine-defect reporting, renewed verification, documentation update, commit, and push to pull request 5.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 
