@@ -2,13 +2,18 @@ package guessmarket.engine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import guessmarket.dto.CommissionMode;
+import guessmarket.dto.EventStatus;
 import guessmarket.dto.MarketEventDetails;
+import guessmarket.dto.MarketEventSummary;
+import guessmarket.dto.TradeHistoryEntry;
+import guessmarket.engine.xml.XmlMarketLoader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
@@ -265,8 +270,140 @@ class GuessMarketEnginePersistenceTest {
         }
     }
 
+    @Test
+    void publicEngineRoundTripRestoresCompleteStateIntoANewInstanceAndContinues()
+            throws Exception {
+        MarketEvent minimum = event(Integer.MIN_VALUE, CommissionMode.ON_PURCHASE, 5, 100);
+        minimum.purchase(1, 3);
+        minimum.purchase(2, 2);
+        MarketEvent maximum = event(Integer.MAX_VALUE, CommissionMode.ON_CLOSE, 90, 5);
+        maximum.purchase(1, 7);
+        maximum.close(1);
+        GuessMarketEngine source = engineWithEvents(new SavedStateStore(), minimum, maximum);
+        Path statePath = temporaryDirectory.resolve("public restart state");
+
+        source.saveState(statePath);
+        GuessMarketEngine restarted = new GuessMarketEngineImpl();
+        int restoredCount = restarted.restoreState(statePath);
+
+        assertAll(
+                () -> assertEquals(2, restoredCount),
+                () -> assertIterableEquals(
+                        List.of(Integer.MIN_VALUE, Integer.MAX_VALUE),
+                        restarted.listEvents().stream()
+                                .map(MarketEventSummary::getEventId)
+                                .toList()));
+        assertDetailsEqual(source.getEventDetails(Integer.MIN_VALUE),
+                restarted.getEventDetails(Integer.MIN_VALUE));
+        assertDetailsEqual(source.getEventDetails(Integer.MAX_VALUE),
+                restarted.getEventDetails(Integer.MAX_VALUE));
+
+        restarted.purchaseShares(Integer.MIN_VALUE, 1, 4);
+        MarketEventDetails continued = restarted.closeEvent(Integer.MIN_VALUE, 2);
+
+        assertAll(
+                () -> assertEquals(7, continued.getOptions().get(0).getShareQuantity()),
+                () -> assertEquals(2, continued.getOptions().get(1).getShareQuantity()),
+                () -> assertEquals(3, continued.getPurchaseHistory().size()),
+                () -> assertEquals(EventStatus.CLOSED, continued.getStatus()),
+                () -> assertEquals(2, continued.getWinningOptionNumber().orElseThrow()));
+    }
+
+    @Test
+    void successfulPublicRestoreReplacesRatherThanMergesThePriorLiveSystem() throws Exception {
+        GuessMarketEngine savedSource = engineWithEvents(
+                new SavedStateStore(),
+                event(22, CommissionMode.ON_CLOSE, 0, 5));
+        Path statePath = temporaryDirectory.resolve("replacement");
+        savedSource.saveState(statePath);
+
+        MarketEvent prior = event(11, CommissionMode.ON_PURCHASE, 5, 5);
+        prior.purchase(1, 2);
+        GuessMarketEngine target = engineWithEvents(new SavedStateStore(), prior);
+
+        int count = target.restoreState(statePath);
+
+        assertEquals(1, count);
+        assertIterableEquals(
+                List.of(22),
+                target.listEvents().stream().map(MarketEventSummary::getEventId).toList());
+        EngineOperationException missingPrior = assertThrows(
+                EngineOperationException.class,
+                () -> target.getEventDetails(11));
+        assertEquals(EngineErrorCode.EVENT_NOT_FOUND, missingPrior.getCode());
+        assertEquals(0, target.getEventDetails(22).getPurchaseHistory().size());
+    }
+
+    @Test
+    void everyFailedPublicRestorePreservesTheCompletePriorLiveSystem() throws Exception {
+        MarketEvent prior = event(31, CommissionMode.ON_PURCHASE, 5, 100);
+        prior.purchase(1, 6);
+        GuessMarketEngine engine = engineWithEvents(new SavedStateStore(), prior);
+        MarketEventDetails before = engine.getEventDetails(31);
+
+        Path corrupt = temporaryDirectory.resolve("corrupt-public.ser");
+        Files.write(corrupt, new byte[] {1, 2, 3});
+        Path wrongRoot = temporaryDirectory.resolve("wrong-root-public.ser");
+        writeObject(wrongRoot, new ArrayList<>());
+        Path wrongVersion = temporaryDirectory.resolve("wrong-version-public.ser");
+        writeObject(wrongVersion, new SavedState(2,
+                List.of(event(9, CommissionMode.ON_CLOSE, 0, 5))));
+        Path empty = temporaryDirectory.resolve("empty-public.ser");
+        writeObject(empty, new SavedState(1, List.of()));
+
+        List<RestoreFailure> failures = List.of(
+                new RestoreFailure(temporaryDirectory, EngineErrorCode.INVALID_STATE_PATH),
+                new RestoreFailure(
+                        temporaryDirectory.resolve("missing-public"),
+                        EngineErrorCode.STATE_FILE_NOT_FOUND),
+                new RestoreFailure(corrupt, EngineErrorCode.SAVED_STATE_INVALID),
+                new RestoreFailure(wrongRoot, EngineErrorCode.SAVED_STATE_INVALID),
+                new RestoreFailure(wrongVersion, EngineErrorCode.SAVED_STATE_INVALID),
+                new RestoreFailure(empty, EngineErrorCode.SAVED_STATE_INVALID));
+
+        for (RestoreFailure restoreFailure : failures) {
+            EngineOperationException exception = assertThrows(
+                    EngineOperationException.class,
+                    () -> engine.restoreState(restoreFailure.path()));
+
+            assertEquals(restoreFailure.code(), exception.getCode());
+            assertIterableEquals(
+                    List.of(31),
+                    engine.listEvents().stream().map(MarketEventSummary::getEventId).toList());
+            assertDetailsEqual(before, engine.getEventDetails(31));
+        }
+    }
+
+    @Test
+    void failedPublicSavePreservesTheRunningSystem() throws Exception {
+        SavedStateStore failingStore = new SavedStateStore((source, target, options) -> {
+            throw new IOException("simulated publication failure");
+        });
+        MarketEvent prior = event(41, CommissionMode.ON_CLOSE, 0, 5);
+        prior.purchase(2, 3);
+        GuessMarketEngine engine = engineWithEvents(failingStore, prior);
+        MarketEventDetails before = engine.getEventDetails(41);
+
+        EngineOperationException exception = assertThrows(
+                EngineOperationException.class,
+                () -> engine.saveState(temporaryDirectory.resolve("failed-public-save")));
+
+        assertEquals(EngineErrorCode.STATE_FILE_ACCESS_FAILED, exception.getCode());
+        assertDetailsEqual(before, engine.getEventDetails(41));
+    }
+
     private static MarketEvent event(int eventId, CommissionMode mode, int percentage, int b) {
         return new MarketEvent(eventId, "", "", mode, percentage, b, "same", "same");
+    }
+
+    private static GuessMarketEngine engineWithEvents(
+            SavedStateStore store,
+            MarketEvent... events) {
+        LinkedHashMap<Integer, MarketEvent> initialEvents = new LinkedHashMap<>();
+        for (MarketEvent event : events) {
+            initialEvents.put(event.getEventId(), event);
+        }
+        return new GuessMarketEngineImpl(new XmlMarketLoader(), store, initialEvents);
     }
 
     private static void writeObject(Path path, Object object) throws IOException {
@@ -295,6 +432,8 @@ class GuessMarketEnginePersistenceTest {
                     actual.getOptions().get(index).getLabel());
             assertEquals(expected.getOptions().get(index).getShareQuantity(),
                     actual.getOptions().get(index).getShareQuantity());
+            assertEquals(Double.doubleToLongBits(expected.getOptions().get(index).getCurrentPrice()),
+                    Double.doubleToLongBits(actual.getOptions().get(index).getCurrentPrice()));
         }
         assertEquals(Double.doubleToLongBits(expected.getEventAccountBalance()),
                 Double.doubleToLongBits(actual.getEventAccountBalance()));
@@ -302,11 +441,31 @@ class GuessMarketEnginePersistenceTest {
                 Double.doubleToLongBits(actual.getTotalCommissionCollected()));
         assertEquals(expected.getWinningOptionNumber(), actual.getWinningOptionNumber());
         assertEquals(expected.getPurchaseHistory().size(), actual.getPurchaseHistory().size());
+        assertIterableEquals(
+                expected.getPurchaseHistory().stream()
+                        .map(GuessMarketEnginePersistenceTest::historyValues)
+                        .toList(),
+                actual.getPurchaseHistory().stream()
+                        .map(GuessMarketEnginePersistenceTest::historyValues)
+                        .toList());
+    }
+
+    private static List<Object> historyValues(TradeHistoryEntry entry) {
+        return List.of(
+                entry.getOptionNumber(),
+                entry.getOptionLabel(),
+                entry.getShareQuantity(),
+                entry.getBaseShareCost(),
+                entry.getPurchaseCommission(),
+                entry.getTotalPaid());
     }
 
     @FunctionalInterface
     private interface ThrowingOperation {
         void run() throws Exception;
+    }
+
+    private record RestoreFailure(Path path, EngineErrorCode code) {
     }
 
     private static final class DisallowedPayload implements java.io.Serializable {
