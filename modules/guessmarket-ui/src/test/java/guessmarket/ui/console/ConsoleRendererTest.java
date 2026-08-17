@@ -25,6 +25,16 @@ class ConsoleRendererTest {
     private static final String SEPARATOR = "------------------------------------------------------------";
 
     @Test
+    void blankLineIsAnExplicitRendererOwnedMenuReturnSeparator() {
+        StringWriter text = new StringWriter();
+        ConsoleRenderer renderer = renderer(text);
+
+        renderer.renderBlankLine();
+
+        assertEquals("\n", text.toString());
+    }
+
+    @Test
     void menuIsTheCompleteD072Literal() {
         StringWriter text = new StringWriter();
         ConsoleRenderer renderer = renderer(text);

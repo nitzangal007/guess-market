@@ -24,6 +24,10 @@ final class ConsoleRenderer {
         this.output = Objects.requireNonNull(output, "output");
     }
 
+    void renderBlankLine() {
+        writeLine("");
+    }
+
     void renderMenu() {
         writeLine(EQUALS_SEPARATOR);
         writeLine("                       GUESS MARKET");
