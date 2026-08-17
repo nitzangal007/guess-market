@@ -46,8 +46,8 @@ final class SavedStateValidator {
         if (validated.containsKey(event.getEventId())) {
             throw invalid("Each saved event ID must be unique.");
         }
-        requireText(event.getName(), "event name");
-        requireText(event.getDescription(), "event description");
+        requireCanonicalEventName(event.getName());
+        requireOuterTrimmedText(event.getDescription(), "event description");
         if (event.getLiquidityParameter() <= 0) {
             throw invalid("Each saved event must have a positive liquidity parameter.");
         }
@@ -94,7 +94,7 @@ final class SavedStateValidator {
             throw invalid("The saved event options are invalid.");
         }
         requireDistinct(mutableNodes, option);
-        requireText(option.getLabel(), "option label");
+        requireOuterTrimmedText(option.getLabel(), "option label");
     }
 
     private void validateHistoryAndAccount(
@@ -118,7 +118,7 @@ final class SavedStateValidator {
                 throw invalid("A saved purchase record does not match its event option.");
             }
             String optionLabel = record.getOptionLabel();
-            requireText(optionLabel, "purchase option label");
+            requireOuterTrimmedText(optionLabel, "purchase option label");
             if (!optionLabel.equals(options.get(optionNumber - 1).getLabel())) {
                 throw invalid("A saved purchase record does not match its event option.");
             }
@@ -197,9 +197,21 @@ final class SavedStateValidator {
         }
     }
 
-    private static void requireText(String value, String field) throws EngineOperationException {
+    private static void requireCanonicalEventName(String value) throws EngineOperationException {
         if (value == null || value.getClass() != String.class) {
-            throw invalid("Saved " + field + " is invalid.");
+            throw invalid("Saved event name is invalid.");
+        }
+        String trimmed = value.trim();
+        String canonical = trimmed.isEmpty() ? "" : trimmed.replaceAll("\\s+", " ");
+        if (!value.equals(canonical)) {
+            throw invalid("Saved event name is not in its XML-normalized form.");
+        }
+    }
+
+    private static void requireOuterTrimmedText(String value, String field)
+            throws EngineOperationException {
+        if (value == null || value.getClass() != String.class || !value.equals(value.trim())) {
+            throw invalid("Saved " + field + " is not in its XML-normalized form.");
         }
     }
 

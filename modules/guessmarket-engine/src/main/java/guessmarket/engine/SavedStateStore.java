@@ -92,7 +92,8 @@ final class SavedStateStore {
         String name = fileName.toString();
         Path target = name.toLowerCase(Locale.ROOT).endsWith(".ser")
                 ? basePath : basePath.resolveSibling(name + ".ser");
-        Path parent = target.toAbsolutePath().normalize().getParent();
+        target = target.toAbsolutePath().normalize();
+        Path parent = target.getParent();
         if (parent == null || !Files.isDirectory(parent)) {
             throw invalidPath(target, "The saved state parent directory must already exist.");
         }

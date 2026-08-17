@@ -17,6 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -213,6 +214,55 @@ class GuessMarketEnginePersistenceTest {
 
         assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
                 () -> new SavedStateValidator().validate(new SavedState(1, List.of(event))));
+    }
+
+    @Test
+    void restoreRejectsSerializedEventNameThatIsNotMapperCanonical() throws Exception {
+        MarketEvent event = new MarketEvent(5, "  team\talpha   beta  ", "", CommissionMode.ON_CLOSE,
+                0, 5, "same", "same");
+        Path path = temporaryDirectory.resolve("noncanonical-name.ser");
+        writeObject(path, new SavedState(1, List.of(event)));
+
+        assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
+                () -> new SavedStateStore().restore(path));
+    }
+
+    @Test
+    void restoreRejectsSerializedDescriptionWithOuterWhitespace() throws Exception {
+        MarketEvent event = new MarketEvent(6, "name", " description ", CommissionMode.ON_CLOSE,
+                0, 5, "same", "same");
+        Path path = temporaryDirectory.resolve("noncanonical-description.ser");
+        writeObject(path, new SavedState(1, List.of(event)));
+
+        assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
+                () -> new SavedStateStore().restore(path));
+    }
+
+    @Test
+    void restoreRejectsSerializedOptionLabelWithOuterWhitespace() throws Exception {
+        MarketEvent event = new MarketEvent(7, "name", "", CommissionMode.ON_CLOSE,
+                0, 5, " first ", "second");
+        Path path = temporaryDirectory.resolve("noncanonical-option.ser");
+        writeObject(path, new SavedState(1, List.of(event)));
+
+        assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
+                () -> new SavedStateStore().restore(path));
+    }
+
+    @Test
+    void savesAndRestoresUsingBareRelativeBasePath() throws Exception {
+        Path basePath = Path.of("task9-relative-" + UUID.randomUUID());
+        Path statePath = basePath.toAbsolutePath().normalize().resolveSibling(
+                basePath.getFileName() + ".ser");
+        SavedStateStore store = new SavedStateStore();
+        try {
+            store.save(basePath, List.of(event(8, CommissionMode.ON_CLOSE, 0, 5)));
+
+            assertTrue(Files.isRegularFile(statePath));
+            assertIterableEquals(List.of(8), store.restore(basePath).keySet());
+        } finally {
+            Files.deleteIfExists(statePath);
+        }
     }
 
     private static MarketEvent event(int eventId, CommissionMode mode, int percentage, int b) {
