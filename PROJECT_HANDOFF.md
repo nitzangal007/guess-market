@@ -65,3 +65,12 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 ## Exact next action
 
 The Stage 5 branch is successfully rebased directly onto `9a8c87c`. Keep it unmerged and unpushed while Nitzan performs the Stage 5 review and decides whether to accept it.
+
+## Remaining stages after Stage 5 acceptance
+
+1. Merge Stage 5 only after Nitzan explicitly accepts the checkpoint.
+2. Stage 6 creates the submission candidate on `codex/e1-packaging`. It adds the private reviewed README PDF input, authoritative `build.bat`, manifest, launcher, mandatory JUnit proof verifier, three application JARs, exact ZIP staging, fresh extraction, and packaged-process checks. The Stage 6 gate proves that the build and packaging pipeline produces the intended candidate artifact.
+3. Stage 7 verifies the exact Stage 6 ZIP on `codex/e1-final-verification`. It reruns the zero-based build and packaged scenarios, checks IntelliJ ownership once, requires the exact ZIP on a clean Windows 10 machine, performs the README-led grader walkthrough, records the ZIP SHA-256, and completes the source and privacy review.
+4. Stop for Nitzan's explicit final approval. Only the already verified ZIP with the recorded hash may then be copied to the submission folder and Drive, tagged, or submitted.
+
+Stage 6 does not authorize submission. Stage 7 is the final pre-submission acceptance stage and must verify the exact artifact produced by the authoritative build.
