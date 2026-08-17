@@ -1,6 +1,6 @@
 # Exercise 1 Design
 
-Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation, is independently reviewed on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. The branch is pushed and draft pull request 5 is open for Nitzan's Stage 5 review and acceptance. Stage 5 remains unmerged.
+Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation, is independently reviewed on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. Manual Stage 5 review found a viewport usability defect in the immediate menu redraw and a misleading permanent loaded-system note. D-073 records the proposed correction after Nitzan approved its direction; its exact written contract still awaits review. The branch is pushed and draft pull request 5 is open. Stage 5 remains unmerged.
 
 Last updated: 2026-08-17
 
@@ -2664,6 +2664,86 @@ Nitzan approved the only choice-bearing correction, D-070's direct-domain repres
 
 Nitzan separately approved D-072's Clean Sections console presentation on 2026-08-17 after reviewing Clean Sections, Command Center, and Minimal Transcript mockups. D-072 is a post-review presentation decision and does not reopen the reviewed Engine or DTO architecture.
 
+### D-073: Readable command completion and graceful input closure
+
+Status: proposed for Nitzan's written-spec review. Nitzan approved the correction direction on 2026-08-17 after reproducing the problem manually, but production code and tests must continue to follow D-072 until he approves this exact contract.
+
+Problem and evidence:
+
+- After a command finishes, D-072 immediately redraws the complete menu. In a short PowerShell or IDE terminal, a long result such as the three-event list scrolls above the visible viewport before the user has time to read it.
+- The main menu permanently says `Commands 2 through 6 require a loaded system.` even after XML loading or state restoration succeeds. This sentence is not a live error and does not prove that the Engine lost its loaded state, but its position makes it look like a current failure.
+- The reproduced command 2 transcript contains all three supplied events and later commands can use them. The observed defect is therefore console pacing and status wording, not evidence of an Engine state-loss defect.
+
+Decision:
+
+- Remove `Commands 2 through 6 require a loaded system.` from the main menu. Pre-load attempts already produce the existing structured response `Error: No system is loaded.` followed by `Recovery: Load XML or restore saved state first.`
+- After every handled command attempt from 1 through 7, keep its success output, result block, empty-set message, or recoverable Engine error visible and print `Press Enter to return to the main menu:`.
+- Redraw the complete menu only after the user submits an empty line at that pause.
+- Command 8 remains immediate: print `Goodbye.` and exit without a return-to-menu pause.
+- Do not clear the screen, query terminal size, truncate output, or introduce cursor control. The user remains free to scroll through long results before pressing Enter.
+
+The revised complete main menu is:
+
+```text
+============================================================
+                       GUESS MARKET
+============================================================
+
+DATA
+  1. Load events from XML
+  2. Display all events
+  3. View an event's trading status
+
+TRADING
+  4. Purchase shares
+  5. Close an event
+
+STATE AND SESSION
+  6. Save current state
+  7. Restore saved state
+  8. Exit
+
+Choose a command [1-8]:
+```
+
+Return-to-menu input contract:
+
+- The exact pause prompt is `Press Enter to return to the main menu:`.
+- An empty line completes the pause and permits one fresh menu redraw.
+- A nonblank line at the pause is not treated as the next menu command. Print `Press Enter without typing a command.` and repeat only the pause prompt. This prevents a typed `2`, for example, from being silently discarded or executed without the user seeing the menu.
+- End-of-input at the pause prints the existing `Input closed. Exiting.` message exactly once, exits normally, and does not redraw the menu.
+- End-of-input at the main menu or at any command-specific prompt keeps the same graceful result: print `Input closed. Exiting.` exactly once and exit normally without another menu or pause.
+
+Command and recovery matrix:
+
+| Situation | Required behavior before any next menu |
+| --- | --- |
+| Command 1 through 7 succeeds | Render the complete success or result output, then wait at the return-to-menu prompt. |
+| Command 1 through 7 reaches an approved empty result such as no open events | Render the empty-result message, then wait at the return-to-menu prompt. |
+| Command 1 through 7 receives a checked `EngineOperationException` | Render the existing `Error` and `Recovery` lines, then wait at the return-to-menu prompt. |
+| Invalid main-menu line | Render `Invalid menu choice. Enter a number from 1 to 8.` and redraw the menu without a pause because no command began. |
+| Invalid command-specific input | Keep the existing prompt-local retry. Do not return to the menu and do not show the pause yet. |
+| Command 8 | Render `Goodbye.` and exit immediately. |
+| Unexpected unchecked exception or assertion failure | Keep it visible to the developer. Do not convert it into a user recovery message or a pause. |
+
+Implementation boundaries:
+
+- `ConsoleInput` owns the new full-line return-to-menu prompt, blank-line validation, nonblank retry, and end-of-input signal, consistent with its ownership of all other prompt-local input.
+- `GuessMarketConsoleApp` invokes the pause only after a handled command attempt from 1 through 7 and keeps one outer graceful end-of-input boundary.
+- `ConsoleRenderer` owns the revised static menu literal and otherwise preserves D-072 output formatting.
+- No new production class, public method, Engine method, DTO field, loaded-state flag, dependency, or terminal-specific behavior is introduced.
+- A UI audit may report a concrete Engine defect, but D-073 does not authorize changing Engine behavior. Any such defect must be documented with reproduction evidence and reviewed separately before an Engine correction.
+
+Verification requirements:
+
+- `ConsoleRendererTest` must reject the removed loaded-system note and assert the revised complete menu literal.
+- `ConsoleInputTest` must cover blank return, whitespace-only return, nonblank retry, repeated nonblank retry, and end-of-input at the pause.
+- `GuessMarketConsoleAppTest` must prove output ordering: command result, return-to-menu prompt, accepted Enter, then exactly one new menu. It must also cover checked Engine recovery, empty results, command 8 without a pause, invalid menu input without a pause, and EOF at the main menu, pause, and every command-specific prompt category.
+- A real-process transcript using supplied XML must prove that the events remain loaded, command 2 renders all supplied events, the result remains visible until Enter, and the misleading static note is absent.
+- The remaining command conversations must be audited for equivalent viewport, retry, error-recovery, and EOF defects. The full eleven-suite strict Java 25 gate must pass before the correction is committed as complete or pushed for renewed review.
+
+D-073 supersedes only D-072's permanent loaded-system sentence and immediate menu-redraw rule. All D-072 section grammar, exact command numbering, approved result shapes, Engine calls, selection translation, error mapping, numeric formatting, and architecture boundaries remain unchanged.
+
 ## Deliberately deferred Exercise 2 and Exercise 3 features
 
 - JavaFX screens, controls, tasks, and progress indicators.
@@ -2743,6 +2823,6 @@ Current SHA-256 evidence:
 
 ## Exact next checkpoint
 
-The written design is approved through D-072. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, and D-072 controls the Stage 5 console presentation without changing Engine or DTO behavior.
+The written design is approved through D-072. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, and D-072 controls the Stage 5 console presentation without changing Engine or DTO behavior. D-073 records a proposed manual-review correction for viewport readability and graceful input closure; its exact written contract awaits Nitzan's approval.
 
-Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12, passed independent review on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Do not modify the completed Stage 4 history. The branch is pushed and draft pull request 5 is open while Stage 5 remains unmerged pending Nitzan's review and acceptance.
+Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12, passed independent review on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Manual Stage 5 review then found the D-073 usability defect, so the earlier green gate does not complete Stage 5 acceptance. Do not modify the completed Stage 4 history. The branch is pushed and draft pull request 5 is open while Stage 5 remains unmerged pending the D-073 correction, renewed verification, and Nitzan's review.
