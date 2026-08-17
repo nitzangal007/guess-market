@@ -20,6 +20,16 @@ if /I "%~1"=="--verify-reports" (
     exit /b %ERRORLEVEL%
 )
 
+if /I "%~1"=="--verify-manifest" (
+    if "%~2"=="" (
+        echo ERROR: --verify-manifest requires a manifest file.
+        exit /b 1
+    )
+    set "MANIFEST_FILE=%~f2"
+    call :verify_manifest_source
+    exit /b %ERRORLEVEL%
+)
+
 call :phase "preflight"
 call :preflight
 if errorlevel 1 goto :failure
@@ -272,11 +282,16 @@ if errorlevel 1 (
     exit /b 1
 )
 popd
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$actual = [IO.File]::ReadAllText('%PROJECT_ROOT%\packaging\guessmarket-ui.mf'); $expected = (@('Manifest-Version: 1.0','Main-Class: guessmarket.ui.console.ConsoleMain','Class-Path: lib/guessmarket-engine.jar lib/guessmarket-dto.jar','  lib/jakarta.activation-api.jar lib/angus-activation.jar','  lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-impl.jar','') -join [Environment]::NewLine) + [Environment]::NewLine; if ($actual -cne $expected) { throw 'The source manifest does not match the required exact text.' }"
+set "MANIFEST_FILE=%PROJECT_ROOT%\packaging\guessmarket-ui.mf"
+call :verify_manifest_source
 if errorlevel 1 exit /b 1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$lines = @(Get-Content -LiteralPath '%BUILD_DIR%\inspection\ui-manifest\META-INF\MANIFEST.MF'); if ($lines -notcontains 'Main-Class: guessmarket.ui.console.ConsoleMain') { throw 'UI JAR Main-Class is incorrect.' }; $index = [Array]::FindIndex([string[]]$lines, [Predicate[string]]{ param($line) $line.StartsWith('Class-Path: ') }); if ($index -lt 0) { throw 'UI JAR is missing Class-Path.' }; $classPath = $lines[$index].Substring('Class-Path: '.Length); while ($index + 1 -lt $lines.Count -and $lines[$index + 1].StartsWith(' ')) { $index++; $classPath += $lines[$index].Substring(1) }; $expected = 'lib/guessmarket-engine.jar lib/guessmarket-dto.jar lib/jakarta.activation-api.jar lib/angus-activation.jar lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-impl.jar'; if ($classPath -ne $expected) { throw ('UI JAR Class-Path mismatch: ' + $classPath) }"
 if errorlevel 1 exit /b 1
 exit /b 0
+
+:verify_manifest_source
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$raw = [IO.File]::ReadAllText($env:MANIFEST_FILE); $actual = $raw.Replace(\"`r`n\", \"`n\"); if ($actual.Contains(\"`r\")) { throw 'The source manifest uses a bare carriage return.' }; $expected = (@('Manifest-Version: 1.0','Main-Class: guessmarket.ui.console.ConsoleMain','Class-Path: lib/guessmarket-engine.jar lib/guessmarket-dto.jar','  lib/jakarta.activation-api.jar lib/angus-activation.jar','  lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-impl.jar','') -join \"`n\") + \"`n\"; if ($actual -cne $expected) { throw 'The source manifest does not match the required logical text and final blank line.' }; Write-Output 'Source manifest logical text passed.'"
+exit /b %ERRORLEVEL%
 
 :inventory_jar
 "%JAR_EXE%" --list --file "%~1" > "%~2"
