@@ -2,7 +2,7 @@
 
 ## Status
 
-The build pipeline is completely designed but not implemented yet. Commands in this document describe the approved target and must not be presented as working until `build.bat` exists and passes its verification gates.
+The final build pipeline is completely designed but `build.bat` does not exist yet. Through Stage 3, the verified workflow is source-level only: strict Oracle Java 25 compilation of DTO and Engine production and test sources, followed by direct execution of the six current JUnit suites. The planned commands below are not a working packaged build.
 
 ## Environment
 
@@ -43,7 +43,7 @@ The build phases are:
 | `xjc-run.bat` | Course-aligned source-generation wrapper |
 | `LICENSE.txt` | JAXB distribution license |
 
-The later testing foundation adds the approved JUnit Platform Console Standalone JAR and its license under `tools/testing`.
+The approved JUnit Platform Console Standalone JAR and its license are present under `tools/testing` and are used by the current source-level test workflow. They remain excluded from runtime packaging.
 
 ## Planned application artifacts
 

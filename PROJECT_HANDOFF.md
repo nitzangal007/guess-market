@@ -2,7 +2,7 @@
 
 ## Mode
 
-Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently reviewed, and accepted by Nitzan on 2026-08-16. Merge pull request 2 before creating the Stage 3 milestone branch.
+Review. Stage 2 was accepted by Nitzan and merged through pull request 2 as `6842dfd`. Stage 3 Tasks 6 through 8 are implemented and verified on `codex/e1-engine-xml`; Nitzan's Stage 3 review and approval remain pending.
 
 ## Current state
 
@@ -25,10 +25,14 @@ Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently revi
 - Task 5 implemented the serializable event aggregate, accounting, history, immutable DTO conversion, and atomic purchase and close transitions in commits `7502964`, review fix `e0a341a`, and completion record `3daadb1`.
 - The original Stage 2 whole-branch review found one Important numerical precision defect, one Important stale-handoff defect, and three Minor evidence or detail gaps. The residual re-review then found a second Important numerical precision defect and later documentation-only Minor corrections. The completed corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, complete `Integer.MIN_VALUE` observation coverage, and align the planning and walkthrough records with the implemented code.
 - The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
-- XML, persistence, UI, `build.bat`, generated JAXB project source, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
-- Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 is approved for merge before Stage 3 begins.
+- Persistence, UI, `build.bat`, IntelliJ configuration, packaging inputs, and release artifacts do not exist yet.
+- Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 was squash-merged as `6842dfd`.
+- The isolated Stage 3 branch `codex/e1-engine-xml` starts from that exact merged commit. Its fresh Java 25 baseline compiled with warnings as errors and passed all 48 existing tests.
+- Task 6 added the trusted XSD, supplied and custom fixtures, and eight retained XJC-generated sources. Task 7 added ordered JAXB-to-domain candidate mapping. Task 8 added trusted-schema XML loading and structured error translation.
+- The Stage 3 review correction classifies invalid UTF-8 parser decoding as `XML_STRUCTURE_INVALID` while preserving genuine input open and read failures as `XML_FILE_ACCESS_FAILED`.
+- The final Stage 3 strict Java 25 gate used exactly the five approved JAXB runtime JARs and all six current suites: 74 tests found, started, and successful, with zero failures, skips, or aborts.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
-- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 and Stage 2 calculation, constructor, transition, observation, and verification result.
+- `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 3 calculation, constructor, transition, observation, and verification result.
 
 ## Authority
 
@@ -51,4 +55,4 @@ Integration. Stage 2 Tasks 4 and 5 are implemented, verified, independently revi
 
 ## Exact next action
 
-Merge pull request 2, update `main`, and create the isolated `codex/e1-engine-xml` Stage 3 worktree. Then execute Tasks 6 through 8 with their test-first and review gates.
+Nitzan reviews the Stage 3 draft pull request and either approves Stage 3 or requests corrections. Do not merge Stage 3 or begin Stage 4 before that explicit approval.

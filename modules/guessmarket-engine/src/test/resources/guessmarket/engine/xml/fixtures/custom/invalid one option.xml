@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Guess-Market>
+    <GM-events>
+        <GM-event name="one option">
+            <id>7</id>
+            <description>The XSD permits one option, but Exercise 1 does not.</description>
+            <comision type="on-purchase">0</comision>
+            <GM-options><GM-option>only</GM-option></GM-options>
+            <GM-method><GM-LMSR><b>1</b></GM-LMSR></GM-method>
+        </GM-event>
+    </GM-events>
+</Guess-Market>

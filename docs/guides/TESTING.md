@@ -2,7 +2,7 @@
 
 ## Status
 
-The complete testing strategy is approved. The Stage 1 test foundation, `DtoContractTest`, and the public-contract portion of `GuessMarketEngineUseCaseTest` are implemented.
+The complete testing strategy is approved. Stages 1 and 2 are accepted and merged. Stage 3 source-level verification compiles DTO and Engine production and test source with Oracle Java 25, `--release 25 -encoding UTF-8 -Xlint:all -Werror`, JUnit Platform Console Standalone 6.1.1, and exactly the five approved JAXB runtime JARs. Six suites are active through Stage 3; later-stage suites remain planned.
 
 ## Vendored test dependency
 
@@ -38,7 +38,7 @@ The implementation plan must cover eleven behavior-centered test classes:
 
 UI tests use a handwritten fake Engine. Domain collaborators may use focused same-package tests. Production visibility must not be widened for tests, and tests must not inspect private fields through reflection.
 
-`GuessMarketEngineUseCaseTest` begins in Stage 1 with four tests for the public interface, exact error-code set, checked exception shape, and structured optional context. Stage 4 extends this same approved class with complete Engine operation behavior rather than creating another test class.
+`GuessMarketEngineUseCaseTest` currently contains four tests for the public interface, exact error-code set, checked exception shape, and structured optional context. Stage 4 extends this same approved class with complete Engine operation behavior rather than creating another test class.
 
 ## Evidence layers
 
@@ -60,7 +60,7 @@ The real launcher and extracted JAR graph must run representative success and re
 
 ### Independent environment evidence
 
-IntelliJ artifacts are checked once as a secondary comparison. Future GitHub Actions will invoke `build.bat` on Windows. Neither replaces the mandatory clean-Windows run of the exact final ZIP.
+During Stage 3, direct strict `javac` and JUnit Console commands are the verified source-level workflow. The later authoritative `build.bat`, GitHub Actions, IDE comparison, and clean-Windows exact-ZIP run remain separate Stage 6 and Stage 7 gates.
 
 ### Manual evidence
 

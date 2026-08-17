@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Guess-Market>
+    <GM-events>
+        <GM-event name="missing description">
+            <id>8</id>
+            <comision type="on-close">90</comision>
+            <GM-options><GM-option>yes</GM-option><GM-option>no</GM-option></GM-options>
+            <GM-method><GM-LMSR><b>1</b></GM-LMSR></GM-method>
+        </GM-event>
+    </GM-events>
+</Guess-Market>
