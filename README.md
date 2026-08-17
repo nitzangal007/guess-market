@@ -4,7 +4,7 @@ Guess Market is a Java 25 prediction-market simulator designed around LMSR prici
 
 ## Current status
 
-Exercise 1 design is approved through decision D-072 and passed a full pre-implementation review with no blocking design findings. Stages 1 through 3 are accepted and merged. Stage 4 persistence and complete Engine orchestration are independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Clean Sections console UI is implemented and independently reviewed on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`; its current known strict Java 25 all-eleven-suite result is 137 successful tests. Stage 5 remains unmerged and unpushed, and now awaits Nitzan's Stage 5 review and acceptance. The authoritative build and release artifacts remain later stages.
+Exercise 1 design is approved through decision D-072 and passed a full pre-implementation review with no blocking design findings. Stages 1 through 3 are accepted and merged. Stage 4 persistence and complete Engine orchestration are independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Clean Sections console UI is implemented and independently reviewed on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`; its current known strict Java 25 all-eleven-suite result is 137 successful tests. The branch is pushed and draft pull request 5 is open for Nitzan's Stage 5 review and acceptance. Stage 5 remains unmerged. The authoritative build and release artifacts remain later stages.
 
 ## Planned architecture
 
@@ -60,6 +60,8 @@ The detailed plan was approved on 2026-08-15. Implementation proceeds through se
 ## Repository boundaries
 
 Course handouts, private submission documents, runtime `.ser` files, generated build output, and identity-bearing submission ZIP files remain outside Git. The repository includes only project-owned source and documentation, required test fixtures, reproducible build inputs, and the minimal vendored dependency set with its license material.
+
+The repository remains private during active implementation and review. Aviad confirmed that it must become public for grader access before submission. Nitzan will make that visibility change manually only after the final public-safety, documentation, and link checks pass.
 
 ## License
 

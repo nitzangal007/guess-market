@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, and have been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`; the current known strict Java 25 all-eleven-suite result is 137 successful tests. Stage 5 remains unmerged and unpushed, and now awaits Nitzan's Stage 5 review and acceptance.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, and have been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`; the current known strict Java 25 all-eleven-suite result is 137 successful tests. The branch is pushed and draft pull request 5 is open for Nitzan's Stage 5 review and acceptance. Stage 5 remains unmerged.
 
 ## Global Constraints
 
@@ -985,7 +985,7 @@ git commit -m "feat: implement console application flows"
 
 Review input recovery, the exact D-072 menu and prompts, all named block shapes, same-operation result use, filtering ownership, runtime-defect visibility, ASCII-only decoration, long supplied text, all eleven tests, the smoke transcript, and walkthrough entries before merging.
 
-Completion record: current rebased Task 11 evidence is `bdb5abd` plus correction `3f3eec2`. Current rebased Task 12 evidence is `9fd2d5d` (`feat: implement console application flows`). The Stage 5 branch is independently reviewed and the current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. The final renderer coverage correction changes no production code and does not repeat the historical real XML smoke. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`; Stage 5 has been successfully rebased directly onto that merge. No Stage 5 merge, push, or Nitzan acceptance is recorded; it now awaits Nitzan's Stage 5 review and acceptance.
+Completion record: current rebased Task 11 evidence is `bdb5abd` plus correction `3f3eec2`. Current rebased Task 12 evidence is `9fd2d5d` (`feat: implement console application flows`). The Stage 5 branch is independently reviewed and the current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. The final renderer coverage correction changes no production code and does not repeat the historical real XML smoke. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`; Stage 5 has been successfully rebased directly onto that merge. The branch is pushed and draft pull request 5 is open. No Stage 5 merge or Nitzan acceptance is recorded; it now awaits Nitzan's Stage 5 review and acceptance.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 
@@ -1124,9 +1124,9 @@ Configure three separate artifacts and confirm logical class, resource, manifest
 
 Record the OS evidence, Java version, exact ZIP SHA-256, extraction location, launcher command, central transcript, and result. A CI runner, development machine, or Windows 11 result cannot silently replace this requirement.
 
-- [ ] **Step 5: Perform the README-led grader walkthrough**
+- [ ] **Step 5: Perform the README-led grader walkthrough and public-access check**
 
-Start from another fresh copy of the same hash, follow only the README and `run.bat`, inspect exact contents, verify GitHub accessibility as intended, and record the result.
+Start from another fresh copy of the same hash, follow only the README and `run.bat`, inspect exact contents, and record the result. After the final public-safety review passes, stop for Nitzan to change the repository visibility manually from private to public. Then verify that the GitHub link and intended `main` branch content open from a logged-out or otherwise unauthenticated view.
 
 - [ ] **Step 6: Run final source and privacy review**
 

@@ -2,12 +2,12 @@
 
 ## Mode
 
-Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, follows the approved D-072 Clean Sections console presentation, and has been successfully rebased directly onto `9a8c87c`. Stage 5 remains unmerged and unpushed, and now awaits Nitzan's Stage 5 review and acceptance.
+Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, follows the approved D-072 Clean Sections console presentation, and has been successfully rebased directly onto `9a8c87c`. The branch is pushed and draft pull request 5 is open for Nitzan's Stage 5 review and acceptance. Stage 5 remains unmerged.
 
 ## Current state
 
 - This folder is the dedicated Guess Market repository root.
-- The private repository is published at `https://github.com/nitzangal007/guess-market` with `main` as its default branch.
+- The repository is currently private at `https://github.com/nitzangal007/guess-market` with `main` as its default branch. Aviad confirmed on 2026-08-17 that it must be public for grader access. Nitzan will change the visibility manually near submission, after implementation is complete and the final public-safety review passes.
 - The outer workspace split commit is `df4219e0406d2b0315f739b737f28d126a80d2c2`.
 - The standalone root commit is `d006eaf45910d4cdc164d800d07e70d697d0eb90`.
 - A fresh private clone reproduced the approved 22-file baseline with no `provided` or `private` directory and only the approved JAXB subset.
@@ -64,7 +64,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 
 ## Exact next action
 
-The Stage 5 branch is successfully rebased directly onto `9a8c87c`. Keep it unmerged and unpushed while Nitzan performs the Stage 5 review and decides whether to accept it.
+The Stage 5 branch is successfully rebased directly onto `9a8c87c`, pushed, and available in draft pull request 5 at `https://github.com/nitzangal007/guess-market/pull/5`. Keep it unmerged while Nitzan performs the Stage 5 review and decides whether to accept it.
 
 ## Remaining stages after Stage 5 acceptance
 

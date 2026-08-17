@@ -1,6 +1,6 @@
 # Guess Market GitHub Repository Design
 
-Status: approved written specification on 2026-08-15. No repository migration, remote connection, push, or implementation is authorized by this document alone.
+Status: approved written specification on 2026-08-15 and updated on 2026-08-17 after Aviad confirmed that public grader access is required. The repository remains private during implementation and review. Nitzan will change it to public manually near submission after the final public-safety review.
 
 ## 1. Purpose
 
@@ -17,7 +17,8 @@ The repository is not a mirror of the complete Java Course Workspace. It contain
 - Owner: `nitzangal007`
 - Repository name: `guess-market`
 - Repository URL after creation: `https://github.com/nitzangal007/guess-market`
-- Initial visibility: private
+- Initial and current implementation visibility: private
+- Required submission visibility: public, changed manually by Nitzan near submission
 - Default branch: `main`
 - Initial description: `A Java 25 prediction-market simulator built around LMSR pricing, modular architecture, XML/JAXB loading, automated testing, persistence, and reproducible Windows packaging.`
 
@@ -144,19 +145,19 @@ The repository must identify all vendored third-party binaries and their roles i
 
 ## 8. Visibility, grader access, and publication
 
-The repository remains private throughout the active Java course, including the later Guess Market exercises.
+The repository remains private during active implementation, branch review, and packaging. Aviad confirmed on 2026-08-17 that the repository must be public so the grader can open the GitHub link without collaborator access. Nitzan will change the visibility manually only after implementation is complete and the final public-safety review passes.
 
-A private repository URL does not grant access by itself. For a personal-account repository, the grader must be invited by GitHub username or email and must accept the invitation. That collaborator receives write access because personal repositories do not provide a separate read-only collaborator role.
+Before submission, Stage 7 must verify all of the following:
 
-Before Exercise 1 submission, Nitzan must obtain course guidance on one of these access models:
+1. The complete reachable history contains no credentials, private memory, machine-specific paths, identity-bearing submission files, or excluded course originals.
+2. The public README and documentation accurately describe the finished project and contain no broken public links.
+3. The ignored private README, runtime `.ser` files, build output, and submission ZIP remain absent from Git history.
+4. Nitzan changes the repository visibility from private to public manually.
+5. The GitHub link opens from a logged-out or otherwise unauthenticated view and exposes the intended `main` branch content.
 
-1. Invite a named grader account to the private repository.
-2. Make the repository public because the course explicitly expects public access.
-3. Use another access method explicitly accepted by the course.
+The visibility switch is a submission-readiness action, not an implementation or architecture change. If any tracked content changes after the safety review, rerun the affected review before submission.
 
-This access question is a required submission-readiness item, not an implementation blocker. Repository visibility must not change without Nitzan's explicit approval.
-
-Public portfolio release requires all of the following:
+A later portfolio release still requires all of the following:
 
 - Completion of the active course work.
 - Confirmation that publication does not conflict with current course rules or other students' active work.
@@ -246,7 +247,7 @@ After the course and the public-release review gates pass, the portfolio project
 
 ## 14. Approval record
 
-Nitzan approved the following decisions on 2026-08-15:
+Nitzan approved the original repository decisions on 2026-08-15. The visibility and grader-access bullets below were superseded on 2026-08-17 after Aviad's guidance and Nitzan's instruction:
 
 - Portfolio-ready purpose after the course.
 - A dedicated Guess Market repository rather than the complete Java Course Workspace.
@@ -255,8 +256,8 @@ Nitzan approved the following decisions on 2026-08-15:
 - Layered, curated public documentation with the complete approved design and implementation plan.
 - Minimal vendored build dependencies with required licenses, while course originals remain excluded.
 - Repository identity `nitzangal007/guess-market`.
-- Private visibility throughout the active course and an explicit later publication gate.
-- Explicit grader-access clarification before submission.
+- Private visibility during implementation and review, followed by Nitzan's manual public switch near submission.
+- Aviad's 2026-08-17 confirmation that public access is required for the grader.
 - Browser-based authentication and no-reply commit identity.
 - Lightweight milestone branches, pull requests, squash merges, and no long-lived `develop` branch.
 - CI that later invokes `build.bat` and never replaces exact-artifact Windows verification.
@@ -264,4 +265,4 @@ Nitzan approved the following decisions on 2026-08-15:
 
 ## 15. Exact next step
 
-The written specification is approved. Finish and verify the standalone repository migration first. After the dedicated repository is established, create and approve the detailed Java implementation plan as the next separate phase. Do not begin Java implementation before that later plan is approved.
+Keep the repository private while Stage 5 is reviewed and while Stages 6 and 7 are executed. During Stage 7, complete the public-safety and documentation review, then stop for Nitzan to change the visibility manually. Verify unauthenticated access before final submission approval.

@@ -1,6 +1,6 @@
 # Exercise 1 Design
 
-Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation, is independently reviewed on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. Stage 5 remains unmerged and unpushed, and now awaits Nitzan's Stage 5 review and acceptance.
+Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation, is independently reviewed on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Current Task 12 evidence is commit `9fd2d5d`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. The branch is pushed and draft pull request 5 is open for Nitzan's Stage 5 review and acceptance. Stage 5 remains unmerged.
 
 Last updated: 2026-08-17
 
@@ -14,7 +14,7 @@ After every approval round, update this file before advancing to the next design
 
 ## Current boundary
 
-- The written design is complete. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation exist on `codex/e1-console-ui`, successfully rebased directly onto that merge. Stage 5 remains unmerged and unpushed while awaiting Nitzan's Stage 5 review and acceptance.
+- The written design is complete. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation exist on `codex/e1-console-ui`, successfully rebased directly onto that merge. The branch is pushed and draft pull request 5 is open while Stage 5 remains unmerged pending Nitzan's review and acceptance.
 - Exercise 1 is the implementation scope.
 - Exercise 2 and Exercise 3 are compatibility evidence only. Their features will not be designed or implemented early.
 - The target is every base requirement plus the 5-point save-and-restore bonus.
@@ -2745,4 +2745,4 @@ Current SHA-256 evidence:
 
 The written design is approved through D-072. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, and D-072 controls the Stage 5 console presentation without changing Engine or DTO behavior.
 
-Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12, passed independent review on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Do not modify the completed Stage 4 history. Stage 5 remains unmerged and unpushed while awaiting Nitzan's Stage 5 review and acceptance.
+Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12, passed independent review on `codex/e1-console-ui`, and has been successfully rebased directly onto `9a8c87c`. Do not modify the completed Stage 4 history. The branch is pushed and draft pull request 5 is open while Stage 5 remains unmerged pending Nitzan's review and acceptance.

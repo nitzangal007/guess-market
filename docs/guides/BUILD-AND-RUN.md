@@ -2,7 +2,7 @@
 
 ## Status
 
-The final build pipeline is completely designed but `build.bat` does not exist yet. Through Stage 5, the verified workflow is source-level only: strict Oracle Java 25 compilation of DTO, Engine, and UI production and test sources, followed by direct execution of all eleven required JUnit classes. The current known strict Java 25 gate reports 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, successfully rebased directly onto `9a8c87c`, and remains unmerged and unpushed while awaiting Nitzan's Stage 5 review and acceptance. The planned commands below are not a working packaged build, and packaging remains Stage 6 and Stage 7 work.
+The final build pipeline is completely designed but `build.bat` does not exist yet. Through Stage 5, the verified workflow is source-level only: strict Oracle Java 25 compilation of DTO, Engine, and UI production and test sources, followed by direct execution of all eleven required JUnit classes. The current known strict Java 25 gate reports 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, successfully rebased directly onto `9a8c87c`, and published in draft pull request 5. It remains unmerged while awaiting Nitzan's Stage 5 review and acceptance. The planned commands below are not a working packaged build, and packaging remains Stage 6 and Stage 7 work.
 
 ## Environment
 

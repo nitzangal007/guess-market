@@ -1,6 +1,6 @@
 # Exercise 1 Design Brief
 
-Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui` and has been successfully rebased directly onto `9a8c87c`; current Task 12 evidence is commit `9fd2d5d`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. Stage 5 remains unmerged and unpushed, and now awaits Nitzan's Stage 5 review and acceptance.
+Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui` and has been successfully rebased directly onto `9a8c87c`; current Task 12 evidence is commit `9fd2d5d`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. The branch is pushed and draft pull request 5 is open for Nitzan's Stage 5 review and acceptance. Stage 5 remains unmerged.
 
 Last updated: 2026-08-17
 
@@ -19,7 +19,7 @@ Read this file first when you need the overall design without all of the decisio
 - Keep clean boundaries that can evolve in Exercises 2 and 3, but do not implement their features now.
 - Use Java 25.
 - Produce three separate application JARs: Console UI, Engine, and DTO.
-- The private standalone repository contains the implemented Stage 1 through Stage 5 Java source, generated JAXB source, tests, and documentation. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`; Stage 5 is an independently reviewed branch successfully rebased onto that merge, but is not integrated or accepted.
+- The standalone repository is currently private and contains the implemented Stage 1 through Stage 5 Java source, generated JAXB source, tests, and documentation. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`; Stage 5 is an independently reviewed branch successfully rebased onto that merge, but is not integrated or accepted. Aviad confirmed that the repository must become public for grader access before submission. Nitzan will make that change manually after implementation and the final public-safety review.
 
 ## Whole-system mental model
 
@@ -366,8 +366,8 @@ This applies to XML replacement, purchases, closing, save, and restore. Failed o
 
 The adversarial review and D-067 through D-071 correction pass are complete. D-072 separately records the approved Stage 5 Clean Sections presentation. The requirement and lecturer-checklist audits have no remaining blocking design finding.
 
-The private standalone GitHub repository is the approved source repository. It must preserve the unchanged three-module layout, invoke the authoritative `build.bat` in any future CI rather than bypassing its mandatory JUnit verifier, track generated JAXB source, custom XML fixtures, and build inputs, exclude the private submission README and runtime `.ser` files, and treat a clean Windows 10 run of the exact final ZIP as mandatory evidence that CI cannot automatically replace.
+The standalone GitHub repository is the approved source repository. It remains private during active implementation and review, then must become public for grader access before submission as confirmed by Aviad on 2026-08-17. It must preserve the unchanged three-module layout, invoke the authoritative `build.bat` in any future CI rather than bypassing its mandatory JUnit verifier, track generated JAXB source, custom XML fixtures, and build inputs, exclude the private submission README and runtime `.ser` files, and treat a clean Windows 10 run of the exact final ZIP as mandatory evidence that CI cannot automatically replace.
 
-The detailed staged implementation plan is approved and active. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 follows D-072, its Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, and it has been successfully rebased directly onto `9a8c87c`. It remains unmerged and unpushed while awaiting Nitzan's Stage 5 review and acceptance.
+The detailed staged implementation plan is approved and active. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 follows D-072, its Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, and it has been successfully rebased directly onto `9a8c87c`. The branch is pushed and draft pull request 5 is open while awaiting Nitzan's Stage 5 review and acceptance. It remains unmerged.
 
 The earlier combined proposal using Section 10 labels D-054 through D-056 was not approved. New D-054, D-055, and D-056 decisions were later explained and approved separately for build authority, module-local roots, and package topology with supported API visibility.
