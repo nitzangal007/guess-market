@@ -1202,7 +1202,7 @@ Compile all production and test sources into a fresh `build/d073-final` director
 
 Mark D-073 approved and implemented in the design ledger and brief. Record the new method, menu behavior, EOF contract, regression tests, audit scenarios, exact test count, and any separately reported Engine finding in the walkthrough and testing guide. Update `PROJECT_HANDOFF.md` so Stage 5 awaits renewed Nitzan review rather than claiming the earlier 137-test gate completes it.
 
-- [ ] **Step 10: Verify, commit, and push for renewed pull request review**
+- [x] **Step 10: Verify, commit, and push for renewed pull request review**
 
 Run `git diff --check`, inspect every staged path, confirm `.superpowers/` and every `build/` output remain untracked or ignored, and scan the staged diff for secrets or private absolute paths. Commit only the reviewed source, tests, and durable public documentation:
 
@@ -1216,7 +1216,7 @@ The Stage 5 pull request remains a draft and unmerged until Nitzan completes the
 
 Task 12A approval record: Nitzan approved D-073 on 2026-08-17 and authorized its test-first implementation, full UI audit, separate Engine-defect reporting, renewed verification, documentation update, commit, and push to pull request 5.
 
-Task 12A completion record: the RED compile failed with four expected missing-method errors. Focused GREEN passed 33 UI tests, including the final review regression proving direct `AssertionError` visibility. The renewed strict Java 25 all-eleven-suite gate passed all 145 tests with zero failures, skips, disabled tests, or aborts. Real Engine process audits passed the complete supplied-XML workflow, pre-load recovery, and exact EOF at the pause. No concrete Engine defect was found, and no Engine production source changed. The main correction is committed as `9366bea`; Step 10 now requires only the final review-fix commit and branch push.
+Task 12A completion record: the RED compile failed with four expected missing-method errors. Focused GREEN passed 33 UI tests, including the final review regression proving direct `AssertionError` visibility. The renewed strict Java 25 all-eleven-suite gate passed all 145 tests with zero failures, skips, disabled tests, or aborts. Real Engine process audits passed the complete supplied-XML workflow, pre-load recovery, and exact EOF at the pause. No concrete Engine defect was found, and no Engine production source changed. The main correction is `9366bea`, the independent-review fix is `d737087`, and both are pushed to `origin/codex/e1-console-ui` in draft pull request 5. Task 12A is complete and awaits Nitzan's renewed manual review.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 

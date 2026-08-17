@@ -42,6 +42,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 - D-072 keeps the eight commands and existing Engine behavior, while grouping the menu under `DATA`, `TRADING`, and `STATE AND SESSION` and using named 60-character ASCII output sections. D-073 removes the misleading permanent loaded-system note and pauses after handled commands 1 through 7. Blank or whitespace-only Enter returns to the menu, nonblank pause input retries locally, command 8 exits immediately, and EOF at every prompt exits normally.
 - Task 12A adds `ConsoleInput.waitForMenuReturn`, updates the menu and command loop, and adds eight tests. The focused UI gate passes 33 tests, and the renewed strict all-eleven-suite gate passes 145 tests with zero failures, skips, disabled tests, or aborts. The final review addition directly proves that an injected `AssertionError`, like an unexpected runtime defect, remains uncaught and visible.
 - Real Engine process audits cover the complete supplied-XML workflow, pre-load recovery, and exact EOF at the return pause. All three supplied events remain loaded, purchase, close, save, restore, and restored closed state succeed, each process exits 0, and no concrete Engine defect was found. No Engine production source changed.
+- Task 12A implementation is `9366bea`, and its independent-review test and documentation fix is `d737087`. Both are pushed to `origin/codex/e1-console-ui` in draft pull request 5.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 5 calculation, constructor, transition, observation, console conversation, and verification result.
 
@@ -66,7 +67,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 
 ## Exact next action
 
-Push the verified Task 12A correction to draft pull request 5 at `https://github.com/nitzangal007/guess-market/pull/5`. Keep Stage 5 unmerged while Nitzan performs the renewed manual review and decides whether to accept it.
+The verified Task 12A correction is pushed to draft pull request 5 at `https://github.com/nitzangal007/guess-market/pull/5`. Keep Stage 5 unmerged while Nitzan performs the renewed manual review and decides whether to accept it.
 
 ## Remaining stages after Stage 5 acceptance
 
