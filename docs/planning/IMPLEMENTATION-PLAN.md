@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed and verified on `codex/e1-engine-core-persistence`, but remain unmerged in draft pull request 4 pending Nitzan's review and acceptance. Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Task 12 is commit `49627ea`; the current known strict Java 25 all-eleven-suite result is 137 successful tests. Before Stage 5 integration, this branch must be rebased onto the eventual Stage 4 squash-merge result. Stage 5 is not merged, pushed, or accepted by Nitzan.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Task 12 is commit `49627ea`; the current known strict Java 25 all-eleven-suite result is 137 successful tests. Before its final integration and review handoff, this branch must be rebased onto `9a8c87c`. Stage 5 is not merged, pushed, or accepted by Nitzan.
 
 ## Global Constraints
 
@@ -985,7 +985,7 @@ git commit -m "feat: implement console application flows"
 
 Review input recovery, the exact D-072 menu and prompts, all named block shapes, same-operation result use, filtering ownership, runtime-defect visibility, ASCII-only decoration, long supplied text, all eleven tests, the smoke transcript, and walkthrough entries before merging.
 
-Completion record: Task 11 is implemented in `681fd47` and `52ccd59`. Task 12 is implemented in `49627ea` (`feat: implement console application flows`). The Stage 5 branch is independently reviewed and the current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. The final renderer coverage correction changes no production code and does not repeat the historical real XML smoke. Stage 4 remains unmerged in draft pull request 4; rebase Stage 5 onto the eventual Stage 4 squash-merge result before any integration. No Stage 5 merge, push, or Nitzan acceptance is recorded.
+Completion record: Task 11 is implemented in `681fd47` and `52ccd59`. Task 12 is implemented in `49627ea` (`feat: implement console application flows`). The Stage 5 branch is independently reviewed and the current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. The final renderer coverage correction changes no production code and does not repeat the historical real XML smoke. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`; rebase Stage 5 onto `9a8c87c` before its final integration and review handoff. No Stage 5 merge, push, or Nitzan acceptance is recorded.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 
