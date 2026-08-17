@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are implemented, independently reviewed, and verified on `codex/e1-engine-core-persistence`; they await Nitzan's Stage 4 review and approval. Stage 5 has not started.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed and verified on `codex/e1-engine-core-persistence`, and await Nitzan's review in draft pull request 4. On 2026-08-17, Nitzan approved D-072 and authorized Stage 5 isolated implementation on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Before Stage 5 integration, this branch must be rebased onto the eventual Stage 4 squash-merge result.
 
 ## Global Constraints
 
@@ -23,6 +23,7 @@
 - Initialize each market-maker event account to `0.0`. Treat `b * ln(2)` only as a derived maximum-subsidy measure.
 - Use the D-068 cancellation-safe direct LMSR purchase delta. Never calculate a purchase delta by subtracting two independently rounded total costs.
 - Keep calculations as unrounded `double` values. Only `ConsoleRenderer` formats financial output to two decimal places with `Locale.US`.
+- Implement D-072's exact Clean Sections menu, prompt ranges, section grammar, and ASCII-only portability rules. Do not substitute the rejected Command Center or Minimal Transcript directions.
 - Every failed load, purchase, close, or restore preserves the previous valid Engine state.
 - Save and restore use one versioned direct-domain `SavedState` graph, a strict exact-class filter with `maxdepth = 32`, full semantic validation, and one live-map reference replacement.
 - Use all eleven exact approved test class names. Every class must execute at least one test with zero failures, skips, disabled tests, and aborts.
@@ -38,7 +39,7 @@
 
 Use these files in this order during implementation:
 
-1. `docs/design/EXERCISE-1-DESIGN.md`, with D-067 through D-071 superseding only the conflicting portions of earlier decisions.
+1. `docs/design/EXERCISE-1-DESIGN.md`, with D-067 through D-072 superseding only the conflicting portions of earlier decisions.
 2. `docs/design/EXERCISE-1-DESIGN-BRIEF.md` for the concise system map.
 3. `docs/reviews/DESIGN-REVIEW-RESOLUTIONS.md` for the corrected risk boundary.
 4. This implementation plan for task order, exact file ownership, tests, and checkpoints.
@@ -861,11 +862,39 @@ Milestone branch: `codex/e1-console-ui`
 **Interfaces:**
 
 - Consumes: borrowed `Scanner` and `PrintWriter`, DTOs, `EngineErrorCode`, and `EngineOperationException`.
-- Produces: prompt-local parsing and deterministic English presentation.
+- Produces: prompt-local parsing and deterministic Clean Sections English presentation.
 
-Keep both classes package-private. `ConsoleInput` reads only complete lines and provides separate methods for one-shot menu choice, repeated range selection, option selection, positive quantity, and full path. A nested checked `EndOfInputException` distinguishes normal input closure from invalid text without adding a fifth production class.
+Keep both classes package-private. `ConsoleInput` reads only complete lines and provides separate methods for one-shot menu choice, repeated range selection, option selection, positive quantity, and full path. A nested checked `EndOfInputException` distinguishes normal input closure from invalid text without adding a fifth production class. Its production prompts are the exact D-072 strings, including `Choose a command [1-8]:`, the dynamic `Choose an event [1-N]:`, both `[1-2]` option prompts, and the positive-whole-number quantity prompt.
 
-`ConsoleRenderer` owns the exact menu, prompts, summary blocks, details, receipts, newest-first history, empty-open-set messages, success messages, `Error` and `Recovery` mapping, and one shared formatter:
+`ConsoleRenderer` owns the exact menu, prompts, summary blocks, details, receipts, newest-first history, empty-open-set messages, success messages, `Error` and `Recovery` mapping, and one shared formatter. Its exact menu literal is:
+
+```text
+============================================================
+                       GUESS MARKET
+============================================================
+
+DATA
+  1. Load events from XML
+  2. Display all events
+  3. View an event's trading status
+
+TRADING
+  4. Purchase shares
+  5. Close an event
+
+STATE AND SESSION
+  6. Save current state
+  7. Restore saved state
+  8. Exit
+
+Commands 2 through 6 require a loaded system.
+
+Choose a command [1-8]:
+```
+
+Use one shared 60-character hyphen separator for top-level output blocks. Render only the D-072 top-level headings that correspond to present content: `EVENTS`, `OPEN EVENTS`, `EVENT DETAILS`, `PURCHASE SUMMARY`, `UPDATED EVENT STATUS`, and `FINAL EVENT STATUS`. Render `OPTIONS`, `ACCOUNT`, and `PURCHASE HISTORY` as uppercase subsections inside event details without surrounding separators. Preserve variable-length labeled blocks and exact XML option labels without table truncation or console-width logic. The menu and every output byte remain plain ASCII except user or XML text that is preserved as data.
+
+The shared financial formatter remains:
 
 ```java
 String formatFinancial(double value)
@@ -875,13 +904,13 @@ The formatter uses `String.format(Locale.US, "%.2f", value)`, converts rendered 
 
 - [ ] **Step 1: Write `ConsoleInputTest` and `ConsoleRendererTest` first**
 
-Cover every D-044 parsing message, whitespace, integer overflow, prompt-local retry, path spaces, end-of-input, exact eight-command menu, full and filtered summary numbering, details, winner, both commission modes, multiple history rows, all sixteen error codes, omitted absent context, no raw cause text, no ANSI or clear-screen sequence, and positive, negative, tiny, signed-zero formatting.
+Cover every unchanged D-044 parsing message, every revised D-072 prompt, whitespace, integer overflow, prompt-local retry, path spaces, end-of-input, the complete D-072 menu literal, exact 60-character separators, all approved section headings, full and filtered summary numbering, long variable-length descriptions without truncation, details, winner, both commission modes, profit, subsidy, break-even, multiple history rows, all sixteen error codes, omitted absent context, no raw cause text, no ANSI, Unicode box drawing, or clear-screen sequence, and positive, negative, tiny, signed-zero formatting.
 
 - [ ] **Step 2: Confirm focused UI tests fail**
 
-- [ ] **Step 3: Implement input and renderer with injected streams**
+- [ ] **Step 3: Implement D-072 input and rendering with injected streams**
 
-Do not close borrowed streams. Do not import domain, XML, or persistence classes.
+Use named constants for the 60-character equals and hyphen separators so menu and block widths cannot drift independently. Keep output methods focused by block, but do not add another production class or a generic layout framework. Do not close borrowed streams. Do not import domain, XML, or persistence classes.
 
 - [ ] **Step 4: Run the two focused UI test classes**
 
@@ -915,7 +944,7 @@ Purchase and close call `listEvents()`, filter `OPEN` summaries in load order, a
 
 The fake records every call and can return configured values, throw a configured checked failure, or throw a configured unexpected runtime defect.
 
-Cover all fifteen D-046 scenarios, all D-071 UI-owned filtering and ID-translation proofs, and one complete happy session across all eight commands.
+Cover all fifteen D-046 scenarios, all D-071 UI-owned filtering and ID-translation proofs, and D-072's menu-return and revised-prompt requirements. The complete happy session across all eight commands must assert that each completed command is separated from a fresh Clean Sections menu by one blank line. Include a recoverable Engine failure that prints the existing `Error` and `Recovery` lines and then returns to that same menu.
 
 - [ ] **Step 2: Confirm application tests fail**
 
@@ -943,7 +972,7 @@ GuessMarketConsoleAppTest
 
 - [ ] **Step 5: Perform a temporary classpath console smoke test**
 
-Run load, list, details, purchase, close, save, restore, and exit through compiled class directories. This is development evidence only and does not replace packaged-process proof.
+Run load, list, details, purchase, close, save, restore, and exit through compiled class directories. Use the supplied `multiple.xml` data so the transcript includes real variable-length descriptions and option labels. Inspect the transcript for the exact grouped menu, named sections, one-blank-line menu return, readable long text without truncation, no ANSI or screen clearing, and unchanged success and recovery meaning. This is development evidence only and does not replace packaged-process proof.
 
 - [ ] **Step 6: Update the walkthrough and commit**
 
@@ -954,7 +983,7 @@ git commit -m "feat: implement console application flows"
 
 - [ ] **Step 7: Run the Stage 5 gate**
 
-Review input recovery, exact messages, same-operation result use, filtering ownership, runtime-defect visibility, all eleven tests, and walkthrough entries before merging.
+Review input recovery, the exact D-072 menu and prompts, all named block shapes, same-operation result use, filtering ownership, runtime-defect visibility, ASCII-only decoration, long supplied text, all eleven tests, the smoke transcript, and walkthrough entries before merging.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 
@@ -1111,12 +1140,13 @@ Present the exact ZIP hash and all evidence. Only after Nitzan explicitly approv
 
 ## 12. Plan self-review checklist
 
-- [x] Every D-001 through D-071 implementation requirement maps to a task or final gate.
+- [x] Every D-001 through D-072 implementation requirement maps to a task or final gate.
 - [x] D-067 zero-based account and profit, subsidy, or break-even output map to domain, renderer, persistence, and final tests.
 - [x] D-068 direct delta and binary64 limits map to calculator, domain atomicity, and simulator evidence.
 - [x] D-069 full-range IDs and text rules map to custom fixtures, mapper, Engine, UI translation, and persistence.
 - [x] D-070 direct-domain graph, filter, alias checks, move behavior, and honest guarantees map to Task 9.
 - [x] D-071 UI proof ownership, all eleven classes, mandatory verifier, and clean Windows 10 evidence map to Tasks 10 through 14.
+- [x] D-072 Clean Sections menu, prompts, section grammar, portability limits, transcript proof, and rejected-direction boundaries map to Tasks 11 and 12 plus the Stage 5 gate.
 - [x] All seven Engine methods and all sixteen error codes have an implementation and automated proof owner.
 - [x] No Exercise 2 or Exercise 3 feature entered the file map.
 - [x] No unapproved framework, module, fat JAR, public API wrapper, or console-specific Engine method entered the plan.

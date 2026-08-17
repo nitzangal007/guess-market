@@ -2,7 +2,7 @@
 
 ## Mode
 
-Review. Stages 1 through 3 are accepted and merged. Stage 3 was squash-merged as `15c8c8f70d21b4a2e8021ef6b7d3dfb88bac2caf`. Stage 4 Tasks 9 and 10 are implemented, independently reviewed, and verified. Stage 4 awaits Nitzan's review through its draft pull request; Stage 5 has not started and is not authorized.
+Implementation. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed and verified, and remain in Nitzan's draft pull-request review. Stage 5 is authorized in this isolated worktree, based on the verified Stage 4 candidate, and follows the approved D-072 Clean Sections console presentation. This branch must not modify or merge the Stage 4 branch or pull request.
 
 ## Current state
 
@@ -36,6 +36,8 @@ Review. Stages 1 through 3 are accepted and merged. Stage 3 was squash-merged as
 - Task 10 review fixes centralize complete DTO equality with exact binary64 comparisons and prove load and restore replacement atomicity for injected `XML_FILE_ACCESS_FAILED`, `ENGINE_CONFIGURATION_ERROR`, and `STATE_FILE_ACCESS_FAILED` failures.
 - The final Stage 4 persistence review fix `acf3c36` validates raw saved graph elements before casting, correctly separates stream-opening access failures from serialization-format failures, rejects trailing `null` data as `SAVED_STATE_INVALID`, and records the completed Task 9 and Task 10 plan steps.
 - The final independent strict Java 25 gate uses exactly the five approved JAXB runtime JARs and all eight suites: 112 tests found, started, and successful, with zero failures, skips, disabled tests, or aborts. A final persistence re-review found no remaining Critical, Important, or Minor issue.
+- Nitzan approved D-072 on 2026-08-17 after comparing Clean Sections, Command Center, and Minimal Transcript console mockups. Clean Sections is the controlling Stage 5 presentation direction.
+- D-072 keeps the eight commands and existing Engine behavior, while grouping the menu under `DATA`, `TRADING`, and `STATE AND SESSION` and using named 60-character ASCII output sections.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 4 calculation, constructor, transition, observation, and verification result.
 
@@ -60,4 +62,4 @@ Review. Stages 1 through 3 are accepted and merged. Stage 3 was squash-merged as
 
 ## Exact next action
 
-Nitzan reviews the Stage 4 draft pull request. Do not begin Stage 5 before Nitzan explicitly accepts Stage 4.
+Execute Stage 5 Tasks 11 and 12 in this isolated worktree using D-072 Clean Sections exactly. Keep Stage 4 pull request 4 unmerged and unchanged. Before Stage 5 integration, rebase this branch onto the eventual Stage 4 squash-merge result.

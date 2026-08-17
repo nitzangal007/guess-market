@@ -4,7 +4,7 @@ Guess Market is a Java 25 prediction-market simulator designed around LMSR prici
 
 ## Current status
 
-Exercise 1 design is complete through decision D-071 and passed a full pre-implementation review with no blocking design findings. Stages 1 and 2 are accepted and merged. Stage 3 is implemented and verified on its milestone branch, including retained JAXB source, trusted XML resources, ordered business mapping, and trusted-schema loading. It awaits Nitzan's review and approval. Persistence, UI, the authoritative build, and release artifacts remain later stages.
+Exercise 1 design is approved through decision D-072 and passed a full pre-implementation review with no blocking design findings. Stages 1 through 3 are accepted and merged. Stage 4 persistence and complete Engine orchestration are in progress. Stage 5 will use the approved Clean Sections console presentation. UI implementation, the authoritative build, and release artifacts remain later stages.
 
 ## Planned architecture
 

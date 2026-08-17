@@ -1,8 +1,8 @@
 # Exercise 1 Design
 
-Status: adversarial review corrections approved through D-071 on 2026-08-15. The written design is complete and ready for implementation planning. Implementation has not started.
+Status: approved through D-072. Stages 1 through 3 are accepted and merged, Stage 4 is in progress, and Stage 5 must implement the approved Clean Sections console presentation.
 
-Last updated: 2026-08-15
+Last updated: 2026-08-17
 
 Evidence status: reconciled through the 2026-08-15 adversarial review against the current V2 handout, supplied schema and fixtures, lecturer checklist and learning guide, current forum guidance including Aviad Cohen's market-maker account clarification, the supplied simulator, Java 25 and JUnit primary documentation, and the complete decision history through D-066.
 
@@ -2540,6 +2540,107 @@ The exact final extracted ZIP remains the runtime verification target. IntelliJ 
 
 This decision supersedes only the contradictory proof ownership in D-060 and D-061, the incomplete proof matrix, D-065's insufficient exit-code inference, and D-066 Gate 8's preferred wording. It does not add a twelfth test class, a new module, a CI dependency, or an implementation artifact.
 
+### D-072: Clean Sections console presentation
+
+Decision: Stage 5 uses the approved Clean Sections console direction. Nitzan selected it after comparing three realistic browser mockups on 2026-08-17. The choice improves grader-facing hierarchy and scanning while preserving the eight-command behavior, four-class UI boundary, deterministic English output, and modest Exercise 1 implementation scope.
+
+The exact main menu is:
+
+```text
+============================================================
+                       GUESS MARKET
+============================================================
+
+DATA
+  1. Load events from XML
+  2. Display all events
+  3. View an event's trading status
+
+TRADING
+  4. Purchase shares
+  5. Close an event
+
+STATE AND SESSION
+  6. Save current state
+  7. Restore saved state
+  8. Exit
+
+Commands 2 through 6 require a loaded system.
+
+Choose a command [1-8]:
+```
+
+Presentation grammar:
+
+- A top-level output block begins with a 60-character hyphen separator, an uppercase title, and another 60-character hyphen separator.
+- Approved top-level titles are `EVENTS`, `OPEN EVENTS`, `EVENT DETAILS`, `PURCHASE SUMMARY`, `UPDATED EVENT STATUS`, and `FINAL EVENT STATUS` where their corresponding content is present.
+- `OPTIONS`, `ACCOUNT`, and `PURCHASE HISTORY` are uppercase subsection titles inside an event-details block. They do not receive their own surrounding separators, matching the approved mockup's restrained hierarchy.
+- Event summary blocks retain the labeled, variable-length structure from D-039 beneath `EVENTS` or `OPEN EVENTS`. They are not converted into a fixed-width table, truncated, or padded to the longest supplied value.
+- Detailed event output begins with `EVENT DETAILS`, then displays `ID`, `Name`, `Description`, `Status`, and one combined `Commission` line before the `OPTIONS`, `ACCOUNT`, and `PURCHASE HISTORY` sections. An open event omits a winner. A closed event adds `Winner: N - label` after `Status`.
+- Each option uses its own numbered line, followed by one indented line containing `Price` and `Shares purchased`. The option labels remain exact XML-provided text.
+- `ACCOUNT` shows `Event account balance` and `Total commission collected`. A closed event also shows D-067's exact `Final market-maker result` line, derived from the unrounded final-balance sign.
+- `PURCHASE HISTORY` prints `No purchases have been made.` for an empty history. Nonempty newest-first rows retain the complete D-041 financial breakdown.
+- Existing success sentences, the two-line `Error` and `Recovery` mapping, empty-open-set messages, end-of-input message, and two-decimal `Locale.US` rules remain unchanged unless this decision gives a more specific label or prompt.
+
+Canonical open-event details use this shape with real supplied data:
+
+```text
+------------------------------------------------------------
+EVENT DETAILS
+------------------------------------------------------------
+ID: 2
+Name: World Cap Winner
+Description: Who do you think will win the world cap ?
+Status: OPEN
+Commission: 15% on close
+
+OPTIONS
+  1. Argentina
+     Price: 0.50   Shares purchased: 0
+  2. Spain
+     Price: 0.50   Shares purchased: 0
+
+ACCOUNT
+  Event account balance: 0.00
+  Total commission collected: 0.00
+
+PURCHASE HISTORY
+  No purchases have been made.
+```
+
+The renderer preserves the exact supplied description, including its punctuation and spacing. `ON_PURCHASE` renders as `N% on purchase`; `ON_CLOSE` renders as `N% on close`. Closed details add `Winner: N - label` after `Status` and the exact D-067 `Final market-maker result` line inside `ACCOUNT`.
+
+The exact revised interactive prompts are:
+
+```text
+Choose a command [1-8]:
+Choose an event [1-N]:
+Choose an option [1-2]:
+Choose the winning option [1-2]:
+Enter shares to purchase (positive whole number):
+Enter the full path to the XML file:
+Enter the full path and file name to save, without an extension:
+Enter the full path and file name to restore, without an extension:
+```
+
+`N` is the current displayed collection size. D-044's invalid-input messages remain exact and continue to repeat only the current prompt. Engine rejections still abandon the command and return to a fresh menu.
+
+Restraint and portability rules:
+
+- Use plain ASCII separators and ordinary spaces only. Do not add Unicode box drawing, emoji, icons, colors, ANSI sequences, cursor movement, or screen clearing.
+- Do not surround the full application or every event with a box. That more decorative Command Center direction was reviewed and not selected.
+- Do not add a console-width query, dynamic wrapping algorithm, fixed-width event table, confirmation screen, cancellation grammar, progress animation, or JavaFX behavior.
+- Reprint the complete menu after each completed or recoverable command, separated from the prior output by one blank line, as already required by D-044.
+
+Verification ownership:
+
+- `ConsoleRendererTest` asserts the complete menu literal, every section heading, 60-character separators, open and closed detail shapes, summaries, receipt and history composition, and the absence of ANSI and clear-screen sequences.
+- `ConsoleInputTest` asserts the revised prompts together with the existing parsing and prompt-local retry rules.
+- `GuessMarketConsoleAppTest` asserts at least one complete multi-command transcript that returns to the Clean Sections menu after every completed or recoverable command.
+- The Stage 5 smoke test and later packaged-process transcript include a long supplied description and real XML option labels to confirm readable variable-length output without truncation.
+
+This decision supersedes D-044's exact menu literal, the conflicting prompt literals in D-035 through D-038, and the conflicting rendering shapes in D-039 through D-041. It does not change command numbering, command availability, Engine calls, DTO fields, selection translation, ordering, recovery boundaries, financial formatting, public APIs, or the deferred JavaFX boundary.
+
 ### Resolution index for historical forward references
 
 The original wording remains historical. The following later decisions close statements that still used future or pending language:
@@ -2561,6 +2662,8 @@ The original wording remains historical. The following later decisions close sta
 
 Nitzan approved the only choice-bearing correction, D-070's direct-domain representation, on 2026-08-15. The remaining D-067 through D-071 content follows current assignment or lecturer evidence or mechanically resolves contradictions found by the approved adversarial review. No Java source, build script, generated class, test, IDE configuration, JAR, ZIP, environment change, GitHub remote, staging action, or commit was created by this correction pass.
 
+Nitzan separately approved D-072's Clean Sections console presentation on 2026-08-17 after reviewing Clean Sections, Command Center, and Minimal Transcript mockups. D-072 is a post-review presentation decision and does not reopen the reviewed Engine or DTO architecture.
+
 ## Deliberately deferred Exercise 2 and Exercise 3 features
 
 - JavaFX screens, controls, tasks, and progress indicators.
@@ -2573,9 +2676,9 @@ Nitzan approved the only choice-bearing correction, D-070's direct-domain repres
 
 The approved Exercise 1 boundaries should make later refactoring reasonable, but none of these features belong in the current implementation.
 
-## Remaining pre-implementation gates
+## Historical pre-implementation gates
 
-Sections 10 and 11, the consolidated written-design review, and the approved correction pass through D-071 are complete. These gates remain before Java implementation:
+Sections 10 and 11, the consolidated written-design review, the D-067 through D-071 correction pass, and the detailed implementation plan were completed before Java implementation began. The original gates were:
 
 1. Create the detailed implementation plan from the reviewed design and obtain Nitzan's approval of that plan.
 2. Keep the separate GitHub repository name and visibility decision synchronized with the parallel GitHub-preparation stream. No remote may be created without explicit approval, and the private submission README and runtime `.ser` files must never enter the public repository.
@@ -2584,7 +2687,7 @@ Sections 10 and 11, the consolidated written-design review, and the approved cor
 
 ## 2026-08-12 session closeout
 
-Historical snapshot only: this subsection records the boundary as it existed on 2026-08-12. It does not override the current reviewed D-071 checkpoint.
+Historical snapshot only: this subsection records the boundary as it existed on 2026-08-12. It does not override the current D-072 checkpoint.
 
 - The durable design boundary is D-053. Sections 7, 8, and 9 are complete.
 - No Java source tree, IntelliJ module, artifact configuration, generated JAXB source, build script, GitHub remote, or implementation was created.
@@ -2640,6 +2743,6 @@ Current SHA-256 evidence:
 
 ## Exact next checkpoint
 
-The written design is complete and ready for implementation planning. D-001 through D-066 remain intact as history, D-067 through D-071 contain the approved corrections, the adversarial report has no remaining blocking design finding, and every lecturer-checklist item is classified as satisfied by design, future implementation evidence, or not applicable.
+The written design is approved through D-072. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, and D-072 controls the Stage 5 console presentation without changing Engine or DTO behavior.
 
-The next action is to create and review the implementation plan. Do not begin implementation during that planning step. The GitHub repository name and visibility remain a separate approval decision and must be synchronized with the parallel GitHub-preparation stream. No Java source, build script, generated JAXB source, test fixture, IntelliJ artifact, GitHub remote, environment change, build output, or packaging artifact was created by the review or correction pass.
+Stage 4 remains the active implementation stage. After its review and explicit approval, Stage 5 must follow D-072 and the revised Stage 5 tasks in `docs/planning/IMPLEMENTATION-PLAN.md`. Do not begin Stage 5 early or modify the active Stage 4 worktree as part of this documentation decision.

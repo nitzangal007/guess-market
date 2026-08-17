@@ -2,7 +2,7 @@
 
 ## Status
 
-The seven-stage plan was approved on 2026-08-15. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 implement and verify the Engine-private saved-state boundary plus complete public Engine orchestration. Stage 4 is ready for Nitzan's review but is not yet accepted or merged.
+The seven-stage plan was approved on 2026-08-15. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 implement and verify the Engine-private saved-state boundary plus complete public Engine orchestration. Stage 4 is ready for Nitzan's review but is not yet accepted or merged. D-072's Clean Sections presentation is approved, and Stage 5 is authorized in this isolated worktree from the verified Stage 4 candidate.
 
 ## Purpose
 
@@ -218,9 +218,9 @@ Add constructors, public methods, and meaningful package-private helpers as code
 | 4 | `GuessMarketEngineImpl` | `listEvents` and `getEventDetails` | Require loaded state, resolve actual full-range IDs, and create fresh immutable DTO snapshots without filtering or exposing domain collections | Ordered, full-range, immutable, missing-ID, and no-loaded-state cases in `GuessMarketEngineUseCaseTest` | Implemented |
 | 4 | `GuessMarketEngineImpl` | `purchaseShares` and `closeEvent` | Locate one actual event, delegate its atomic transition, and return same-operation receipt or final details while preserving state and typed context on failure | Successful and failed purchase and close cases in `GuessMarketEngineUseCaseTest` plus continued operation after restore | Implemented |
 | 4 | `GuessMarketEngineImpl` | `saveState`, `requireLoadedSystem`, and `requireEvent` | Reject state-dependent calls before load, publish only the current ordered domain graph, and centralize checked no-system and missing-ID context without console behavior | No-loaded-state and missing-ID use cases plus public save success and failure cases in `GuessMarketEnginePersistenceTest` | Implemented |
-| 5 | `ConsoleInput` | Menu, selection, option, quantity, and path readers | Read full lines, repeat prompt-local shape errors, and signal end-of-input | `ConsoleInputTest` | Planned |
+| 5 | `ConsoleInput` | Menu, selection, option, quantity, and path readers | Read full lines, print the exact D-072 range prompts, repeat prompt-local shape errors, and signal end-of-input | `ConsoleInputTest` | Planned |
 | 5 | `ConsoleRenderer` | `formatFinancial` | Format finite values with two US decimal places and normalize signed zero | `ConsoleRendererTest` | Planned |
-| 5 | `ConsoleRenderer` | Menu, DTO, receipt, history, and error renderers | Produce deterministic English output without domain logic | `ConsoleRendererTest` | Planned |
+| 5 | `ConsoleRenderer` | Menu, DTO, receipt, history, and error renderers | Produce the deterministic D-072 Clean Sections menu and named ASCII blocks without domain logic | `ConsoleRendererTest` | Planned |
 | 5 | `GuessMarketConsoleApp` | `run` and command handlers | Own the stable loop, command conversations, filtering, actual-ID translation, and recovery scope | `GuessMarketConsoleAppTest` | Planned |
 | 5 | `ConsoleMain` | `main` | Compose production dependencies once and start the app through the interface | Packaged-process checks | Planned |
 
@@ -232,7 +232,7 @@ Add constructors, public methods, and meaningful package-private helpers as code
 | 2 | Cancellation-safe LMSR plus self-validating event state, accounting, chronological history, DTO conversion, serialization boundary, atomic transitions, whole-branch review corrections, and residual numerical correction | `LmsrCalculatorTest`: 16 successful; `MarketEventTest`: 20 successful | Clean Java 25 compile with `--release 25 -encoding UTF-8 -Xlint:all -Werror`; focused Stage 2 gate: 36 successful; 48 total regressions successful with zero failures, skips, disabled tests, or aborts; dependency, visibility, serialization, source, and diff inspections passed | Task 4 `542768d` and `cf14539`; Task 5 `7502964`, `e0a341a`, and `3daadb1`; final review fix `be0ba85`; merged as `6842dfd` | Accepted and merged |
 | 3 | Task 6 JAXB resources and generated source, Task 7 business mapping, and Task 8 trusted-schema loading | `JaxbMarketMapperTest`: 9 successful; `XmlMarketLoaderTest`: 17 successful | Fresh Java 25 strict compile with `-Xlint:all -Werror`; all six current suites used exactly five JAXB runtime JARs; 74 tests successful with zero failures, skips, disabled tests, or aborts | Task 6 `43c67d4`; Task 7 mapper `a642d13` and proof `32c6a76`; Task 8 `07d3d6a`, access fix `71ea0f8`, count fix `a1b4d9b`, and review fix `b9e0b4e`; merged as `15c8c8f` | Accepted and merged |
 | 4 | Task 9 direct-domain persistence plus Task 10 complete Engine orchestration, immutable public snapshots, actual-ID behavior, XML and restore replacement, restart round trip, continued operations, and failure atomicity | Task 10 public Engine gate: `GuessMarketEngineUseCaseTest` 11, `GuessMarketEngineXmlLoadTest` 6, and `GuessMarketEnginePersistenceTest` 25 successful | Fresh Java 25 strict compile with `--release 25 -encoding UTF-8 -Xlint:all -Werror`; all eight exact DTO and Engine classes used exactly five JAXB runtime JARs; 112 tests successful with zero failures, skips, disabled tests, or aborts; source and public `javap` boundary inspections passed | Task 9 `5eb202b`, `6b722ac`, and final review fix `acf3c36`; Task 10 RED `706df9a`; implementation `f536bdb`; review fix `9aaafad` | Implemented and verified, awaiting Nitzan review |
-| 5 | Console UI | None before execution | None before execution | None before approval | Planned |
+| 5 | D-072 Clean Sections console UI | None before execution | None before execution | None before approval | Planned |
 | 6 | Authoritative build and exact ZIP | None before execution | None before execution | None before approval | Planned |
 | 7 | Exact-artifact acceptance | None before execution | None before execution | None before approval | Planned |
 
