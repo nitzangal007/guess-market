@@ -272,6 +272,80 @@ class GuessMarketEnginePersistenceTest {
     }
 
     @Test
+    void restoreRejectsAllowedButMisplacedEventListElement() throws Exception {
+        Path path = temporaryDirectory.resolve("wrong-event-element.ser");
+        writeObject(path, rawSavedState(List.of(new MarketOption(1, "same"))));
+
+        assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
+                () -> new SavedStateStore().restore(path));
+    }
+
+    @Test
+    void restoreRejectsAllowedButMisplacedOptionListElement() throws Exception {
+        MarketEvent event = event(61, CommissionMode.ON_CLOSE, 0, 5);
+        replaceRaw(event.getOptions(), 0, new TradeRecord(1, "same", 1, 1.0, 0.0, 1.0));
+        Path path = temporaryDirectory.resolve("wrong-option-element.ser");
+        writeObject(path, new SavedState(1, List.of(event)));
+
+        assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
+                () -> new SavedStateStore().restore(path));
+    }
+
+    @Test
+    void restoreRejectsAllowedButMisplacedHistoryListElement() throws Exception {
+        MarketEvent event = event(62, CommissionMode.ON_CLOSE, 0, 5);
+        appendRaw(event.getPurchaseHistory(), new MarketOption(1, "same"));
+        Path path = temporaryDirectory.resolve("wrong-history-element.ser");
+        writeObject(path, new SavedState(1, List.of(event)));
+
+        assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
+                () -> new SavedStateStore().restore(path));
+    }
+
+    @Test
+    void restoreRejectsTrailingNullObjectAsInvalidState() throws Exception {
+        Path path = temporaryDirectory.resolve("trailing-null.ser");
+        writeObjects(path, new SavedState(1, List.of(event(63, CommissionMode.ON_CLOSE, 0, 5))),
+                null);
+
+        assertFailure(EngineErrorCode.SAVED_STATE_INVALID,
+                () -> new SavedStateStore().restore(path));
+    }
+
+    @Test
+    void restoreMapsDeterministicStreamOpeningAccessFailureToAccessCode() throws Exception {
+        Path path = temporaryDirectory.resolve("opening-access.ser");
+        writeObject(path, new SavedState(1, List.of(event(64, CommissionMode.ON_CLOSE, 0, 5))));
+        SavedStateStore store = new SavedStateStore(Files::move,
+                ignored -> {
+                    throw new IOException("simulated denied open");
+                });
+
+        EngineOperationException exception = assertThrows(EngineOperationException.class,
+                () -> store.restore(path));
+
+        assertEquals(EngineErrorCode.STATE_FILE_ACCESS_FAILED, exception.getCode());
+        assertEquals(path.toAbsolutePath().normalize(), exception.getPath().orElseThrow());
+    }
+
+    @Test
+    void restoreMapsDeletionAtStreamOpeningToNotFoundCode() throws Exception {
+        Path path = temporaryDirectory.resolve("opening-delete.ser");
+        writeObject(path, new SavedState(1, List.of(event(65, CommissionMode.ON_CLOSE, 0, 5))));
+        SavedStateStore store = new SavedStateStore(Files::move,
+                openingPath -> {
+                    Files.delete(openingPath);
+                    return Files.newInputStream(openingPath);
+                });
+
+        EngineOperationException exception = assertThrows(EngineOperationException.class,
+                () -> store.restore(path));
+
+        assertEquals(EngineErrorCode.STATE_FILE_NOT_FOUND, exception.getCode());
+        assertEquals(path.toAbsolutePath().normalize(), exception.getPath().orElseThrow());
+    }
+
+    @Test
     void publicEngineRoundTripRestoresCompleteStateIntoANewInstanceAndContinues()
             throws Exception {
         MarketEvent minimum = event(Integer.MIN_VALUE, CommissionMode.ON_PURCHASE, 5, 100);
@@ -462,9 +536,35 @@ class GuessMarketEnginePersistenceTest {
     }
 
     private static void writeObject(Path path, Object object) throws IOException {
+        writeObjects(path, object);
+    }
+
+    private static void writeObjects(Path path, Object... objects) throws IOException {
         try (ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(path))) {
-            output.writeObject(object);
+            for (Object object : objects) {
+                output.writeObject(object);
+            }
         }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static SavedState rawSavedState(List<?> elements) {
+        return new SavedState(1, (java.util.Collection) elements);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static List rawList(List<?> list) {
+        return (List) list;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void replaceRaw(List<?> list, int index, Object value) {
+        rawList(list).set(index, value);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void appendRaw(List<?> list, Object value) {
+        rawList(list).add(value);
     }
 
     private static void assertFailure(EngineErrorCode expected, ThrowingOperation operation) {

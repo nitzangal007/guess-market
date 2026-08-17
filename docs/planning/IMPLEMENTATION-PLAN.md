@@ -760,21 +760,21 @@ The store appends `.ser` case-insensitively, requires an existing parent directo
 
 The restore filter allows only `SavedState`, the exact domain graph, required JDK collection or array types, strings, and enums, with `maxdepth = 32`. Validation proves nonempty ordered events, exact runtime types, distinct mutable identity, unique full-range IDs, text and option rules, nonnegative quantities, lifecycle and winner consistency, finite financial history, chronological quantity sums, commission totals, D-067 account arithmetic, and closed payout consistency. It never replays purchases or recomputes historical accepted costs.
 
-- [ ] **Step 1: Write store and validator persistence tests first**
+- [x] **Step 1: Write store and validator persistence tests first**
 
 Cover suffix rules, paths with dots and spaces, first save, overwrite, both publication paths, cleanup, missing and corrupt files, wrong root, wrong version, filtered class, empty state, duplicate object or ID, semantic inconsistency reachable through a serialized candidate, full-range IDs, and numerical-boundary history. Task 10 adds the public Engine round trip, prior-live-state preservation, and continued-operation cases to the same approved test class after `GuessMarketEngineImpl` exists.
 
-- [ ] **Step 2: Confirm focused persistence tests fail**
+- [x] **Step 2: Confirm focused persistence tests fail**
 
-- [ ] **Step 3: Implement state root, strict filter, validator, and store**
+- [x] **Step 3: Implement state root, strict filter, validator, and store**
 
 Do not serialize DTOs, Engine implementation, XML classes, calculators, paths, or streams. Do not claim a failed move preserves an old disk target.
 
-- [ ] **Step 4: Run persistence and domain tests together**
+- [x] **Step 4: Run persistence and domain tests together**
 
 Expected: round trips preserve exact stored binary64 values and all semantic rejection cases preserve the caller's previous live map when tested through the Engine in Task 10.
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-engine docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -817,32 +817,32 @@ saveState: validate loaded state; stateStore.save(path, events.values())
 
 Empty `events` means no loaded system. Full and filtered console positioning never enters this class. DTO conversion creates newest-first history values on demand and exposes no domain or JAXB object.
 
-- [ ] **Step 1: Write public use-case and XML-load tests first, then complete public persistence cases**
+- [x] **Step 1: Write public use-case and XML-load tests first, then complete public persistence cases**
 
 Exercise the implementation through a `GuessMarketEngine` reference. Cover no-loaded-state rules, ordered listing, full-range actual-ID lookup, details, successful and failed purchase, successful and failed close, checked error context, atomic replacement after load and restore, a save and restore through a completely new Engine instance, continued operations after restore, and prior-state preservation after every failure.
 
-- [ ] **Step 2: Confirm the new tests fail because the implementation is missing**
+- [x] **Step 2: Confirm the new tests fail because the implementation is missing**
 
-- [ ] **Step 3: Implement `GuessMarketEngineImpl` and DTO conversion helpers**
+- [x] **Step 3: Implement `GuessMarketEngineImpl` and DTO conversion helpers**
 
 Use `@Override` on all interface methods. Do not print, parse console text, expose a filtering method, or return internal collections.
 
-- [ ] **Step 4: Run every Engine and DTO test class**
+- [x] **Step 4: Run every Engine and DTO test class**
 
 Expected: eight exact classes now exist and pass: one DTO class plus seven Engine classes.
 
-- [ ] **Step 5: Run source-boundary inspection**
+- [x] **Step 5: Run source-boundary inspection**
 
 Confirm Engine production imports contain no `guessmarket.ui` or `java.util.Scanner`, and public signatures contain only JDK, DTO, and approved Engine contract types.
 
-- [ ] **Step 6: Update the walkthrough and commit**
+- [x] **Step 6: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-engine docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: implement complete Guess Market engine"
 ```
 
-- [ ] **Step 7: Run the Stage 4 gate**
+- [x] **Step 7: Run the Stage 4 gate**
 
 Demonstrate XML replacement, purchase, close, save, restart restore, failure atomicity, direct-domain filtering, and actual-ID behavior. Review the complete Engine public boundary and walkthrough before merging.
 

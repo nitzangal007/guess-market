@@ -20,7 +20,7 @@ final class SavedStateValidator {
             throw invalid("The saved state format version is unsupported.");
         }
 
-        ArrayList<MarketEvent> events = candidate.getEvents();
+        List<?> events = candidate.getEvents();
         if (events == null || events.getClass() != ArrayList.class || events.isEmpty()) {
             throw invalid("The saved state must contain an ordered nonempty event list.");
         }
@@ -28,20 +28,21 @@ final class SavedStateValidator {
         IdentityHashMap<Object, Boolean> mutableNodes = new IdentityHashMap<>();
         requireDistinct(mutableNodes, events);
         LinkedHashMap<Integer, MarketEvent> validated = new LinkedHashMap<>();
-        for (MarketEvent event : events) {
-            validateEvent(event, mutableNodes, validated);
+        for (Object eventCandidate : events) {
+            validateEvent(eventCandidate, mutableNodes, validated);
         }
         return validated;
     }
 
     private void validateEvent(
-            MarketEvent event,
+            Object eventCandidate,
             IdentityHashMap<Object, Boolean> mutableNodes,
             LinkedHashMap<Integer, MarketEvent> validated)
             throws EngineOperationException {
-        if (event == null || event.getClass() != MarketEvent.class) {
+        if (eventCandidate == null || eventCandidate.getClass() != MarketEvent.class) {
             throw invalid("The saved state contains an invalid event.");
         }
+        MarketEvent event = (MarketEvent) eventCandidate;
         requireDistinct(mutableNodes, event);
         if (validated.containsKey(event.getEventId())) {
             throw invalid("Each saved event ID must be unique.");
@@ -61,15 +62,15 @@ final class SavedStateValidator {
             throw invalid("The saved event commission policy is invalid.");
         }
 
-        List<MarketOption> options = event.getOptions();
+        List<?> options = event.getOptions();
         if (options == null || options.getClass() != ArrayList.class || options.size() != 2) {
             throw invalid("Each saved event must contain exactly two ordered options.");
         }
         requireDistinct(mutableNodes, options);
-        validateOption(options.get(0), 1, mutableNodes);
-        validateOption(options.get(1), 2, mutableNodes);
+        MarketOption firstOption = validateOption(options.get(0), 1, mutableNodes);
+        MarketOption secondOption = validateOption(options.get(1), 2, mutableNodes);
 
-        List<TradeRecord> history = event.getPurchaseHistory();
+        List<?> history = event.getPurchaseHistory();
         if (history == null || history.getClass() != ArrayList.class) {
             throw invalid("The saved event purchase history is invalid.");
         }
@@ -79,28 +80,33 @@ final class SavedStateValidator {
             throw invalid("The saved event account is invalid.");
         }
         requireDistinct(mutableNodes, account);
-        validateLifecycle(event, options);
-        validateHistoryAndAccount(event, options, history, account, mutableNodes);
+        validateLifecycle(event);
+        validateHistoryAndAccount(event, firstOption, secondOption, history, account, mutableNodes);
         validated.put(event.getEventId(), event);
     }
 
-    private void validateOption(
-            MarketOption option,
+    private MarketOption validateOption(
+            Object optionCandidate,
             int expectedNumber,
             IdentityHashMap<Object, Boolean> mutableNodes)
             throws EngineOperationException {
-        if (option == null || option.getClass() != MarketOption.class
-                || option.getOptionNumber() != expectedNumber || option.getQuantity() < 0) {
+        if (optionCandidate == null || optionCandidate.getClass() != MarketOption.class) {
+            throw invalid("The saved event options are invalid.");
+        }
+        MarketOption option = (MarketOption) optionCandidate;
+        if (option.getOptionNumber() != expectedNumber || option.getQuantity() < 0) {
             throw invalid("The saved event options are invalid.");
         }
         requireDistinct(mutableNodes, option);
         requireOuterTrimmedText(option.getLabel(), "option label");
+        return option;
     }
 
     private void validateHistoryAndAccount(
             MarketEvent event,
-            List<MarketOption> options,
-            List<TradeRecord> history,
+            MarketOption firstOption,
+            MarketOption secondOption,
+            List<?> history,
             EventAccount account,
             IdentityHashMap<Object, Boolean> mutableNodes)
             throws EngineOperationException {
@@ -108,10 +114,11 @@ final class SavedStateValidator {
         int secondQuantity = 0;
         double expectedBalance = 0.0;
         double expectedCommission = 0.0;
-        for (TradeRecord record : history) {
-            if (record == null || record.getClass() != TradeRecord.class) {
+        for (Object recordCandidate : history) {
+            if (recordCandidate == null || recordCandidate.getClass() != TradeRecord.class) {
                 throw invalid("The saved event purchase history is invalid.");
             }
+            TradeRecord record = (TradeRecord) recordCandidate;
             requireDistinct(mutableNodes, record);
             int optionNumber = record.getOptionNumber();
             if ((optionNumber != 1 && optionNumber != 2) || record.getQuantity() <= 0) {
@@ -119,7 +126,8 @@ final class SavedStateValidator {
             }
             String optionLabel = record.getOptionLabel();
             requireOuterTrimmedText(optionLabel, "purchase option label");
-            if (!optionLabel.equals(options.get(optionNumber - 1).getLabel())) {
+            MarketOption option = optionNumber == 1 ? firstOption : secondOption;
+            if (!optionLabel.equals(option.getLabel())) {
                 throw invalid("A saved purchase record does not match its event option.");
             }
             requireFinitePositive(record.getBaseShareCost(), "purchase base cost");
@@ -144,15 +152,15 @@ final class SavedStateValidator {
             expectedCommission = addFinite(expectedCommission, record.getPurchaseCommission(),
                     "total commission");
         }
-        if (firstQuantity != options.get(0).getQuantity()
-                || secondQuantity != options.get(1).getQuantity()) {
+        if (firstQuantity != firstOption.getQuantity()
+                || secondQuantity != secondOption.getQuantity()) {
             throw invalid("Saved option quantities do not match purchase history.");
         }
 
         if (event.getStatus() == EventStatus.CLOSED) {
             OptionalInt winner = event.getWinningOptionNumber();
             int winnerNumber = winner.orElseThrow(() -> new IllegalStateException("missing winner"));
-            double grossPayout = options.get(winnerNumber - 1).getQuantity();
+            double grossPayout = (winnerNumber == 1 ? firstOption : secondOption).getQuantity();
             double closingCommission = event.getCommissionPolicy().closingCommission(grossPayout);
             requireFiniteNonnegative(closingCommission, "closing commission");
             expectedBalance = addFinite(expectedBalance, -(grossPayout - closingCommission),
@@ -168,7 +176,7 @@ final class SavedStateValidator {
         }
     }
 
-    private void validateLifecycle(MarketEvent event, List<MarketOption> options)
+    private void validateLifecycle(MarketEvent event)
             throws EngineOperationException {
         EventStatus status = event.getStatus();
         OptionalInt winner = event.getWinningOptionNumber();
@@ -176,7 +184,7 @@ final class SavedStateValidator {
             return;
         }
         if (status == EventStatus.CLOSED && winner.isPresent()
-                && winner.getAsInt() >= 1 && winner.getAsInt() <= options.size()) {
+                && winner.getAsInt() >= 1 && winner.getAsInt() <= 2) {
             return;
         }
         throw invalid("Saved event lifecycle state is inconsistent.");

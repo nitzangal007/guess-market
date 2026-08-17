@@ -3,6 +3,7 @@ package guessmarket.engine;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InvalidClassException;
+import java.io.InputStream;
 import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,14 +21,20 @@ import java.util.Objects;
 
 final class SavedStateStore {
     private final MoveOperation moveOperation;
+    private final InputStreamOpener inputStreamOpener;
     private final SavedStateValidator validator;
 
     SavedStateStore() {
-        this(Files::move);
+        this(Files::move, Files::newInputStream);
     }
 
     SavedStateStore(MoveOperation moveOperation) {
+        this(moveOperation, Files::newInputStream);
+    }
+
+    SavedStateStore(MoveOperation moveOperation, InputStreamOpener inputStreamOpener) {
         this.moveOperation = Objects.requireNonNull(moveOperation, "moveOperation");
+        this.inputStreamOpener = Objects.requireNonNull(inputStreamOpener, "inputStreamOpener");
         validator = new SavedStateValidator();
     }
 
@@ -63,7 +70,8 @@ final class SavedStateStore {
             throws EngineOperationException {
         Path target = resolveStatePath(basePath);
         validateRestoreTarget(target);
-        try (ObjectInputStream input = new ObjectInputStream(Files.newInputStream(target))) {
+        InputStream stateInput = openStateInput(target);
+        try (stateInput; ObjectInputStream input = new ObjectInputStream(stateInput)) {
             input.setObjectInputFilter(SavedStateStore::filter);
             Object root = input.readObject();
             if (!(root instanceof SavedState state)) {
@@ -77,6 +85,16 @@ final class SavedStateStore {
             throw invalid("The saved state file is corrupt or incompatible.", exception);
         } catch (IOException exception) {
             throw invalid("The saved state file is corrupt or incomplete.", exception);
+        }
+    }
+
+    private InputStream openStateInput(Path target) throws EngineOperationException {
+        try {
+            return inputStreamOpener.open(target);
+        } catch (NoSuchFileException exception) {
+            throw stateFileNotFound(target, exception);
+        } catch (IOException exception) {
+            throw accessFailed(target, "The saved state file could not be opened.", exception);
         }
     }
 
@@ -126,11 +144,7 @@ final class SavedStateStore {
         try {
             attributes = Files.readAttributes(target, BasicFileAttributes.class);
         } catch (NoSuchFileException exception) {
-            throw new EngineOperationException(
-                    EngineErrorCode.STATE_FILE_NOT_FOUND,
-                    "The saved state file does not exist.",
-                    "Choose an existing saved state file and try again.",
-                    target, null, null, null, null, null, null, null, null, exception);
+            throw stateFileNotFound(target, exception);
         } catch (IOException exception) {
             throw accessFailed(target, "The saved state file cannot be inspected.", exception);
         }
@@ -146,8 +160,7 @@ final class SavedStateStore {
             throws IOException, ClassNotFoundException, EngineOperationException {
         try {
             Object trailing = input.readObject();
-            throw invalid("The saved state file contains unexpected trailing data: "
-                    + trailing.getClass().getName(), null);
+            throw invalid("The saved state file contains an unexpected trailing object.", null);
         } catch (EOFException expectedEnd) {
             // A single completed root object is the whole file format.
         }
@@ -206,6 +219,14 @@ final class SavedStateStore {
                 path, null, null, null, null, null, null, null, null, cause);
     }
 
+    private static EngineOperationException stateFileNotFound(Path path, NoSuchFileException cause) {
+        return new EngineOperationException(
+                EngineErrorCode.STATE_FILE_NOT_FOUND,
+                "The saved state file does not exist.",
+                "Choose an existing saved state file and try again.",
+                path, null, null, null, null, null, null, null, null, cause);
+    }
+
     private static EngineOperationException invalid(String detail, Throwable cause) {
         return new EngineOperationException(
                 EngineErrorCode.SAVED_STATE_INVALID,
@@ -217,5 +238,10 @@ final class SavedStateStore {
     @FunctionalInterface
     interface MoveOperation {
         void move(Path source, Path target, CopyOption... options) throws IOException;
+    }
+
+    @FunctionalInterface
+    interface InputStreamOpener {
+        InputStream open(Path path) throws IOException;
     }
 }
