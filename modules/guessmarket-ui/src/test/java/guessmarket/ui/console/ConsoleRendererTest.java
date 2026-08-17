@@ -150,6 +150,25 @@ class ConsoleRendererTest {
         assertTrue(output.contains("FINAL EVENT STATUS"));
         assertTrue(output.contains("Option: 1 - Yes"));
         assertTrue(output.contains("Purchase commission: 0.10"));
+
+        StringWriter onCloseText = new StringWriter();
+        ConsoleRenderer onCloseRenderer = renderer(onCloseText);
+        MarketEventDetails onCloseDetails = details(EventStatus.OPEN, CommissionMode.ON_CLOSE, 10, 1.0, 0.0,
+                List.of(history(1, "Yes", 1, 1.0, 0.75, 1.75)), OptionalInt.empty());
+        onCloseRenderer.renderPurchaseReceipt(new PurchaseReceipt(1, 1, 1.0, 0.75, 1.75, onCloseDetails));
+
+        String onCloseOutput = onCloseText.toString();
+        int updatedStatusIndex = onCloseOutput.indexOf("UPDATED EVENT STATUS");
+        assertFalse(onCloseOutput.substring(0, updatedStatusIndex).contains("Purchase commission:"));
+        assertFalse(onCloseOutput.substring(updatedStatusIndex).contains("Purchase commission:"));
+
+        StringWriter zeroPercentText = new StringWriter();
+        ConsoleRenderer zeroPercentRenderer = renderer(zeroPercentText);
+        MarketEventDetails zeroPercentDetails = details(EventStatus.OPEN, CommissionMode.ON_PURCHASE, 0, 1.0, 0.0,
+                List.of(history(1, "Yes", 1, 1.0, 0.0, 1.0)), OptionalInt.empty());
+        zeroPercentRenderer.renderPurchaseReceipt(new PurchaseReceipt(1, 1, 1.0, 0.0, 1.0, zeroPercentDetails));
+
+        assertTrue(zeroPercentText.toString().contains("Purchase commission: 0.00"));
     }
 
     @Test

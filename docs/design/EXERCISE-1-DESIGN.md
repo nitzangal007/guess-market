@@ -1,6 +1,6 @@
 # Exercise 1 Design
 
-Status: approved through D-072. Stages 1 through 3 are accepted and merged, Stage 4 is in progress, and Stage 5 must implement the approved Clean Sections console presentation.
+Status: approved through D-072. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified but remains unmerged in draft pull request 4. Stage 5 implements the approved Clean Sections console presentation and is independently reviewed on `codex/e1-console-ui`, based on the Stage 4 candidate. Task 12 is commit `49627ea`, and the current known strict Java 25 all-eleven-suite result is 137 successful tests. Before integration, Stage 5 must be rebased onto the eventual Stage 4 squash-merge result. Stage 5 is not merged, pushed, or accepted by Nitzan.
 
 Last updated: 2026-08-17
 
@@ -1861,7 +1861,7 @@ Engine module in `guessmarket.engine.xml`:
 UI module in `guessmarket.ui.console`:
 
 - `ConsoleInputTest` covers full-line parsing, blank and whitespace-only input, non-numeric input, integer overflow, zero, negatives, out-of-range menu and selection values, invalid quantities, paths containing spaces, prompt-local retries, and end-of-input at the main menu or a secondary prompt.
-- `ConsoleRendererTest` covers the stable menu, empty-set responses, summaries, complete details, purchase receipts, history, lifecycle and winner display, all approved `EngineErrorCode` responses, omission of absent optional context, absence of raw exception text, and fixed two-decimal `Locale.US` formatting for positive, negative, tiny, and negative-zero values.
+- `ConsoleRendererTest` covers the stable menu, empty-set responses, summaries, complete details, purchase receipts, history, lifecycle and winner display, all approved `EngineErrorCode` responses, omission of absent optional context, absence of raw exception text, and fixed two-decimal `Locale.US` formatting for positive, negative, tiny, and negative-zero values. It also proves that ON_CLOSE receipt and history output omit `Purchase commission`, while ON_PURCHASE at 0 percent retains the exact `Purchase commission: 0.00` line.
 - `GuessMarketConsoleAppTest` covers all eight command conversations with scripted input and a handwritten fake Engine. It verifies commands before loading, menu recovery, event-position-to-ID translation, open and closed filtering, no-open-event behavior, successful and failed purchase and close flows, save and restore flows, explicit exit, graceful end-of-input, one complete happy path, and the rule that an unexpected runtime defect remains visible rather than being swallowed.
 - `FakeGuessMarketEngine` is a test helper, not a test class. It records calls and returns configured DTOs, checked failures, or unexpected runtime failures so UI behavior can be verified independently of Engine internals.
 
@@ -2745,4 +2745,4 @@ Current SHA-256 evidence:
 
 The written design is approved through D-072. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, and D-072 controls the Stage 5 console presentation without changing Engine or DTO behavior.
 
-Stage 4 remains the active implementation stage. After its review and explicit approval, Stage 5 must follow D-072 and the revised Stage 5 tasks in `docs/planning/IMPLEMENTATION-PLAN.md`. Do not begin Stage 5 early or modify the active Stage 4 worktree as part of this documentation decision.
+Stage 4 is independently verified but remains unmerged in draft pull request 4 pending Nitzan's review and acceptance. Stage 5 has implemented D-072 Tasks 11 and 12 and passed independent review on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Do not modify the Stage 4 worktree or pull request. After the eventual Stage 4 squash merge, rebase Stage 5 onto that result before any Stage 5 integration. Stage 5 is not merged, pushed, or accepted by Nitzan.

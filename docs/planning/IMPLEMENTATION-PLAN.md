@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed and verified on `codex/e1-engine-core-persistence`, and await Nitzan's review in draft pull request 4. On 2026-08-17, Nitzan approved D-072 and authorized Stage 5 isolated implementation on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Before Stage 5 integration, this branch must be rebased onto the eventual Stage 4 squash-merge result.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed and verified on `codex/e1-engine-core-persistence`, but remain unmerged in draft pull request 4 pending Nitzan's review and acceptance. Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Task 12 is commit `49627ea`; the current known strict Java 25 all-eleven-suite result is 137 successful tests. Before Stage 5 integration, this branch must be rebased onto the eventual Stage 4 squash-merge result. Stage 5 is not merged, pushed, or accepted by Nitzan.
 
 ## Global Constraints
 
@@ -902,19 +902,19 @@ String formatFinancial(double value)
 
 The formatter uses `String.format(Locale.US, "%.2f", value)`, converts rendered `-0.00` to `0.00`, and treats non-finite input as a programming defect. Closed details derive `Profit`, `Subsidy`, or `Break-even` from the unrounded sign.
 
-- [ ] **Step 1: Write `ConsoleInputTest` and `ConsoleRendererTest` first**
+- [x] **Step 1: Write `ConsoleInputTest` and `ConsoleRendererTest` first**
 
 Cover every unchanged D-044 parsing message, every revised D-072 prompt, whitespace, integer overflow, prompt-local retry, path spaces, end-of-input, the complete D-072 menu literal, exact 60-character separators, all approved section headings, full and filtered summary numbering, long variable-length descriptions without truncation, details, winner, both commission modes, profit, subsidy, break-even, multiple history rows, all sixteen error codes, omitted absent context, no raw cause text, no ANSI, Unicode box drawing, or clear-screen sequence, and positive, negative, tiny, signed-zero formatting.
 
-- [ ] **Step 2: Confirm focused UI tests fail**
+- [x] **Step 2: Confirm focused UI tests fail**
 
-- [ ] **Step 3: Implement D-072 input and rendering with injected streams**
+- [x] **Step 3: Implement D-072 input and rendering with injected streams**
 
 Use named constants for the 60-character equals and hyphen separators so menu and block widths cannot drift independently. Keep output methods focused by block, but do not add another production class or a generic layout framework. Do not close borrowed streams. Do not import domain, XML, or persistence classes.
 
-- [ ] **Step 4: Run the two focused UI test classes**
+- [x] **Step 4: Run the two focused UI test classes**
 
-- [ ] **Step 5: Update the walkthrough and commit**
+- [x] **Step 5: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-ui docs/guides/IMPLEMENTATION-WALKTHROUGH.md
@@ -940,19 +940,19 @@ git commit -m "feat: add console input and rendering"
 
 Purchase and close call `listEvents()`, filter `OPEN` summaries in load order, assign fresh positions, translate the selected position to the actual event ID, and then use that actual ID. Purchase renders the receipt's resulting details without another query. Close renders the returned final details without another query.
 
-- [ ] **Step 1: Implement the handwritten fake and write `GuessMarketConsoleAppTest` first**
+- [x] **Step 1: Implement the handwritten fake and write `GuessMarketConsoleAppTest` first**
 
 The fake records every call and can return configured values, throw a configured checked failure, or throw a configured unexpected runtime defect.
 
 Cover all fifteen D-046 scenarios, all D-071 UI-owned filtering and ID-translation proofs, and D-072's menu-return and revised-prompt requirements. The complete happy session across all eight commands must assert that each completed command is separated from a fresh Clean Sections menu by one blank line. Include a recoverable Engine failure that prints the existing `Error` and `Recovery` lines and then returns to that same menu.
 
-- [ ] **Step 2: Confirm application tests fail**
+- [x] **Step 2: Confirm application tests fail**
 
-- [ ] **Step 3: Implement app handlers and `ConsoleMain`**
+- [x] **Step 3: Implement app handlers and `ConsoleMain`**
 
 Use four production UI classes only. Do not add a command framework, reflection dispatch, color, screen clearing, cancellation grammar, automatic save, or confirmation prompt.
 
-- [ ] **Step 4: Run all eleven exact JUnit classes**
+- [x] **Step 4: Run all eleven exact JUnit classes**
 
 Expected class names:
 
@@ -970,20 +970,22 @@ ConsoleRendererTest
 GuessMarketConsoleAppTest
 ```
 
-- [ ] **Step 5: Perform a temporary classpath console smoke test**
+- [x] **Step 5: Perform a temporary classpath console smoke test**
 
 Run load, list, details, purchase, close, save, restore, and exit through compiled class directories. Use the supplied `multiple.xml` data so the transcript includes real variable-length descriptions and option labels. Inspect the transcript for the exact grouped menu, named sections, one-blank-line menu return, readable long text without truncation, no ANSI or screen clearing, and unchanged success and recovery meaning. This is development evidence only and does not replace packaged-process proof.
 
-- [ ] **Step 6: Update the walkthrough and commit**
+- [x] **Step 6: Update the walkthrough and commit**
 
 ```powershell
 git add modules/guessmarket-ui docs/guides/IMPLEMENTATION-WALKTHROUGH.md
 git commit -m "feat: implement console application flows"
 ```
 
-- [ ] **Step 7: Run the Stage 5 gate**
+- [x] **Step 7: Run the Stage 5 gate**
 
 Review input recovery, the exact D-072 menu and prompts, all named block shapes, same-operation result use, filtering ownership, runtime-defect visibility, ASCII-only decoration, long supplied text, all eleven tests, the smoke transcript, and walkthrough entries before merging.
+
+Completion record: Task 11 is implemented in `681fd47` and `52ccd59`. Task 12 is implemented in `49627ea` (`feat: implement console application flows`). The Stage 5 branch is independently reviewed and the current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. The final renderer coverage correction changes no production code and does not repeat the historical real XML smoke. Stage 4 remains unmerged in draft pull request 4; rebase Stage 5 onto the eventual Stage 4 squash-merge result before any integration. No Stage 5 merge, push, or Nitzan acceptance is recorded.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 

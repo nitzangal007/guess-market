@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed and verified, and remain in Nitzan's draft pull-request review. Stage 5 is authorized in this isolated worktree, based on the verified Stage 4 candidate, and follows the approved D-072 Clean Sections console presentation. This branch must not modify or merge the Stage 4 branch or pull request.
+Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed and verified, but remain unmerged in Nitzan's draft pull request 4. Stage 5 is implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate, and follows the approved D-072 Clean Sections console presentation. This branch must be rebased onto the eventual Stage 4 squash-merge result before Stage 5 integration. Stage 5 is not merged, pushed, or accepted by Nitzan.
 
 ## Current state
 
@@ -36,7 +36,9 @@ Implementation. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 
 - Task 10 review fixes centralize complete DTO equality with exact binary64 comparisons and prove load and restore replacement atomicity for injected `XML_FILE_ACCESS_FAILED`, `ENGINE_CONFIGURATION_ERROR`, and `STATE_FILE_ACCESS_FAILED` failures.
 - The final Stage 4 persistence review fix `acf3c36` validates raw saved graph elements before casting, correctly separates stream-opening access failures from serialization-format failures, rejects trailing `null` data as `SAVED_STATE_INVALID`, and records the completed Task 9 and Task 10 plan steps.
 - The final independent strict Java 25 gate uses exactly the five approved JAXB runtime JARs and all eight suites: 112 tests found, started, and successful, with zero failures, skips, disabled tests, or aborts. A final persistence re-review found no remaining Critical, Important, or Minor issue.
+- Stage 4 is independently verified but remains unmerged in draft pull request 4 pending Nitzan's review and acceptance.
 - Nitzan approved D-072 on 2026-08-17 after comparing Clean Sections, Command Center, and Minimal Transcript console mockups. Clean Sections is the controlling Stage 5 presentation direction.
+- Stage 5 Tasks 11 and 12 are implemented and independently reviewed on `codex/e1-console-ui`, based on the verified Stage 4 candidate. Task 11 commits are `681fd47` and `52ccd59`; Task 12 is commit `49627ea` (`feat: implement console application flows`). The current known strict Java 25 all-eleven-suite result is 137 successful tests with zero failures, skips, disabled tests, or aborts. Stage 5 production UI is unchanged by the final renderer-coverage correction.
 - D-072 keeps the eight commands and existing Engine behavior, while grouping the menu under `DATA`, `TRADING`, and `STATE AND SESSION` and using named 60-character ASCII output sections.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 4 calculation, constructor, transition, observation, and verification result.
@@ -62,4 +64,4 @@ Implementation. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 
 
 ## Exact next action
 
-Execute Stage 5 Tasks 11 and 12 in this isolated worktree using D-072 Clean Sections exactly. Keep Stage 4 pull request 4 unmerged and unchanged. Before Stage 5 integration, rebase this branch onto the eventual Stage 4 squash-merge result.
+Keep Stage 4 pull request 4 unchanged while Nitzan reviews it. After Nitzan accepts Stage 4 and its squash merge completes, rebase `codex/e1-console-ui` onto that exact squash-merge result before considering Stage 5 integration. Stage 5 remains unmerged and awaits its own later acceptance decision.
