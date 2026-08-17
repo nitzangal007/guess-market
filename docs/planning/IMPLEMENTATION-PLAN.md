@@ -8,7 +8,7 @@
 
 **Tech Stack:** Oracle JDK 25, Java 25 language and JDK APIs, JAXB RI 4.0.5, JUnit Platform Console Standalone 6.1.1 with JUnit Jupiter, Windows Batch, IntelliJ IDEA, Git, and GitHub.
 
-**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 3 were reviewed, accepted, and merged through pull requests 1 through 3. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 Tasks 11 and 12 plus approved D-073 Task 12A are implemented on `codex/e1-console-ui` directly above `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate passes all 145 tests, and real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 5 remains unmerged and awaits Nitzan's renewed manual review and acceptance.
+**Status:** Approved by Nitzan on 2026-08-15 for staged execution through seven human review checkpoints. Stages 1 through 5 are reviewed, accepted, and merged. Stage 5 Tasks 11 and 12 plus approved D-073 Task 12A merged into `main` as `d8ef980` after the strict Java 25 all-eleven-suite gate passed all 145 tests and real-process audits covered the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 6 begins on `codex/e1-packaging`.
 
 ## Global Constraints
 
@@ -1200,7 +1200,7 @@ Compile all production and test sources into a fresh `build/d073-final` director
 
 - [x] **Step 9: Update the durable Stage 5 record**
 
-Mark D-073 approved and implemented in the design ledger and brief. Record the new method, menu behavior, EOF contract, regression tests, audit scenarios, exact test count, and any separately reported Engine finding in the walkthrough and testing guide. Update `PROJECT_HANDOFF.md` so Stage 5 awaits renewed Nitzan review rather than claiming the earlier 137-test gate completes it.
+This step was completed for D-073: the design ledger and brief record the new method, menu behavior, EOF contract, regression tests, audit scenarios, exact test count, and the absence of a concrete Engine finding. After Nitzan's renewed approval, Stage 5 merged into `main` as `d8ef980`.
 
 - [x] **Step 10: Verify, commit, and push for renewed pull request review**
 
@@ -1212,11 +1212,11 @@ git commit -m "fix: keep console results visible before menu return"
 git push origin codex/e1-console-ui
 ```
 
-The Stage 5 pull request remains a draft and unmerged until Nitzan completes the renewed manual review and explicitly accepts it.
+Stage 5 was explicitly accepted by Nitzan, merged into `main` as `d8ef980`, and verified again from the merged tree with the strict 145-test Java 25 gate.
 
 Task 12A approval record: Nitzan approved D-073 on 2026-08-17 and authorized its test-first implementation, full UI audit, separate Engine-defect reporting, renewed verification, documentation update, commit, and push to pull request 5.
 
-Task 12A completion record: the RED compile failed with four expected missing-method errors. Focused GREEN passed 33 UI tests, including the final review regression proving direct `AssertionError` visibility. The renewed strict Java 25 all-eleven-suite gate passed all 145 tests with zero failures, skips, disabled tests, or aborts. Real Engine process audits passed the complete supplied-XML workflow, pre-load recovery, and exact EOF at the pause. No concrete Engine defect was found, and no Engine production source changed. The main correction is `9366bea`, the independent-review fix is `d737087`, and both are pushed to `origin/codex/e1-console-ui` in draft pull request 5. Task 12A is complete and awaits Nitzan's renewed manual review.
+Task 12A completion record: the RED compile failed with four expected missing-method errors. Focused GREEN passed 33 UI tests, including the final review regression proving direct `AssertionError` visibility. The renewed strict Java 25 all-eleven-suite gate passed all 145 tests with zero failures, skips, disabled tests, or aborts. Real Engine process audits passed the complete supplied-XML workflow, pre-load recovery, and exact EOF at the pause. No concrete Engine defect was found, and no Engine production source changed. The main correction is `9366bea`, the independent-review fix is `d737087`, and Stage 5 was accepted and merged into `main` as `d8ef980`. Task 12A is complete.
 
 ## 10. Stage 6: Authoritative build, proof verifier, and exact ZIP
 

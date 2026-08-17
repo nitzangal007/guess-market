@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 follows approved D-072 Clean Sections and D-073 readable command completion on `codex/e1-console-ui`, directly above `9a8c87c`. Task 12A is implemented and verified with 145 passing tests plus real-process audits. Draft pull request 5 remains unmerged and awaits Nitzan's renewed Stage 5 review and acceptance.
+Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sections console UI and the D-073 readable command-completion correction were merged into `main` as `d8ef980` after a fresh strict Java 25 gate passed all 145 tests. Stage 6 packaging preparation begins on `codex/e1-packaging`; its private README PDF input has not yet been created.
 
 ## Current state
 
@@ -42,7 +42,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 - D-072 keeps the eight commands and existing Engine behavior, while grouping the menu under `DATA`, `TRADING`, and `STATE AND SESSION` and using named 60-character ASCII output sections. D-073 removes the misleading permanent loaded-system note and pauses after handled commands 1 through 7. Blank or whitespace-only Enter returns to the menu, nonblank pause input retries locally, command 8 exits immediately, and EOF at every prompt exits normally.
 - Task 12A adds `ConsoleInput.waitForMenuReturn`, updates the menu and command loop, and adds eight tests. The focused UI gate passes 33 tests, and the renewed strict all-eleven-suite gate passes 145 tests with zero failures, skips, disabled tests, or aborts. The final review addition directly proves that an injected `AssertionError`, like an unexpected runtime defect, remains uncaught and visible.
 - Real Engine process audits cover the complete supplied-XML workflow, pre-load recovery, and exact EOF at the return pause. All three supplied events remain loaded, purchase, close, save, restore, and restored closed state succeed, each process exits 0, and no concrete Engine defect was found. No Engine production source changed.
-- Task 12A implementation is `9366bea`, and its independent-review test and documentation fix is `d737087`. Both are pushed to `origin/codex/e1-console-ui` in draft pull request 5.
+- Task 12A implementation is `9366bea`, and its independent-review test and documentation fix is `d737087`. Stage 5 was accepted by Nitzan and merged to `main` as `d8ef980`; the merged tree then passed a fresh strict 145-test gate.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 5 calculation, constructor, transition, observation, console conversation, and verification result.
 
@@ -67,7 +67,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 
 ## Exact next action
 
-The verified Task 12A correction is pushed to draft pull request 5 at `https://github.com/nitzangal007/guess-market/pull/5`. Keep Stage 5 unmerged while Nitzan performs the renewed manual review and decides whether to accept it.
+Create the private, Nitzan-approved README PDF build input outside Git, then execute the approved Stage 6 authoritative packaging pipeline on `codex/e1-packaging`. Stage 6 does not authorize submission.
 
 ## Remaining stages after Stage 5 acceptance
 
