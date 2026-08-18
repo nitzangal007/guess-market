@@ -1,6 +1,6 @@
 # Exercise 1 Design
 
-Status: approved through D-073. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implements the approved Clean Sections console presentation and D-073 readable command completion on `codex/e1-console-ui`, rebased directly onto `9a8c87c`. The renewed strict Java 25 all-eleven-suite gate reports 145 successful tests. Real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Draft pull request 5 remains unmerged and awaits Nitzan's renewed Stage 5 review.
+Status: approved through D-073. Stages 1 through 5 are accepted and merged. Stage 5 implements the approved Clean Sections console presentation and D-073 readable command completion, and merged into `main` as `d8ef980` after the strict Java 25 all-eleven-suite gate reported 145 successful tests. Real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 6 now prepares the approved packaging pipeline.
 
 Last updated: 2026-08-17
 
@@ -14,7 +14,7 @@ After every approval round, update this file before advancing to the next design
 
 ## Current boundary
 
-- The written design is complete. Stages 1 through 3 are accepted and merged. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation exist on `codex/e1-console-ui`, successfully rebased directly onto that merge. The branch is pushed and draft pull request 5 is open while Stage 5 remains unmerged pending Nitzan's review and acceptance.
+- The written design is complete. Stages 1 through 5 are accepted and merged. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation are integrated in `main` as `d8ef980`. Stage 6 prepares the authoritative build and candidate artifact without authorizing submission.
 - Exercise 1 is the implementation scope.
 - Exercise 2 and Exercise 3 are compatibility evidence only. Their features will not be designed or implemented early.
 - The target is every base requirement plus the 5-point save-and-restore bonus.
@@ -2827,4 +2827,4 @@ Current SHA-256 evidence:
 
 The written design is approved through D-073. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, D-072 controls the Stage 5 Clean Sections presentation, and D-073 controls readable command completion and graceful input closure without changing Engine or DTO behavior.
 
-Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 has implemented D-072 Tasks 11 and 12 plus the approved D-073 Task 12A correction on `codex/e1-console-ui`, directly above `9a8c87c`. The renewed 145-test gate and real-process audits pass. Do not modify the completed Stage 4 history. Draft pull request 5 remains unmerged pending Nitzan's renewed manual review and explicit Stage 5 acceptance.
+Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implemented D-072 Tasks 11 and 12 plus the approved D-073 Task 12A correction, then was explicitly accepted by Nitzan and merged into `main` as `d8ef980`. The renewed 145-test gate and real-process audits pass. Do not modify the completed Stage 4 history. Stage 6 now prepares the authoritative build and candidate artifact; it does not authorize submission.

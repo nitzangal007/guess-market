@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks 9 and 10 are independently reviewed, verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 follows approved D-072 Clean Sections and D-073 readable command completion on `codex/e1-console-ui`, directly above `9a8c87c`. Task 12A is implemented and verified with 145 passing tests plus real-process audits. Draft pull request 5 remains unmerged and awaits Nitzan's renewed Stage 5 review and acceptance.
+Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sections console UI and the D-073 readable command-completion correction were merged into `main` as `d8ef980` after a fresh strict Java 25 gate passed all 145 tests. Stage 6 Task 13 packaging is complete on `codex/e1-packaging` and its gate is undergoing final review. The private README PDF exists locally, remains Git-ignored, and is not a repository artifact.
 
 ## Current state
 
@@ -25,7 +25,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 - Task 5 implemented the serializable event aggregate, accounting, history, immutable DTO conversion, and atomic purchase and close transitions in commits `7502964`, review fix `e0a341a`, and completion record `3daadb1`.
 - The original Stage 2 whole-branch review found one Important numerical precision defect, one Important stale-handoff defect, and three Minor evidence or detail gaps. The residual re-review then found a second Important numerical precision defect and later documentation-only Minor corrections. The completed corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, complete `Integer.MIN_VALUE` observation coverage, and align the planning and walkthrough records with the implemented code.
 - The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
-- Stage 5 UI production source and its three UI test suites now exist: `ConsoleInputTest`, `ConsoleRendererTest`, and `GuessMarketConsoleAppTest`. The renewed strict Java 25 all-eleven-suite result is 145 successful tests. `build.bat`, IntelliJ configuration, packaging inputs, and release artifacts remain planned later-stage work.
+- Stage 5 UI production source and its three UI test suites now exist: `ConsoleInputTest`, `ConsoleRendererTest`, and `GuessMarketConsoleAppTest`. The renewed strict Java 25 all-eleven-suite result is 145 successful tests. Task 13 now supplies the repository-owned `build.bat`, manifest, launcher, mandatory JUnit proof verifier, three non-fat JARs, exact ZIP, fresh extraction, and deterministic packaged-process checks. IntelliJ cross-check, clean Windows 10 evidence, README-led walkthrough, and final approval remain Stage 7 work.
 - Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 was squash-merged as `6842dfd`.
 - Stage 3 was accepted and squash-merged as full commit `15c8c8f70d21b4a2e8021ef6b7d3dfb88bac2caf`.
 - Task 6 added the trusted XSD, supplied and custom fixtures, and eight retained XJC-generated sources. Task 7 added ordered JAXB-to-domain candidate mapping. Task 8 added trusted-schema XML loading and structured error translation.
@@ -42,7 +42,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 - D-072 keeps the eight commands and existing Engine behavior, while grouping the menu under `DATA`, `TRADING`, and `STATE AND SESSION` and using named 60-character ASCII output sections. D-073 removes the misleading permanent loaded-system note and pauses after handled commands 1 through 7. Blank or whitespace-only Enter returns to the menu, nonblank pause input retries locally, command 8 exits immediately, and EOF at every prompt exits normally.
 - Task 12A adds `ConsoleInput.waitForMenuReturn`, updates the menu and command loop, and adds eight tests. The focused UI gate passes 33 tests, and the renewed strict all-eleven-suite gate passes 145 tests with zero failures, skips, disabled tests, or aborts. The final review addition directly proves that an injected `AssertionError`, like an unexpected runtime defect, remains uncaught and visible.
 - Real Engine process audits cover the complete supplied-XML workflow, pre-load recovery, and exact EOF at the return pause. All three supplied events remain loaded, purchase, close, save, restore, and restored closed state succeed, each process exits 0, and no concrete Engine defect was found. No Engine production source changed.
-- Task 12A implementation is `9366bea`, and its independent-review test and documentation fix is `d737087`. Both are pushed to `origin/codex/e1-console-ui` in draft pull request 5.
+- Task 12A implementation is `9366bea`, and its independent-review test and documentation fix is `d737087`. Stage 5 was accepted by Nitzan and merged to `main` as `d8ef980`; the merged tree then passed a fresh strict 145-test gate.
 - `docs/planning/IMPLEMENTATION-PLAN.md` contains the approved staged implementation plan and effort estimate.
 - `docs/guides/IMPLEMENTATION-WALKTHROUGH.md` records every implemented Stage 1 through Stage 5 calculation, constructor, transition, observation, console conversation, and verification result.
 
@@ -67,7 +67,7 @@ Implementation review. Stages 1 through 3 are accepted and merged. Stage 4 Tasks
 
 ## Exact next action
 
-The verified Task 12A correction is pushed to draft pull request 5 at `https://github.com/nitzangal007/guess-market/pull/5`. Keep Stage 5 unmerged while Nitzan performs the renewed manual review and decides whether to accept it.
+Complete final Stage 6 review of the authoritative build evidence on `codex/e1-packaging`, then begin the separate Stage 7 exact-artifact acceptance workflow. Stage 6 does not authorize submission.
 
 ## Remaining stages after Stage 5 acceptance
 

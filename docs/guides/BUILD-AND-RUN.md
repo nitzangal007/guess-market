@@ -2,7 +2,7 @@
 
 ## Status
 
-The final build pipeline is completely designed but `build.bat` does not exist yet. Through Stage 5, the verified workflow is source-level only: strict Oracle Java 25 compilation of DTO, Engine, and UI production and test sources, followed by direct execution of all eleven required JUnit classes. The renewed D-073 strict Java 25 gate reports 145 successful tests with zero failures, skips, disabled tests, or aborts. Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 including the D-073 readable command-completion correction is implemented on `codex/e1-console-ui` directly above `9a8c87c` and published in draft pull request 5. It remains unmerged while awaiting Nitzan's renewed Stage 5 review and acceptance. The planned commands below are not a working packaged build, and packaging remains Stage 6 and Stage 7 work.
+`build.bat` is the repository-owned authoritative Exercise 1 build. It requires one Oracle JDK 25 through `JAVA_HOME`, performs a clean build, proves all eleven required JUnit classes, creates the three application JARs, verifies ownership and manifests, creates the exact ZIP, extracts it under a path containing spaces, and runs packaged console scenarios. It does not download dependencies.
 
 ## Environment
 
@@ -11,23 +11,33 @@ The final build pipeline is completely designed but `build.bat` does not exist y
 - `JAVA_HOME` pointing to one coherent JDK 25 installation
 - No dependency download during the build
 
-## Planned build authority
+## Authoritative build command
 
-The repository root will contain one `build.bat`. It will use `%~dp0` to locate the project, quote paths, use local variables, fail fast, and clean only the fixed repository `build` directory.
+From the repository root in `cmd.exe`:
+
+```bat
+set "JAVA_HOME=C:\Program Files\Java\jdk-25.0.4"
+.\build.bat
+```
+
+From the repository root in PowerShell:
+
+```powershell
+$env:JAVA_HOME = 'C:\Program Files\Java\jdk-25.0.4'
+.\build.bat
+```
+
+Use the actual Oracle JDK 25 location on the machine. The script uses `%~dp0` to locate the project, quotes paths, invokes `java.exe`, `javac.exe`, and `jar.exe` only beneath that `JAVA_HOME`, checks major version 25, uses `setlocal`, and refuses to clean any target except this project’s fixed `build` directory.
 
 The build phases are:
 
-1. Verify the JDK environment.
-2. Clean the fixed build directory.
-3. Compile DTO production source.
-4. Compile Engine production source against DTO and the five JAXB runtime JARs.
-5. Compile UI production source against Engine and DTO.
-6. Compile tests in module dependency order.
-7. Run all required JUnit suites and verify the report contains no failure, skip, disabled test, or abort.
-8. Create and inspect the three non-fat application JARs.
-9. Stage the exact runtime package.
-10. Create and inspect the ZIP.
-11. Extract the ZIP to a fresh path and run packaged-process scenarios.
+1. Preflight and clean the fixed build directory.
+2. Create source lists, compile production modules in dependency order, and copy Engine resources.
+3. Compile tests in module dependency order and run JUnit 6.1.1 with captured console output and XML reports.
+4. Require every exact test class to execute at least one test with zero failures, container failures, skips, disabled tests, and aborts.
+5. Create and inspect DTO, Engine, and UI application JARs.
+6. Stage exactly the runtime files, create the ZIP with `jar --no-manifest`, and prove exact ZIP membership.
+7. Extract to `build/verification/Fresh Extraction With Spaces` and run deterministic redirected-input launcher checks.
 
 ## Vendored JAXB dependencies
 
@@ -45,15 +55,15 @@ The build phases are:
 
 The approved JUnit Platform Console Standalone JAR and its license are present under `tools/testing` and are used by the current source-level test workflow. They remain excluded from runtime packaging.
 
-## Planned application artifacts
+## Generated application artifacts
 
 - `guessmarket-dto.jar`
 - `guessmarket-engine.jar`
 - `guessmarket-ui.jar`
 
-Only the UI JAR is executable. Its manifest will name `guessmarket.ui.console.ConsoleMain` and reference Engine, DTO, and the five JAXB runtime JARs through relative `Class-Path` entries.
+Only the UI JAR is executable. Its manifest names `guessmarket.ui.console.ConsoleMain` and references Engine, DTO, and the five JAXB runtime JARs through relative `Class-Path` entries.
 
-## Planned ZIP layout
+## Exact ZIP layout
 
 ```text
 run.bat
@@ -69,10 +79,20 @@ lib/
   jaxb-impl.jar
 ```
 
-The launcher is planned as:
+The launcher is:
 
 ```bat
 @java -jar "%~dp0guessmarket-ui.jar"
 ```
 
-The final ZIP must be verified after fresh extraction under a path containing spaces and on a clean Windows 10 or demonstrably compatible clean Windows environment.
+Important generated locations are:
+
+- `build/reports/junit/` - JUnit XML reports and `junit-proof.txt`.
+- `build/reports/junit-console.txt` - captured JUnit console output.
+- `build/inspection/` - JAR and ZIP inventories plus extracted UI manifest.
+- `build/reports/packaged-*.txt` - launcher transcripts for inside and outside launch, integration, restore, and invalid XML recovery.
+- `build/distributions/guess-market-exercise-1.zip` - the candidate ZIP.
+
+`build/staging/` is only the controlled input to ZIP creation. It is not the final verification target. Process checks run from the fresh extraction of the ZIP so they prove the packaged runtime graph, manifest-relative classpath, launcher, and exact ZIP contents together.
+
+Stage 7 must still verify the exact candidate ZIP on a clean Windows 10 machine and complete the README-led grader walkthrough.
