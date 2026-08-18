@@ -1,12 +1,18 @@
 # Guess Market
 
-Guess Market is a Java 25 prediction-market simulator designed around LMSR pricing, modular architecture, XML/JAXB loading, automated testing, Java serialization, and reproducible Windows packaging.
+Guess Market is a Java 25 console-based prediction-market simulator. It loads market definitions from XML, calculates prices with the LMSR model, supports purchasing shares and closing events, and can save and restore the market state.
 
-## Current status
+## Features
 
-Exercise 1 design is approved through decision D-073 and passed a full pre-implementation review with no blocking design findings. Stages 1 through 5 are accepted and merged, with Stage 5 Clean Sections console UI plus its D-073 readable command-completion correction merged into `main` as `d8ef980`. Stage 6 adds the authoritative Java 25 build pipeline, mandatory JUnit proof verifier, three non-fat JARs, exact runtime ZIP, fresh extraction, and packaged-process checks. Stage 7 final acceptance, including the required independent clean Windows 10 run and grader walkthrough, remains pending.
+- XML loading and validation with JAXB
+- Display of all events and detailed trading status
+- LMSR-based share pricing and purchase receipts
+- Purchase or closing commission policies
+- Event closing with the final market-maker result
+- Save and restore of the complete engine state
+- Console input recovery for invalid commands and recoverable errors
 
-## Planned architecture
+## Architecture
 
 The project uses three modules with one-directional dependencies:
 
@@ -16,61 +22,47 @@ guessmarket-ui -> guessmarket-engine -> guessmarket-dto
        +----------------->+
 ```
 
-- `guessmarket-dto` owns immutable values shared across module boundaries.
-- `guessmarket-engine` owns market behavior, XML loading, LMSR calculations, persistence, and the supported engine interface.
-- `guessmarket-ui` owns console input, output, menus, recovery conversations, and application startup.
+- `guessmarket-dto` contains immutable values shared between modules.
+- `guessmarket-engine` contains market behavior, XML loading, LMSR calculations, persistence, and the supported engine interface.
+- `guessmarket-ui` contains the console menu, input, output, and application startup.
 
-Each module will produce a separate non-fat JAR. The UI JAR will be the only executable application JAR.
-
-## Exercise 1 scope
-
-- Load and validate market definitions from XML through JAXB-generated mapping classes.
-- List markets and show detailed market state.
-- Purchase shares through stable LMSR calculations.
-- Close markets and report the final market-maker profit, subsidy, or break-even result.
-- Save and restore complete Engine state through the optional serialization bonus.
-- Build, test, inspect, package, extract, and run the exact Windows submission artifact reproducibly.
+Each module is packaged as a separate JAR. The UI JAR is the executable application JAR.
 
 ## Requirements
 
+- Windows
 - Oracle JDK 25
-- Windows for the authoritative `build.bat` and final package verification
-- Repository-vendored JAXB 4.0.5 dependencies
-- Repository-vendored JUnit Platform Console Standalone 6.1.1 dependency for tests only
 
-The authoritative build does not download dependencies.
+All required JAXB runtime dependencies are included in the repository. The build does not download dependencies.
 
-From the repository root on Windows, set `JAVA_HOME` to one Oracle JDK 25 installation and run:
+## Build and run
 
-```bat
+From the repository root in Windows PowerShell, set `JAVA_HOME` to an Oracle JDK 25 installation and run:
+
+```powershell
+$env:JAVA_HOME = 'C:\Program Files\Java\jdk-25.0.4'
 .\build.bat
 ```
 
-The build writes only ignored output below `build/`, including JUnit XML reports, JAR inventories, extracted-process transcripts, and `build/distributions/211722525-submission.zip`. See [Build and run](docs/guides/BUILD-AND-RUN.md) for the complete artifact layout and verification contract.
+The build compiles the three modules, runs the automated tests, creates the JAR files, and creates a submission archive under `build\distributions`.
 
-## Documentation
+To run the packaged application, extract the archive and run `run.bat` from the extracted folder.
 
-Start with the [documentation index](docs/README.md).
+## Project layout
 
-- [Architecture](docs/design/ARCHITECTURE.md)
-- [Exercise 1 design brief](docs/design/EXERCISE-1-DESIGN-BRIEF.md)
-- [Complete Exercise 1 design](docs/design/EXERCISE-1-DESIGN.md)
-- [Exercise 1 implementation plan](docs/planning/IMPLEMENTATION-PLAN.md)
-- [Living implementation walkthrough](docs/guides/IMPLEMENTATION-WALKTHROUGH.md)
+- `modules/guessmarket-dto` - shared immutable data-transfer objects
+- `modules/guessmarket-engine` - market engine, XML support, and persistence
+- `modules/guessmarket-ui` - console application
+- `packaging` - manifest and runtime launcher inputs
+- `tools` - required JAXB and test dependencies
+- `build.bat` - reproducible Windows build and package entry point
+
+## Technical documentation
+
 - [Build and run](docs/guides/BUILD-AND-RUN.md)
-- [Testing strategy](docs/guides/TESTING.md)
+- [Testing](docs/guides/TESTING.md)
 - [JAXB and XML](docs/guides/JAXB-AND-XML.md)
-- [Design review resolutions](docs/reviews/DESIGN-REVIEW-RESOLUTIONS.md)
-- [Repository design](docs/repository/GITHUB-REPOSITORY-DESIGN.md)
-
-The detailed plan was approved on 2026-08-15. Implementation proceeds through seven human review checkpoints.
-
-## Repository boundaries
-
-Course handouts, private submission documents, runtime `.ser` files, generated build output, and identity-bearing submission ZIP files remain outside Git. The repository includes only project-owned source and documentation, required test fixtures, reproducible build inputs, and the minimal vendored dependency set with its license material.
-
-The repository remains private during active implementation and review. Aviad confirmed that it must become public for grader access before submission. Nitzan will make that visibility change manually only after the final public-safety, documentation, and link checks pass.
 
 ## License
 
-No open-source license is granted for the project code during the active course. Vendored third-party components retain their own licenses.
+No open-source license is granted for the project code. Vendored third-party components retain their own licenses.
