@@ -1,8 +1,8 @@
 # Exercise 1 Design
 
-Status: approved through D-073. Stages 1 through 5 are accepted and merged. Stage 5 implements the approved Clean Sections console presentation and D-073 readable command completion, and merged into `main` as `d8ef980` after the strict Java 25 all-eleven-suite gate reported 145 successful tests. Real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 6 now prepares the approved packaging pipeline.
+Status: approved through D-073. Stages 1 through 5 are accepted and merged. Stage 5 implements the approved Clean Sections console presentation and D-073 readable command completion, and merged into `main` as `d8ef980` after the strict Java 25 all-eleven-suite gate reported 145 successful tests. Real-process audits cover the complete workflow, pre-load recovery, and exact EOF at the return pause. Stage 6 completed the approved packaging pipeline. Stage 7 local verification and the supplementary IntelliJ ownership cross-check passed; clean Windows 10 and public-access evidence remain manual gates.
 
-Last updated: 2026-08-17
+Last updated: 2026-08-18
 
 Evidence status: reconciled through the 2026-08-15 adversarial review against the current V2 handout, supplied schema and fixtures, lecturer checklist and learning guide, current forum guidance including Aviad Cohen's market-maker account clarification, the supplied simulator, Java 25 and JUnit primary documentation, and the complete decision history through D-066.
 
@@ -14,7 +14,7 @@ After every approval round, update this file before advancing to the next design
 
 ## Current boundary
 
-- The written design is complete. Stages 1 through 5 are accepted and merged. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation are integrated in `main` as `d8ef980`. Stage 6 prepares the authoritative build and candidate artifact without authorizing submission.
+- The written design is complete. Stages 1 through 5 are accepted and merged. The Java source tree, three-module project, retained generated JAXB classes, and Stage 5 console implementation are integrated in `main` as `d8ef980`. Stage 6 completed the authoritative build and candidate artifact pipeline. Stage 7 local verification is complete, while the clean Windows 10 and public-access gates still prevent submission authorization.
 - Exercise 1 is the implementation scope.
 - Exercise 2 and Exercise 3 are compatibility evidence only. Their features will not be designed or implemented early.
 - The target is every base requirement plus the 5-point save-and-restore bonus.
@@ -2827,4 +2827,4 @@ Current SHA-256 evidence:
 
 The written design is approved through D-073. D-001 through D-066 remain intact as history, D-067 through D-071 contain the adversarial-review corrections, D-072 controls the Stage 5 Clean Sections presentation, and D-073 controls readable command completion and graceful input closure without changing Engine or DTO behavior.
 
-Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implemented D-072 Tasks 11 and 12 plus the approved D-073 Task 12A correction, then was explicitly accepted by Nitzan and merged into `main` as `d8ef980`. The renewed 145-test gate and real-process audits pass. Do not modify the completed Stage 4 history. Stage 6 now prepares the authoritative build and candidate artifact; it does not authorize submission.
+Stage 4 is independently verified, accepted, and squash-merged into `main` as `9a8c87c`. Stage 5 implemented D-072 Tasks 11 and 12 plus the approved D-073 Task 12A correction, then was explicitly accepted by Nitzan and merged into `main` as `d8ef980`. The renewed 145-test gate and real-process audits pass. Do not modify the completed Stage 4 history. Stage 6 completed the authoritative build and candidate artifact pipeline. Stage 7 local verification and the supplementary IntelliJ ownership cross-check passed, but clean Windows 10 and public-access evidence still prevent submission authorization.
