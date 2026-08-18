@@ -108,7 +108,7 @@ if errorlevel 1 goto :failure
 call :phase "success summary"
 echo SUCCESS: Guess Market Exercise 1 build, package, extraction, and process checks passed.
 echo JUnit proof: %BUILD_DIR%\reports\junit-proof.txt
-echo Distribution: %BUILD_DIR%\distributions\guess-market-exercise-1.zip
+echo Distribution: %BUILD_DIR%\distributions\211722525-submission.zip
 exit /b 0
 
 :phase
@@ -319,7 +319,7 @@ for %%F in (jakarta.activation-api.jar angus-activation.jar jakarta.xml.bind-api
 exit /b 0
 
 :create_zip
-set "ZIP_FILE=%BUILD_DIR%\distributions\guess-market-exercise-1.zip"
+set "ZIP_FILE=%BUILD_DIR%\distributions\211722525-submission.zip"
 pushd "%BUILD_DIR%\staging"
 "%JAR_EXE%" --create --file "%ZIP_FILE%" --no-manifest .
 if errorlevel 1 (
@@ -330,9 +330,9 @@ popd
 exit /b 0
 
 :verify_zip
-"%JAR_EXE%" --list --file "%BUILD_DIR%\distributions\guess-market-exercise-1.zip" > "%BUILD_DIR%\inspection\guess-market-exercise-1-zip.txt"
+"%JAR_EXE%" --list --file "%BUILD_DIR%\distributions\211722525-submission.zip" > "%BUILD_DIR%\inspection\211722525-submission-zip.txt"
 if errorlevel 1 exit /b 1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $actual = @(Get-Content -LiteralPath '%BUILD_DIR%\inspection\guess-market-exercise-1-zip.txt' | Where-Object { $_ -ne '' }); $expected = @('run.bat','README.pdf','guessmarket-ui.jar','lib/','lib/guessmarket-engine.jar','lib/guessmarket-dto.jar','lib/jakarta.activation-api.jar','lib/angus-activation.jar','lib/jakarta.xml.bind-api.jar','lib/jaxb-core.jar','lib/jaxb-impl.jar'); $difference = Compare-Object -ReferenceObject $expected -DifferenceObject $actual; if ($difference) { throw ('ZIP membership mismatch: ' + (($difference | ForEach-Object { $_.InputObject }) -join ', ')) }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; trap { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }; $actual = @(Get-Content -LiteralPath '%BUILD_DIR%\inspection\211722525-submission-zip.txt' | Where-Object { $_ -ne '' }); $expected = @('run.bat','README.pdf','guessmarket-ui.jar','lib/','lib/guessmarket-engine.jar','lib/guessmarket-dto.jar','lib/jakarta.activation-api.jar','lib/angus-activation.jar','lib/jakarta.xml.bind-api.jar','lib/jaxb-core.jar','lib/jaxb-impl.jar'); $difference = Compare-Object -ReferenceObject $expected -DifferenceObject $actual; if ($difference) { throw ('ZIP membership mismatch: ' + (($difference | ForEach-Object { $_.InputObject }) -join ', ')) }"
 if errorlevel 1 exit /b 1
 exit /b 0
 
@@ -342,7 +342,7 @@ if exist "%EXTRACTION_DIR%" rmdir /s /q "%EXTRACTION_DIR%"
 mkdir "%EXTRACTION_DIR%"
 if errorlevel 1 exit /b 1
 pushd "%EXTRACTION_DIR%"
-"%JAR_EXE%" --extract --file "%BUILD_DIR%\distributions\guess-market-exercise-1.zip"
+"%JAR_EXE%" --extract --file "%BUILD_DIR%\distributions\211722525-submission.zip"
 if errorlevel 1 (
     popd
     exit /b 1

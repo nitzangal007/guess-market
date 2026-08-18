@@ -91,8 +91,8 @@ Important generated locations are:
 - `build/reports/junit-console.txt` - captured JUnit console output.
 - `build/inspection/` - JAR and ZIP inventories plus extracted UI manifest.
 - `build/reports/packaged-*.txt` - launcher transcripts for inside and outside launch, integration, restore, and invalid XML recovery.
-- `build/distributions/guess-market-exercise-1.zip` - the candidate ZIP.
+- `build/distributions/211722525-submission.zip` - the candidate ZIP.
 
 `build/staging/` is only the controlled input to ZIP creation. It is not the final verification target. Process checks run from the fresh extraction of the ZIP so they prove the packaged runtime graph, manifest-relative classpath, launcher, and exact ZIP contents together.
 
-Stage 7 must still verify the exact candidate ZIP on a clean Windows 10 machine and complete the README-led grader walkthrough.
+Stage 7 has completed its local README-led grader walkthrough. It must still verify the exact candidate ZIP on a clean Windows 10 machine before submission.

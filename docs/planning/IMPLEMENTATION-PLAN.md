@@ -1238,7 +1238,7 @@ Milestone branch: `codex/e1-packaging`
 **Interfaces:**
 
 - Consumes: one Oracle Java 25 `JAVA_HOME`, all three module source trees, Engine resources, JUnit 6.1.1, five JAXB runtime JARs, and the private README PDF.
-- Produces: clean classes, reports, three JARs, exact staging, fresh extraction, and `build/distributions/guess-market-exercise-1.zip`.
+- Produces: clean classes, reports, three JARs, exact staging, fresh extraction, and `build/distributions/211722525-submission.zip`.
 
 Create the manifest exactly with a final blank line:
 
@@ -1339,15 +1339,15 @@ Milestone branch: `codex/e1-final-verification`
 - Consumes: the exact ZIP produced by a clean authoritative build and Nitzan-approved private README contents.
 - Produces: an evidence-backed decision that the candidate is submission-ready or has a clearly named unresolved risk.
 
-- [ ] **Step 1: Reopen and visually verify the private 1-to-3-page README PDF**
+- [x] **Step 1: Reopen and visually verify the private 1-to-3-page README PDF**
 
 Confirm that it still contains run instructions, key classes, important decisions and assumptions, student details, GitHub link, and explicit bonus declaration. Verify page count, readability, and that the public repository does not track it.
 
-- [ ] **Step 2: Rerun Gates 1 through 6 from a zero-based clean build**
+- [x] **Step 2: Rerun Gates 1 through 6 from a zero-based clean build**
 
 Use only the exact extracted ZIP for packaged scenarios. Cover launch inside and outside the package directory, path with spaces, explicit exit, end-of-input, valid XML, invalid XML recovery, full integration conversation, persistence across a new process, and no raw stack trace for expected failures.
 
-- [ ] **Step 3: Perform the one-time IntelliJ artifact cross-check**
+- [x] **Step 3: Perform the one-time IntelliJ artifact cross-check**
 
 Configure three separate artifacts and confirm logical class, resource, manifest, and dependency ownership. Do not copy IntelliJ output into the submission.
 
@@ -1355,7 +1355,7 @@ Configure three separate artifacts and confirm logical class, resource, manifest
 
 Record the OS evidence, Java version, exact ZIP SHA-256, extraction location, launcher command, central transcript, and result. A CI runner, development machine, or Windows 11 result cannot silently replace this requirement.
 
-- [ ] **Step 5: Perform the README-led grader walkthrough**
+- [x] **Step 5: Perform the README-led grader walkthrough**
 
 Start from another fresh copy of the same hash, follow only the README and `run.bat`, inspect exact contents, verify the documented GitHub link, and record the result.
 
