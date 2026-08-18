@@ -66,10 +66,10 @@ class ConsoleRendererTest {
     }
 
     @Test
-    void summariesUseCleanSectionsFreshNumberingAndNoTruncation() {
-        String longDescription = "This deliberately long XML description must remain complete without wrapping, truncation, or a width calculation.";
+    void summariesUseCleanSectionsFreshNumberingAndCompleteDescriptions() {
+        String description = "A complete summary description.";
         List<MarketEventSummary> summaries = List.of(
-                new MarketEventSummary(-9, "First", longDescription, 5, CommissionMode.ON_PURCHASE,
+                new MarketEventSummary(-9, "First", description, 5, CommissionMode.ON_PURCHASE,
                         List.of("Yes", "No"), EventStatus.OPEN),
                 new MarketEventSummary(80, "Second", "Closed event", 0, CommissionMode.ON_CLOSE,
                         List.of("Home", "Away"), EventStatus.CLOSED));
@@ -84,10 +84,33 @@ class ConsoleRendererTest {
         assertTrue(output.contains(SEPARATOR + "\nOPEN EVENTS\n" + SEPARATOR));
         assertTrue(output.contains("1. Event ID: -9"));
         assertTrue(output.contains("2. Event ID: 80"));
-        assertTrue(output.contains(longDescription));
+        assertTrue(output.contains(description));
         assertTrue(output.contains("Commission percentage: 5%\n   Commission method: On purchase"));
         assertTrue(output.contains("Commission percentage: 0%\n   Commission method: On close"));
         assertEquals(2, occurrences(output, "1. Event ID: -9"));
+    }
+
+    @Test
+    void summaryDescriptionWrapsAtAWordBoundaryBeforeTheConsoleEdge() {
+        String description = "This event gambles if Mujtaba is alive or not. It will be determined if he appears in public before the deadline.";
+        MarketEventSummary summary = new MarketEventSummary(
+                1,
+                "Mujtaba is Dead",
+                description,
+                5,
+                CommissionMode.ON_PURCHASE,
+                List.of("Hell Yea !", "No way !"),
+                EventStatus.OPEN);
+        StringWriter text = new StringWriter();
+        ConsoleRenderer renderer = renderer(text);
+
+        renderer.renderEventSummaries(List.of(summary), false);
+
+        String output = text.toString();
+        assertTrue(output.contains("   Description: This event gambles if Mujtaba is alive or not. It will be\n"
+                + "                determined if he appears in public before the deadline.\n"));
+        assertFalse(output.contains("deter\nmined"));
+        assertTrue(output.lines().allMatch(line -> line.length() <= 80));
     }
 
     @Test

@@ -17,6 +17,7 @@ import java.util.Objects;
 final class ConsoleRenderer {
     private static final String EQUALS_SEPARATOR = "============================================================";
     private static final String HYPHEN_SEPARATOR = "------------------------------------------------------------";
+    private static final int TEXT_LINE_WIDTH = 80;
 
     private final PrintWriter output;
 
@@ -147,7 +148,7 @@ final class ConsoleRenderer {
         Objects.requireNonNull(summary, "summary");
         writeLine(position + ". Event ID: " + summary.getEventId());
         writeLine("   Name: " + summary.getName());
-        writeLine("   Description: " + summary.getDescription());
+        writeWrappedField("   Description: ", summary.getDescription());
         writeLine("   Commission percentage: " + summary.getCommissionPercentage() + "%");
         writeLine("   Commission method: " + commissionMethod(summary.getCommissionMode()));
         writeLine("   Options:");
@@ -160,7 +161,7 @@ final class ConsoleRenderer {
         Objects.requireNonNull(details, "details");
         writeLine("ID: " + details.getEventId());
         writeLine("Name: " + details.getName());
-        writeLine("Description: " + details.getDescription());
+        writeWrappedField("Description: ", details.getDescription());
         writeLine("Status: " + details.getStatus());
         if (details.getWinningOptionNumber().isPresent()) {
             int winner = details.getWinningOptionNumber().getAsInt();
@@ -287,6 +288,29 @@ final class ConsoleRenderer {
 
     private String commissionMethod(CommissionMode mode) {
         return mode == CommissionMode.ON_PURCHASE ? "On purchase" : "On close";
+    }
+
+    private void writeWrappedField(String prefix, String value) {
+        Objects.requireNonNull(prefix, "prefix");
+        Objects.requireNonNull(value, "value");
+        String continuationIndent = " ".repeat(prefix.length());
+        String currentPrefix = prefix;
+        int start = 0;
+
+        while (value.length() - start + currentPrefix.length() > TEXT_LINE_WIDTH) {
+            int maximumTextEnd = start + TEXT_LINE_WIDTH - currentPrefix.length();
+            int breakAt = value.lastIndexOf(' ', maximumTextEnd);
+            if (breakAt < start) {
+                breakAt = value.indexOf(' ', maximumTextEnd);
+            }
+            if (breakAt < start) {
+                break;
+            }
+            writeLine(currentPrefix + value.substring(start, breakAt));
+            start = breakAt + 1;
+            currentPrefix = continuationIndent;
+        }
+        writeLine(currentPrefix + value.substring(start));
     }
 
     private void writeLine(String text) {
