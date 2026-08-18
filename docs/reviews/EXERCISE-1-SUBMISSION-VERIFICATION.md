@@ -36,4 +36,4 @@ The candidate is generated at `build/distributions/211722525-submission.zip` by 
 
 ## Final gate
 
-After the three manual gates are recorded, present this same ZIP hash and all evidence to Nitzan. Only Nitzan's explicit final approval may authorize copying the ZIP to a submission location, copying it to Drive, tagging `exercise-1-submission`, changing repository visibility, or submitting it.
+After the two remaining manual gates are recorded, present this same ZIP hash and all evidence to Nitzan. Only Nitzan's explicit final approval may authorize copying the ZIP to a submission location, copying it to Drive, tagging `exercise-1-submission`, changing repository visibility, or submitting it.
