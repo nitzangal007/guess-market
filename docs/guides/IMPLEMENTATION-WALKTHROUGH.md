@@ -2,7 +2,7 @@
 
 ## Status
 
-The seven-stage plan was approved on 2026-08-15. Stages 1 through 5 are accepted and merged. D-072 Clean Sections and D-073 readable command completion are implemented through Stage 5 Tasks 11, 12, and 12A, which merged into `main` as `d8ef980` after the strict gate passed all 145 tests and real-process audits passed. Stage 6 now implements the authoritative build and submission-candidate pipeline.
+The seven-stage plan was approved on 2026-08-15. Stages 1 through 5 are accepted and merged. D-072 Clean Sections and D-073 readable command completion are implemented through Stage 5 Tasks 11, 12, and 12A, which merged into `main` as `d8ef980` after the strict gate passed all 145 tests and real-process audits passed. Stage 6 provides the authoritative build and submission-candidate pipeline. Stage 7 has started on `codex/e1-final-verification`: the local exact-artifact, README-led, end-of-input, and privacy checks are recorded, while the IntelliJ, clean Windows 10, and public-access gates remain manual evidence.
 
 ## Purpose
 
@@ -264,6 +264,12 @@ The build creates three non-fat JARs. DTO contains only its DTO package, Engine 
 
 Fresh extraction into `build/verification/Fresh Extraction With Spaces` is the packaged verification target. Redirected process fixtures prove the launcher inside and outside that extracted directory, a valid load-list-purchase-close-save flow, a separate restore process whose selected event remains `CLOSED`, and invalid XML recovery without raw exception output. Staging itself is never treated as process proof. The generated reports remain ignored build evidence; Stage 7 still owns independent clean-Windows execution, the README-led grader walkthrough, and final release approval.
 
+## Stage 7 Task 14: exact-artifact acceptance
+
+Stage 7 begins with the ZIP produced by the authoritative build, not an earlier staging directory or a source-tree launch. The current candidate hash and every local verification result are recorded in `docs/reviews/EXERCISE-1-SUBMISSION-VERIFICATION.md`. A second fresh extraction follows only the README and `run.bat`, which proves that the submitted runtime path is understandable without the development workspace. A zero-byte input run separately proves graceful input closure in the exact package.
+
+The final verification deliberately keeps three gates external: IntelliJ must independently show the three logical artifacts without contributing output to the ZIP, a clean Windows 10 machine must run the exact recorded hash, and an unauthenticated GitHub view must be checked only after Nitzan changes visibility manually. These requirements cannot be replaced by a local development-machine result. Until those records and Nitzan's final approval exist, the candidate is not submission-authorized.
+
 ## Stage verification log
 
 | Stage | Verified behavior | Focused tests | Regression evidence | Accepted commit | State |
@@ -274,7 +280,7 @@ Fresh extraction into `build/verification/Fresh Extraction With Spaces` is the p
 | 4 | Task 9 direct-domain persistence plus Task 10 complete Engine orchestration, immutable public snapshots, actual-ID behavior, XML and restore replacement, restart round trip, continued operations, and failure atomicity | Task 10 public Engine gate: `GuessMarketEngineUseCaseTest` 11, `GuessMarketEngineXmlLoadTest` 6, and `GuessMarketEnginePersistenceTest` 25 successful | Fresh Java 25 strict compile with `--release 25 -encoding UTF-8 -Xlint:all -Werror`; all eight exact DTO and Engine classes used exactly five JAXB runtime JARs; 112 tests successful with zero failures, skips, disabled tests, or aborts; source and public `javap` boundary inspections passed | Task 9 `5eb202b`, `6b722ac`, and final review fix `acf3c36`; Task 10 RED `706df9a`; implementation `f536bdb`; review fix `9aaafad`; squash-merged as `9a8c87c` | Accepted and merged |
 | 5 | Task 11 input and Clean Sections rendering, Task 12 complete eight-command application, and Task 12A D-073 readable result pause, local pause retry, revised menu, complete graceful EOF coverage, OPEN filtering, actual-ID translation, same-operation result use, checked recovery, and UTF-8 startup wiring | `ConsoleInputTest`: 8 successful; `ConsoleRendererTest`: 10 successful; `GuessMarketConsoleAppTest`: 15 successful | Oracle Java 25.0.4 strict all-eleven-class gate with exactly five JAXB runtime JARs: 145 successful with zero failures, skips, disabled tests, or aborts. Real Engine complete-workflow, pre-load recovery, and exact pause-EOF processes exited 0; all three supplied events remained loaded; no concrete Engine defect was found. | Task 11 `bdb5abd` and correction `3f3eec2`; Task 12 `9fd2d5d`; Task 12A D-073 correction series; merged as `d8ef980` | Accepted and merged |
 | 6 | Authoritative build, mandatory report proof, non-fat JARs, exact ZIP, fresh extraction, and redirected packaged-process checks | Verifier probes reject missing-class, zero-test, failing-test, disabled-test, and aborted-test reports | Clean Java 25 build: 145 executed tests, zero failures, container failures, skips, disabled tests, and aborts; JAR, ZIP, extraction, and packaged-process checks pass | Task 13 branch checkpoint pending review | Implemented, pending Stage 6 review |
-| 7 | Exact-artifact acceptance | None before execution | None before execution | None before approval | Planned |
+| 7 | Exact-artifact acceptance, README-led extraction, end-of-input runtime check, and source/privacy review | Exact ZIP launched from a second fresh extraction using README and `run.bat` | Clean local build: 145 successful tests, exact ZIP inventory, fresh extraction in a spaces path, README-led load/list/exit, graceful zero-byte-input exit, and 60-commit Gitleaks scan with no leaks | External IntelliJ, clean Windows 10, public-access evidence, and Nitzan's final approval remain required | In progress |
 
 ## Concepts to explain as they appear
 

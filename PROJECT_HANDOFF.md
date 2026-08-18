@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sections console UI and the D-073 readable command-completion correction were merged into `main` as `d8ef980` after a fresh strict Java 25 gate passed all 145 tests. Stage 6 Task 13 packaging is complete on `codex/e1-packaging` and its gate is undergoing final review. The private README PDF exists locally, remains Git-ignored, and is not a repository artifact.
+Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sections console UI and the D-073 readable command-completion correction were merged into `main` as `d8ef980` after a fresh strict Java 25 gate passed all 145 tests. Stage 6 Task 13 packaging is complete on `codex/e1-packaging`. Stage 7 is in progress on `codex/e1-final-verification`: local candidate checks passed, while IntelliJ artifact, clean Windows 10, and public-access evidence remain open. The private README PDF exists locally, remains Git-ignored, and is not a repository artifact.
 
 ## Current state
 
@@ -67,7 +67,7 @@ Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sectio
 
 ## Exact next action
 
-Complete final Stage 6 review of the authoritative build evidence on `codex/e1-packaging`, then begin the separate Stage 7 exact-artifact acceptance workflow. Stage 6 does not authorize submission.
+Complete the three remaining Stage 7 manual gates for the exact candidate hash recorded in `docs/reviews/EXERCISE-1-SUBMISSION-VERIFICATION.md`: IntelliJ artifact cross-check, clean Windows 10 execution, and unauthenticated public access after Nitzan changes repository visibility manually. Then stop for Nitzan's explicit final approval. Stage 6 and partial Stage 7 evidence do not authorize submission.
 
 ## Remaining stages after Stage 5 acceptance
 
