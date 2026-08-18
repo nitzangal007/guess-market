@@ -2,7 +2,7 @@
 
 ## Mode
 
-Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sections console UI and the D-073 readable command-completion correction were merged into `main` as `d8ef980` after a fresh strict Java 25 gate passed all 145 tests. Stage 6 Task 13 packaging is complete on `codex/e1-packaging`. Stage 7 is in progress on `codex/e1-final-verification`: local candidate checks passed, while IntelliJ artifact, clean Windows 10, and public-access evidence remain open. The private README PDF exists locally, remains Git-ignored, and is not a repository artifact.
+Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sections console UI and the D-073 readable command-completion correction were merged into `main` as `d8ef980` after a fresh strict Java 25 gate passed all 145 tests. Stage 6 Task 13 packaging is complete on `codex/e1-packaging`. Stage 7 is in progress on `codex/e1-final-verification`: local candidate checks and the supplementary IntelliJ ownership cross-check passed, while formal clean Windows 10 and public-access evidence remain open. The private README PDF exists locally, remains Git-ignored, and is not a repository artifact.
 
 ## Current state
 
@@ -25,7 +25,7 @@ Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sectio
 - Task 5 implemented the serializable event aggregate, accounting, history, immutable DTO conversion, and atomic purchase and close transitions in commits `7502964`, review fix `e0a341a`, and completion record `3daadb1`.
 - The original Stage 2 whole-branch review found one Important numerical precision defect, one Important stale-handoff defect, and three Minor evidence or detail gaps. The residual re-review then found a second Important numerical precision defect and later documentation-only Minor corrections. The completed corrections extend the combined-long numerical branch to every negative quantity difference, add reachable event accounting proofs for both cancellation boundaries, prove the positive commission-underflow identity, document operation-specific lifecycle and numerical details, complete `Integer.MIN_VALUE` observation coverage, and align the planning and walkthrough records with the implemented code.
 - The current focused Stage 2 gate has 16 `LmsrCalculatorTest` cases and 20 `MarketEventTest` cases. The complete fresh regression and boundary gate is recorded in the walkthrough and final fix report.
-- Stage 5 UI production source and its three UI test suites now exist: `ConsoleInputTest`, `ConsoleRendererTest`, and `GuessMarketConsoleAppTest`. The renewed strict Java 25 all-eleven-suite result is 145 successful tests. Task 13 now supplies the repository-owned `build.bat`, manifest, launcher, mandatory JUnit proof verifier, three non-fat JARs, exact ZIP, fresh extraction, and deterministic packaged-process checks. IntelliJ cross-check, clean Windows 10 evidence, README-led walkthrough, and final approval remain Stage 7 work.
+- Stage 5 UI production source and its three UI test suites now exist: `ConsoleInputTest`, `ConsoleRendererTest`, and `GuessMarketConsoleAppTest`. The renewed strict Java 25 all-eleven-suite result is 145 successful tests. Task 13 now supplies the repository-owned `build.bat`, manifest, launcher, mandatory JUnit proof verifier, three non-fat JARs, exact ZIP, fresh extraction, and deterministic packaged-process checks. The supplementary IntelliJ ownership check and README-led walkthrough are complete. Clean Windows 10 evidence, public-access evidence, and final approval remain Stage 7 work.
 - Nitzan reviewed and accepted Stage 2 on 2026-08-16. Pull request 2 was squash-merged as `6842dfd`.
 - Stage 3 was accepted and squash-merged as full commit `15c8c8f70d21b4a2e8021ef6b7d3dfb88bac2caf`.
 - Task 6 added the trusted XSD, supplied and custom fixtures, and eight retained XJC-generated sources. Task 7 added ordered JAXB-to-domain candidate mapping. Task 8 added trusted-schema XML loading and structured error translation.
@@ -67,7 +67,7 @@ Implementation. Stages 1 through 5 are accepted and merged. Stage 5 Clean Sectio
 
 ## Exact next action
 
-Complete the three remaining Stage 7 manual gates for the exact candidate hash recorded in `docs/reviews/EXERCISE-1-SUBMISSION-VERIFICATION.md`: IntelliJ artifact cross-check, clean Windows 10 execution, and unauthenticated public access after Nitzan changes repository visibility manually. Then stop for Nitzan's explicit final approval. Stage 6 and partial Stage 7 evidence do not authorize submission.
+Complete the two remaining Stage 7 manual gates for the exact candidate hash recorded in `docs/reviews/EXERCISE-1-SUBMISSION-VERIFICATION.md`: clean Windows 10 execution and unauthenticated public access after Nitzan changes repository visibility manually. Then stop for Nitzan's explicit final approval. Stage 6 and partial Stage 7 evidence do not authorize submission.
 
 ## Remaining stages after Stage 5 acceptance
 

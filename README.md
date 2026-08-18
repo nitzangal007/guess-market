@@ -46,7 +46,7 @@ From the repository root on Windows, set `JAVA_HOME` to one Oracle JDK 25 instal
 .\build.bat
 ```
 
-The build writes only ignored output below `build/`, including JUnit XML reports, JAR inventories, extracted-process transcripts, and `build/distributions/guess-market-exercise-1.zip`. See [Build and run](docs/guides/BUILD-AND-RUN.md) for the complete artifact layout and verification contract.
+The build writes only ignored output below `build/`, including JUnit XML reports, JAR inventories, extracted-process transcripts, and `build/distributions/211722525-submission.zip`. See [Build and run](docs/guides/BUILD-AND-RUN.md) for the complete artifact layout and verification contract.
 
 ## Documentation
 

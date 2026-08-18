@@ -2173,7 +2173,7 @@ build/
   verification/
     extracted-package/
   distributions/
-    guess-market-exercise-1.zip
+    211722525-submission.zip
 ```
 
 - Production classes and test classes have separate output roots so test code cannot enter application JARs.
@@ -2218,7 +2218,7 @@ Class-Path: lib/guessmarket-engine.jar lib/guessmarket-dto.jar
 - UI JAR contains UI production classes and the approved custom manifest.
 - JAR creation uses Java 25 `jar --create --file`, `--manifest` for UI, and `-C` to place classes and resources at archive-relative roots.
 - Clean staging copies only D-063's approved files from controlled inputs, freshly created application JARs, and the five exact JAXB runtime JARs.
-- The final archive is created with `jar --create --no-manifest --file build\distributions\guess-market-exercise-1.zip -C build\staging\guess-market-exercise-1 .`.
+- The final archive is created with `jar --create --no-manifest --file build\distributions\211722525-submission.zip -C build\staging .`.
 - `--no-manifest` prevents an unwanted root `META-INF/MANIFEST.MF`, and `-C` exposes D-063's files directly at ZIP root without another wrapper directory.
 - `build.bat` produces only a candidate under `build/distributions`. It never automatically writes to `submissions` or Drive. Copying the verified artifact into a durable submission snapshot requires later explicit approval.
 
