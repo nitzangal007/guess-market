@@ -59,9 +59,9 @@ To run the packaged application, extract the archive and run `run.bat` from the 
 
 ## Technical documentation
 
+- [Architecture](docs/design/ARCHITECTURE.md)
 - [Build and run](docs/guides/BUILD-AND-RUN.md)
 - [Testing](docs/guides/TESTING.md)
-- [JAXB and XML](docs/guides/JAXB-AND-XML.md)
 
 ## License
 
