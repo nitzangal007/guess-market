@@ -35,7 +35,7 @@ Each module is packaged as a separate JAR. The UI JAR is the executable applicat
 
 All required JAXB runtime dependencies are included in the repository. The build does not download dependencies.
 
-## Build and run
+## Build and run from source
 
 From the repository root in Windows PowerShell, set `JAVA_HOME` to an Oracle JDK 25 installation and run:
 
@@ -44,9 +44,11 @@ $env:JAVA_HOME = 'C:\Program Files\Java\jdk-25.0.4'
 .\build.bat
 ```
 
-The build compiles the three modules, runs the automated tests, creates the JAR files, and creates a submission archive under `build\distributions`.
+The build compiles the three modules, runs the automated tests, creates the application JARs, and assembles a runnable distribution.
 
-To run the packaged application, extract the archive and run `run.bat` from the extracted folder.
+The `packaging/run.bat` file in the repository is a packaging input. It becomes directly runnable only after it is placed next to the generated UI JAR in the assembled distribution.
+
+For an already packaged distribution, no build step is required: extract the package and run `run.bat`.
 
 ## Project layout
 
@@ -55,7 +57,7 @@ To run the packaged application, extract the archive and run `run.bat` from the 
 - `modules/guessmarket-ui` - console application
 - `packaging` - manifest and runtime launcher inputs
 - `tools` - required JAXB and test dependencies
-- `build.bat` - reproducible Windows build and package entry point
+- `build.bat` - reproducible Windows source build and verification entry point
 
 ## Technical documentation
 
