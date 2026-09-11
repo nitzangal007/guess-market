@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="guessmarket.ui.javafx.MainController" stylesheets="@main.css">
+    <top>
+        <VBox spacing="12" styleClass="header">
+            <HBox spacing="18" alignment="CENTER_LEFT">
+                <VBox spacing="4"><Label text="Guess Market" styleClass="brand"/><Label text="TRADING TERMINAL" styleClass="muted"/></VBox>
+                <Label fx:id="loadedPath" text="No file loaded" styleClass="file-path"
+                       wrapText="true" minWidth="0" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="fileDetails" text="File details" onAction="#showFileDetails"/>
+                <Button fx:id="loadButton" text="Load File" onAction="#chooseFile" styleClass="primary"
+                        minWidth="-Infinity"/>
+            </HBox>
+            <ProgressBar fx:id="loadProgress" maxWidth="Infinity" visible="false" managed="false"/>
+            <Label fx:id="loadError" styleClass="error" wrapText="true" maxWidth="Infinity"
+                   visible="false" managed="false"/>
+        </VBox>
+    </top>
+    <center>
+        <TabPane fx:id="navigation" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Events">
+                    <ScrollPane fx:id="eventsScroll" fitToWidth="true" hbarPolicy="NEVER" pannable="true">
+                        <content>
+                            <VBox spacing="18" fillWidth="true">
+                                <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+                                <VBox fx:id="eventCatalogue" spacing="16">
+                                    <HBox alignment="CENTER_LEFT" spacing="12">
+                                        <Label text="Events" styleClass="section-title"/>
+                                        <Label fx:id="eventCount" text="0 events" styleClass="muted"/>
+                                    </HBox>
+                                    <Label fx:id="emptyMessage" text="Load an EX2 XML file to explore its events."
+                                           styleClass="muted" wrapText="true"/>
+                                    <FlowPane hgap="10" vgap="10" minWidth="0">
+                                        <VBox spacing="4"><Label text="Method" styleClass="muted"/><ComboBox fx:id="methodFilter"/></VBox>
+                                        <VBox spacing="4"><Label text="Status" styleClass="muted"/><ComboBox fx:id="statusFilter"/></VBox>
+                                        <VBox spacing="4"><Label text="Commission" styleClass="muted"/><ComboBox fx:id="commissionFilter"/></VBox>
+                                    </FlowPane>
+                                    <FlowPane fx:id="eventCards" hgap="14" vgap="14" minWidth="0"/>
+                                </VBox>
+                                <VBox fx:id="details" spacing="18" minWidth="0" fillWidth="true" visible="false" managed="false"/>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </Tab>
+                <Tab fx:id="usersTab" text="Users" disable="true"><content><fx:include source="users.fxml"/></content></Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>
