@@ -24,7 +24,9 @@ final class EventDetailsView extends VBox {
         TabPane sections=new TabPane();sections.setId(prefix+"eventSections");
         sections.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         sections.getTabs().add(tab("Overview",overview(event,prefix)));
-        if(user!=null && event.lmsrTrading().isPresent())sections.getTabs().add(tab("Your position",position(event,user)));
+        if(event.orderBook().isPresent())sections.getTabs().add(tab("Order books",OrderBookView.books(event)));
+        if(user==null&&event.orderBook().isPresent())sections.getTabs().add(tab("Participants",OrderBookView.participants(event)));
+        if(user!=null)sections.getTabs().add(tab("Your position",event.orderBook().isPresent()?OrderBookView.position(event,user):position(event,user)));
         sections.getTabs().add(tab("Trade history",history(event,user)));
         sections.getTabs().add(tab("Settlement",settlement(event)));
         getChildren().add(sections);
@@ -46,7 +48,7 @@ final class EventDetailsView extends VBox {
         if(event.pricing() instanceof OrderBookConfiguration book){
             box.getChildren().addAll(label("Opening investment: "+book.initial()+"  /  Base value (d): "+book.d(),"description"),
                     label("Automatic mint: "+(book.allowMint()?"Enabled":"Disabled"),"description"),
-                    label("Order Book trading is not available yet. No orders have been submitted.","muted"));
+                    label("Issued pairs: "+event.orderBook().orElseThrow().issuedPairs()+" / Waiting orders: "+event.orderBook().orElseThrow().orders().size(),"muted"));
         }
         FlowPane outcomes=new FlowPane(18,18);
         for(int i=0;i<2;i++){
@@ -83,6 +85,7 @@ final class EventDetailsView extends VBox {
         return box;
     }
     private static VBox history(EventSnapshot event,UserSnapshot user){
+        if(event.orderBook().isPresent())return OrderBookView.history(event,user);
         VBox box=new VBox(16);
         if(event.lmsrTrading().isEmpty()){box.getChildren().add(label("Order Book trading is not available yet.","muted"));return box;}
         List<PurchaseEntry> all=event.lmsrTrading().orElseThrow().newestFirstHistory();
@@ -101,7 +104,7 @@ final class EventDetailsView extends VBox {
         }else table.getItems().setAll(all);
         box.getChildren().addAll(label("Trade history, newest first","subheading"),table);return box;
     }
-    private static <T> void column(TableView<T> table,String name,java.util.function.Function<T,String> value,double width){
+    static <T> void column(TableView<T> table,String name,java.util.function.Function<T,String> value,double width){
         TableColumn<T,String> column=new TableColumn<>(name);
         column.setCellValueFactory(cell->new ReadOnlyStringWrapper(value.apply(cell.getValue())));
         column.setCellFactory(ignored->new TableCell<>(){
@@ -114,7 +117,7 @@ final class EventDetailsView extends VBox {
     }
     private static VBox settlement(EventSnapshot event){
         VBox box=new VBox(16);
-        var settled=event.lmsrTrading().flatMap(LmsrTradingSnapshot::settlement);
+        var settled=event.orderBook().isPresent()?event.orderBook().orElseThrow().settlement():event.lmsrTrading().flatMap(LmsrTradingSnapshot::settlement);
         if(settled.isEmpty()){
             box.getChildren().add(label(event.status()==WorldEventStatus.ACTIVE?
                     "This event is still active. Final payouts will appear here after it closes.":
@@ -123,14 +126,16 @@ final class EventDetailsView extends VBox {
         var s=settled.orElseThrow();
         box.getChildren().addAll(label("Winning outcome: "+s.winningLabel(),"subheading"),
                 new FlowPane(30,18,metric("Gross payouts",money(s.totalGrossPayout())),
-                        metric("Closing fees",money(s.totalCommission())),metric("Subsidy returned",money(s.subsidyRefund()))));
+                        metric("Closing fees",money(s.totalCommission()))));
+        if(event.orderBook().isEmpty())box.getChildren().add(metric("Subsidy returned",money(s.subsidyRefund())));
+        else box.getChildren().add(label("Winning shares pay "+((OrderBookConfiguration)event.pricing()).d()+" each. Waiting orders are cancelled and reservations released.","muted"));
         TableView<SettlementPayment> table=new TableView<>();table.setId("settlementPayments");
         column(table,"Recipient",SettlementPayment::userName,160);
         column(table,"Winning shares",p->Integer.toString(p.winningShares()),160);
         column(table,"Gross",p->money(p.grossPayout()),115);column(table,"Fee",p->money(p.commission()),100);
         column(table,"Net payout",p->money(p.netPayout()),120);
         table.getItems().setAll(s.payments());table.setPrefHeight(260);
-        table.setPlaceholder(label("No winning shares. The unused subsidy returns to the market maker.","muted"));
+        table.setPlaceholder(label(event.orderBook().isPresent()?"No winning holdings. No payout is due.":"No winning shares. The unused subsidy returns to the market maker.","muted"));
         box.getChildren().add(table);return box;
     }
     static Label label(String text,String style){

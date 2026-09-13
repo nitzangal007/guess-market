@@ -6,7 +6,8 @@ public final class WorldCommandException extends Exception {
     public enum Code {
         USER_NOT_FOUND, EVENT_NOT_FOUND, NOT_OWNER, WRONG_METHOD,
         WRONG_STATUS, INSUFFICIENT_FUNDS, STALE_WORLD,
-        USER_BLOCKED, INVALID_OPTION, INVALID_QUANTITY, FINANCIAL_CALCULATION_FAILED
+        USER_BLOCKED, INVALID_OPTION, INVALID_QUANTITY, FINANCIAL_CALCULATION_FAILED,
+        POLICY_PENDING, INVALID_ORDER, SELF_MATCH_REJECTED
     }
     private final Code code;
     public WorldCommandException(Code code, String detail) {

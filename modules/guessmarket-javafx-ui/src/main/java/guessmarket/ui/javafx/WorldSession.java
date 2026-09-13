@@ -6,6 +6,10 @@ import guessmarket.dto.world.PurchasePreview;
 import guessmarket.dto.world.PurchaseResult;
 import guessmarket.dto.world.ClosePreview;
 import guessmarket.dto.world.CloseResult;
+import guessmarket.dto.world.OrderRequest;
+import guessmarket.dto.world.OrderPreview;
+import guessmarket.dto.world.OrderResult;
+import guessmarket.dto.world.OrderBookConfiguration;
 import guessmarket.engine.EngineOperationException;
 import guessmarket.engine.GuessMarketWorldEngine;
 import guessmarket.engine.WorldCommandException;
@@ -37,14 +41,16 @@ final class WorldSession implements AutoCloseable {
     private OpeningPreview pendingOpening;
     private PurchasePreview pendingPurchase;
     private ClosePreview pendingClose;
+    private OrderPreview pendingOrder;
     private final ReadOnlyStringWrapper notice = new ReadOnlyStringWrapper("");
     private boolean closed;
     private boolean preserveSelections;
+    private boolean transientError;
 
     WorldSession(GuessMarketWorldEngine engine) { this.engine = Objects.requireNonNull(engine); }
     void load(Path path) {
         requireFxThread();
-        if (path == null || !begin()) return;
+        if (path == null || !begin(false)) return;
         Path absolute = path.toAbsolutePath().normalize();
         Task<WorldSnapshot> task = new Task<>() {
             @Override protected WorldSnapshot call() throws Exception {
@@ -66,10 +72,11 @@ final class WorldSession implements AutoCloseable {
     }
     void previewOpening(String actingUser, int eventId, Consumer<OpeningPreview> showDialog) {
         requireFxThread();
-        if (!begin()) return;
+        if (!begin(true)) return;
+        boolean book=isOrderBook(eventId);
         execute(new Task<OpeningPreview>() {
             @Override protected OpeningPreview call() throws Exception {
-                return engine.previewLmsrOpening(actingUser, eventId);
+                return book?engine.previewOrderBookOpening(actingUser,eventId):engine.previewLmsrOpening(actingUser, eventId);
             }
         }, preview -> {
             pendingOpening = preview;
@@ -83,9 +90,11 @@ final class WorldSession implements AutoCloseable {
         OpeningPreview preview = pendingOpening;
         pendingOpening = null;
         if (!confirmed) { finish(); return; }
+        boolean book=isOrderBook(preview.eventId());
         execute(new Task<WorldSnapshot>() {
             @Override protected WorldSnapshot call() throws Exception {
-                return engine.openLmsrEvent(preview.actingUser(), preview.eventId(), preview.worldRevision());
+                return book?engine.openOrderBookEvent(preview.actingUser(),preview.eventId(),preview.worldRevision()):
+                        engine.openLmsrEvent(preview.actingUser(), preview.eventId(), preview.worldRevision());
             }
         }, snapshot -> {
             preserveSelections = true;
@@ -96,7 +105,7 @@ final class WorldSession implements AutoCloseable {
     boolean preserveSelections() { return preserveSelections; }
     void previewPurchase(String user,int eventId,int option,int quantity,Consumer<PurchasePreview> showDialog) {
         requireFxThread();
-        if (!begin()) return;
+        if (!begin(true)) return;
         execute(new Task<PurchasePreview>() {
             @Override protected PurchasePreview call() throws Exception {
                 return engine.previewLmsrPurchase(user,eventId,option,quantity);
@@ -123,9 +132,10 @@ final class WorldSession implements AutoCloseable {
     }
     void previewClose(String user,int eventId,int winner,Consumer<ClosePreview> showDialog) {
         requireFxThread();
-        if (!begin()) return;
+        if (!begin(true)) return;
+        boolean book=isOrderBook(eventId);
         execute(new Task<ClosePreview>() {
-            @Override protected ClosePreview call() throws Exception { return engine.previewLmsrClose(user,eventId,winner); }
+            @Override protected ClosePreview call() throws Exception { return book?engine.previewOrderBookClose(user,eventId,winner):engine.previewLmsrClose(user,eventId,winner); }
         }, preview -> { pendingClose=preview; showDialog.accept(preview); });
     }
     void completeClose(boolean confirmed) {
@@ -134,9 +144,11 @@ final class WorldSession implements AutoCloseable {
         ClosePreview preview=pendingClose;
         pendingClose=null;
         if (!confirmed) { finish(); return; }
+        boolean book=isOrderBook(preview.eventId());
         execute(new Task<CloseResult>() {
             @Override protected CloseResult call() throws Exception {
-                return engine.closeLmsrEvent(preview.actingUser(),preview.eventId(),preview.winningOption(),preview.worldRevision());
+                return book?engine.closeOrderBookEvent(preview.actingUser(),preview.eventId(),preview.winningOption(),preview.worldRevision()):
+                        engine.closeLmsrEvent(preview.actingUser(),preview.eventId(),preview.winningOption(),preview.worldRevision());
             }
         }, result -> {
             notice.set("Event closed. Winner: "+result.settlement().winningLabel()+". Payouts and market-maker receipts are complete.");
@@ -148,10 +160,32 @@ final class WorldSession implements AutoCloseable {
         try { world.set(snapshot); }
         finally { preserveSelections=false; finish(); }
     }
-    private boolean begin() {
+    void previewOrder(OrderRequest request,Consumer<OrderPreview> showDialog){
+        requireFxThread();if(!begin(true))return;
+        execute(new Task<OrderPreview>(){
+            @Override protected OrderPreview call()throws Exception{return engine.previewOrder(request);}
+        },preview->{pendingOrder=preview;showDialog.accept(preview);});
+    }
+    void completeOrder(boolean confirmed){
+        requireFxThread();if(closed||pendingOrder==null)return;
+        var preview=pendingOrder;pendingOrder=null;
+        if(!confirmed){finish();return;}
+        execute(new Task<OrderResult>(){
+            @Override protected OrderResult call()throws Exception{return engine.submitOrder(preview.request(),preview.worldRevision());}
+        },result->{
+            var execution=result.execution();
+            notice.set("Order completed for "+execution.request().userName()+". Final cash: "+EventDetailsView.money(execution.balanceAfter())
+                    +". Unfilled quantity: "+execution.incomingRemaining()+". Cancelled waiting orders across affected accounts: "+execution.cancelledOrderCount()
+                    +(execution.blockedAfter()?". This account is blocked until a positive receipt leaves cash above zero.":"."));
+            publishMutation(result.world());
+        });
+    }
+    private boolean isOrderBook(int id){return world.get().events().stream().anyMatch(e->e.id()==id&&e.pricing() instanceof OrderBookConfiguration);}
+    private boolean begin(boolean commandFeedback) {
         if (busy.get() || closed) return false;
         error.set("");
         notice.set("");
+        transientError=commandFeedback;
         busy.set(true);
         return true;
     }
@@ -187,6 +221,7 @@ final class WorldSession implements AutoCloseable {
         pendingOpening = null;
         pendingPurchase = null;
         pendingClose = null;
+        pendingOrder = null;
     }
     @Override public void close() {
         requireFxThread();
@@ -202,6 +237,11 @@ final class WorldSession implements AutoCloseable {
     ReadOnlyStringProperty errorProperty() { return error.getReadOnlyProperty(); }
     ReadOnlyStringProperty noticeProperty() { return notice.getReadOnlyProperty(); }
     void dismissNotice() { requireFxThread(); notice.set(""); }
+    void dismissTransientFeedback() {
+        requireFxThread();
+        notice.set("");
+        if(transientError)error.set("");
+    }
     ReadOnlyObjectProperty<WorldSnapshot> worldProperty() { return world.getReadOnlyProperty(); }
     private static void requireFxThread() {
         if (!Platform.isFxApplicationThread()) throw new IllegalStateException("Use the FX application thread");

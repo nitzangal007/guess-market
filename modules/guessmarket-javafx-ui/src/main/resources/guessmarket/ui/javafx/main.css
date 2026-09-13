@@ -56,3 +56,5 @@
 .user-sections .toggle-button { -fx-border-width: 0 0 3 0; -fx-border-color: transparent; }
 .user-sections .toggle-button:selected { -fx-background-color: #203e2f; -fx-text-fill: #98efb8; -fx-border-color: #98efb8; }
 .review-field { -fx-padding: 10 0; -fx-border-color: #32463f; -fx-border-width: 0 0 1 0; }
+.order-panel { -fx-background-color: #142226; -fx-border-color: #32463f; -fx-padding: 16; }
+.table-view:focused { -fx-border-color: #98efb8; -fx-border-width: 2; }

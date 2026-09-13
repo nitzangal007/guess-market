@@ -14,6 +14,54 @@ public final class MarketWorld {
         this.events = Collections.unmodifiableMap(new LinkedHashMap<>(events));
         this.users = Collections.unmodifiableMap(new LinkedHashMap<>(users));
     }
+    OrderBookOperations.Candidate planOrder(OrderRequest request,long revision)throws WorldCommandException {
+        return new OrderBookOperations(events,users).order(request,revision);
+    }
+    ClosePreview previewOrderBookClose(String actor,int eventId,int winner,long revision)throws WorldCommandException {
+        return new OrderBookOperations(events,users).previewClose(actor,eventId,winner,revision);
+    }
+    MarketWorld closeOrderBookEvent(String actor,int eventId,int winner,long revision)throws WorldCommandException {
+        return new OrderBookOperations(events,users).close(actor,eventId,winner,revision);
+    }
+    OpeningPreview previewOrderBookOpening(String actingUser,int eventId,long revision)
+            throws WorldCommandException {
+        MarketUser user=users.get(actingUser);
+        if(user==null)throw new WorldCommandException(USER_NOT_FOUND,"The acting user does not exist.");
+        requireUnblocked(user);
+        WorldEvent event=events.get(eventId);
+        if(event==null)throw new WorldCommandException(EVENT_NOT_FOUND,"The event does not exist.");
+        if(!event.marketMakerName().equals(actingUser))
+            throw new WorldCommandException(NOT_OWNER,"Only this event's market maker may open it.");
+        if(!(event.pricing() instanceof OrderBookConfiguration book))
+            throw new WorldCommandException(WRONG_METHOD,"This opening flow supports Order Book events only.");
+        if(event.status()!=WorldEventStatus.NOT_STARTED)
+            throw new WorldCommandException(WRONG_STATUS,"This event has already been opened or closed.");
+        if(book.initial()%book.d()!=0)
+            throw new WorldCommandException(INVALID_QUANTITY,
+                    "Opening requires whole pairs. Initial funding must be a multiple of "+book.d()+".");
+        if(user.currentBalance()<book.initial())
+            throw new WorldCommandException(INSUFFICIENT_FUNDS,"The market maker has insufficient funds to open this event.");
+        double balanceAfter=representedDebit(user.currentBalance(),book.initial());
+        return new OpeningPreview(revision,eventId,event.name(),actingUser,user.currentBalance(),
+                book.initial(),balanceAfter);
+    }
+    MarketWorld openOrderBookEvent(String actingUser,int eventId) throws WorldCommandException {
+        OpeningPreview preview=previewOrderBookOpening(actingUser,eventId,0);
+        MarketUser user=users.get(actingUser);
+        WorldEvent event=events.get(eventId);
+        var book=(OrderBookConfiguration)event.pricing();
+        var nextUsers=new LinkedHashMap<>(users);
+        var nextEvents=new LinkedHashMap<>(events);
+        nextUsers.put(actingUser,new MarketUser(actingUser,preview.balanceAfterOpening(),user.ownedEventIds(),user.blocked()));
+        nextEvents.put(eventId,new WorldEvent(event.id(),event.name(),event.description(),event.options(),
+                event.commission(),event.commissionMode(),event.marketMakerName(),event.pricing(),
+                WorldEventStatus.ACTIVE,preview.requiredFunding(),null,
+                OrderBookState.opened(actingUser,book.initial()/book.d()).withLedger(new OrderBookLedger(
+                    java.util.List.of(),java.util.List.of(),java.util.List.of(new OrderBookLedger.Flow(actingUser,0,
+                    OrderBookLedger.Kind.FUNDING,java.math.BigDecimal.valueOf(book.initial()))),
+                    java.util.List.of(actingUser),java.util.Optional.empty()))));
+        return new MarketWorld(nextEvents,nextUsers);
+    }
     OpeningPreview previewLmsrOpening(String actingUser, int eventId, long revision)
             throws WorldCommandException {
         MarketUser user = users.get(actingUser);
@@ -31,7 +79,7 @@ public final class MarketWorld {
         if (user.currentBalance() < funding)
             throw new WorldCommandException(INSUFFICIENT_FUNDS, "The market maker has insufficient funds to open this event.");
         return new OpeningPreview(revision, eventId, event.name(), actingUser,
-                user.currentBalance(), funding, user.currentBalance() - funding);
+                user.currentBalance(), funding, representedDebit(user.currentBalance(),funding));
     }
     MarketWorld openLmsrEvent(String actingUser, int eventId) throws WorldCommandException {
         OpeningPreview preview = previewLmsrOpening(actingUser, eventId, 0);
@@ -74,7 +122,7 @@ public final class MarketWorld {
             double total = finite(base+fee);
             boolean self = actingUser.equals(event.marketMakerName());
             double receipt = self ? fee : 0;
-            double afterDebit = finite(buyer.currentBalance() - total);
+            double afterDebit = representedDebit(buyer.currentBalance(),total);
             double after = finite(afterDebit + receipt);
             // User revision September 11: gross debit blocks, then a positive-cash receipt restores access.
             boolean becomesBlocked = afterDebit < 0 && !(receipt > 0 && after > 0);
@@ -109,6 +157,7 @@ public final class MarketWorld {
                 event.commission(),event.commissionMode(),event.marketMakerName(),event.pricing(),event.status(),
                 event.contractBalance()+preview.shareCost(),
                 event.trading().purchased(actingUser,option,quantity,preview.shareCost(),preview.commission())));
+        OrderBookOperations.cancelBlocked(nextEvents,nextUsers);
         return new MarketWorld(nextEvents,nextUsers);
     }
     ClosePreview previewLmsrClose(String actingUser,int eventId,int winner,long revision) throws WorldCommandException {
@@ -188,6 +237,13 @@ public final class MarketWorld {
         if (!Double.isFinite(value)) throw new ArithmeticException("Nonfinite account result");
         return value;
     }
+    private static double representedDebit(double balance,double funding) throws WorldCommandException {
+        double after=finite(balance-funding);
+        if(funding>0&&Double.compare(after,balance)==0)
+            throw new WorldCommandException(FINANCIAL_CALCULATION_FAILED,
+                    "The debit cannot be represented against this account balance. No cash or shares were transferred.");
+        return after;
+    }
     public WorldSnapshot snapshot() {
         return new WorldSnapshot(events.values().stream().map(WorldEvent::snapshot).toList(),
                 users.values().stream().map(this::userSnapshot).toList());
@@ -199,6 +255,15 @@ public final class MarketWorld {
     private UserSnapshot userSnapshot(MarketUser user) {
         var positions = new java.util.ArrayList<UserEventPosition>();
         for (WorldEvent event : events.values()) {
+            if(event.orderBook()!=null){
+                var book=event.orderBook().snapshot(((OrderBookConfiguration)event.pricing()).d());
+                if(book.participants().contains(user.name())){
+                    var position=book.positions().stream().filter(p->p.userName().equals(user.name())).findFirst().orElseThrow();
+                    double paid=position.purchases().add(position.funding()).doubleValue();
+                    double fee=position.commissionsPaid().doubleValue();
+                    positions.add(new UserEventPosition(event.id(),position.optionOneShares(),position.optionTwoShares(),paid,fee,paid+fee));
+                }
+            }
             if (event.trading() == null) continue;
             int one=0, two=0; double base=0, fee=0;
             for (var trade : event.trading().history()) {

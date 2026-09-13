@@ -5,6 +5,7 @@ import guessmarket.dto.world.EventSnapshot;
 import guessmarket.dto.world.PricingConfiguration;
 import guessmarket.dto.world.WorldEventStatus;
 import guessmarket.dto.world.LmsrConfiguration;
+import guessmarket.dto.world.OrderBookConfiguration;
 import java.util.Optional;
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +14,15 @@ import java.util.Objects;
 public record WorldEvent(int id, String name, String description, List<String> options,
                          int commission, CommissionMode commissionMode,
                          String marketMakerName, PricingConfiguration pricing,
-                         WorldEventStatus status, double contractBalance, LmsrTradingState trading) {
+                         WorldEventStatus status, double contractBalance, LmsrTradingState trading,
+                         OrderBookState orderBook) {
+    public WorldEvent(int id, String name, String description, List<String> options,
+                      int commission, CommissionMode commissionMode, String marketMakerName,
+                      PricingConfiguration pricing, WorldEventStatus status, double contractBalance,
+                      LmsrTradingState trading) {
+        this(id,name,description,options,commission,commissionMode,marketMakerName,pricing,status,
+                contractBalance,trading,pricing instanceof OrderBookConfiguration ? OrderBookState.empty() : null);
+    }
     public WorldEvent(int id, String name, String description, List<String> options,
                       int commission, CommissionMode commissionMode, String marketMakerName,
                       PricingConfiguration pricing, WorldEventStatus status, double contractBalance) {
@@ -36,6 +45,8 @@ public record WorldEvent(int id, String name, String description, List<String> o
         Objects.requireNonNull(status);
         if ((pricing instanceof LmsrConfiguration) != (trading != null))
             throw new IllegalArgumentException("Trading state must match the pricing method");
+        if ((pricing instanceof OrderBookConfiguration) != (orderBook != null))
+            throw new IllegalArgumentException("Order Book state must match the pricing method");
         if (options.size() != 2 || commission < 0 || commission > 90
                 || !Double.isFinite(contractBalance) || contractBalance < 0)
             throw new IllegalArgumentException("Invalid event definition or balance");
@@ -44,6 +55,7 @@ public record WorldEvent(int id, String name, String description, List<String> o
         return new EventSnapshot(id, name, description, options, commission, commissionMode,
                 status, marketMakerName, contractBalance, pricing,
                 pricing instanceof LmsrConfiguration lmsr
-                        ? Optional.of(trading.snapshot(id,options,lmsr.b())) : Optional.empty());
+                        ? Optional.of(trading.snapshot(id,options,lmsr.b())) : Optional.empty(),
+                Optional.ofNullable(orderBook).map(book->book.snapshot(((OrderBookConfiguration)pricing).d())));
     }
 }

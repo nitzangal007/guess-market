@@ -39,18 +39,22 @@ final class CloseDialog {
         dialog.show();
     }
     static void show(Window owner,ClosePreview preview,Consumer<Boolean> decision) {
+        show(owner,preview,false,decision);
+    }
+    static void show(Window owner,ClosePreview preview,boolean orderBook,Consumer<Boolean> decision) {
         Dialog<Boolean> dialog=new Dialog<>();
         PurchaseDialog.setup(dialog,owner,"Review payouts",preview.eventName()+" | Acting as "+preview.actingUser()
                 +" | Winner: "+preview.winningLabel(),"closeDialog");
         VBox rows=new VBox(12);
         rows.getChildren().add(EventDetailsView.label("Closing ends trading permanently.","warning"));
-        if(preview.payments().isEmpty())rows.getChildren().add(EventDetailsView.label("No winning shares. The contract funds return to the market maker.","muted"));
+        if(preview.payments().isEmpty())rows.getChildren().add(EventDetailsView.label(orderBook?"No winning holdings. No payout is due.":"No winning shares. The contract funds return to the market maker.","muted"));
         for(var payment:preview.payments())rows.getChildren().add(PurchaseDialog.field(payment.userName(),
                 "Shares: "+payment.winningShares()+" | Gross: "+EventDetailsView.money(payment.grossPayout())
                 +" | Fee: "+EventDetailsView.money(payment.commission())+" | Net payout: "+EventDetailsView.money(payment.netPayout()),"payout-"+payment.userName()));
         rows.getChildren().addAll(PurchaseDialog.field("Total gross payouts",EventDetailsView.money(preview.totalGrossPayout()),"closingGross"),
-                PurchaseDialog.field("Closing fees to market maker",EventDetailsView.money(preview.totalCommission()),"closingFees"),
-                PurchaseDialog.field("Unused subsidy returned to market maker",EventDetailsView.money(preview.subsidyRefund()),"closingRefund"));
+                PurchaseDialog.field("Closing fees to market maker",EventDetailsView.money(preview.totalCommission()),"closingFees"));
+        if(!orderBook)rows.getChildren().add(PurchaseDialog.field("Unused subsidy returned to market maker",EventDetailsView.money(preview.subsidyRefund()),"closingRefund"));
+        else rows.getChildren().add(EventDetailsView.label("All remaining orders will be cancelled and SELL reservations released. Winning holdings consume the pair backing; no unused subsidy is returned.","muted"));
         ScrollPane scroll=new ScrollPane(rows);scroll.setFitToWidth(true);scroll.setPrefViewportHeight(380);
         dialog.getDialogPane().setContent(scroll);
         PurchaseDialog.confirm(dialog,"Close event and pay out",decision);

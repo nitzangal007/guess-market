@@ -91,7 +91,7 @@ final class LmsrSettlementTest {
         assertThrows(ArithmeticException.class,()->LmsrSettlementRounding.verify(badQuantity));
     }
     @Test void boundedLegitimateSequenceMatrixSettlesBothOutcomes() throws Exception {
-        int cases=0,trades=0,reconciliations=0;
+        int cases=0,trades=0,reconciliations=0,rejectedDebits=0,rejectedPrices=0;
         java.math.BigDecimal maxDeficit=java.math.BigDecimal.ZERO,maxBound=java.math.BigDecimal.ZERO;
         for(int b:new int[]{1,2,3,5,10,100,1000,Integer.MAX_VALUE})
         for(int step:new int[]{1,3,7})
@@ -104,7 +104,25 @@ final class LmsrSettlementTest {
             var random=new java.util.Random(7381);
             for(int i=0;i<count;i++) {
                 int option=switch(pattern) { case 0->1;case 1->2;case 2->i%2+1;case 3->(i/4)%2+1;default->random.nextInt(2)+1; };
-                world=world.purchaseLmsrShares("Buyer",1,option,step);trades++;
+                var checkpoint=world.snapshot();
+                var quantities=checkpoint.events().getFirst().lmsrTrading().orElseThrow();
+                double cost;
+                try{cost=LmsrCalculator.purchaseCost(option==1?quantities.quantityOne():quantities.quantityTwo(),
+                        option==1?quantities.quantityTwo():quantities.quantityOne(),step,b);}catch(ArithmeticException unrepresentablePrice){
+                    final var unchanged=world;
+                    assertEquals(WorldCommandException.Code.FINANCIAL_CALCULATION_FAILED,assertThrows(WorldCommandException.class,
+                            ()->unchanged.purchaseLmsrShares("Buyer",1,option,step)).getCode());
+                    assertEquals(checkpoint,world.snapshot());rejectedPrices++;continue;
+                }
+                double total=cost+new CommissionPolicy(mode,5).purchaseCommission(cost);
+                double cash=checkpoint.users().stream().filter(u->u.name().equals("Buyer")).findFirst().orElseThrow().currentBalance();
+                if(cash-total==cash){
+                    // R6: a positive price is not payable if its gross account debit disappears.
+                    final var unchanged=world;
+                    assertEquals(WorldCommandException.Code.FINANCIAL_CALCULATION_FAILED,assertThrows(WorldCommandException.class,
+                            ()->unchanged.purchaseLmsrShares("Buyer",1,option,step)).getCode());
+                    assertEquals(checkpoint,world.snapshot());rejectedDebits++;
+                }else{world=world.purchaseLmsrShares("Buyer",1,option,step);trades++;}
             }
             var before=world.snapshot();
             var active=reconstruct(before.events().getFirst());
@@ -146,7 +164,8 @@ final class LmsrSettlementTest {
             }
         }
         System.out.println("R1 matrix: settlements="+cases+", trades="+trades+", reconciliations="+reconciliations
-                +", maximum actual adjustment="+maxDeficit+", maximum computed allowance="+maxBound);
+                +", rejected unrepresentable prices="+rejectedPrices+", rejected unrepresentable debits="+rejectedDebits+", maximum actual adjustment="+maxDeficit+", maximum computed allowance="+maxBound);
+        assertEquals(1920,cases);assertEquals(105120,trades+rejectedDebits+rejectedPrices);assertTrue(rejectedDebits>0);
         assertTrue(reconciliations>0);
     }
     @Test void potentialBoundsCoverSymmetryAndIntegerBoundary() {
@@ -163,6 +182,7 @@ final class LmsrSettlementTest {
     }
     @Test void integerLimitSequencesRetainPayoutsAndBlocking() throws Exception {
         var maximumDeficit=java.math.BigDecimal.ZERO;
+        int recoveredAccounts=0;
         for(int b:new int[]{1,3,100,Integer.MAX_VALUE}) {
             var event=new WorldEvent(1,"Boundary","Details",List.of("Yes","No"),0,CommissionMode.ON_PURCHASE,
                     "Owner",new LmsrConfiguration(b));
@@ -183,13 +203,22 @@ final class LmsrSettlementTest {
                     assertTrue(deficit.compareTo(proof.maximumAdjustment())<=0);
                     var after=world.closeLmsrEvent("Owner",1,winner).snapshot();
                     assertEquals(0,after.events().getFirst().contractBalance());
-                    for(var user:before.users())assertEquals(user.blocked(),after.users().stream()
-                            .filter(u->u.name().equals(user.name())).findFirst().orElseThrow().blocked());
+                    var receipts=new java.util.LinkedHashMap<String,Double>();
+                    for(var payment:preview.payments())receipts.merge(payment.userName(),payment.netPayout(),Double::sum);
+                    receipts.merge("Owner",preview.totalCommission()+preview.subsidyRefund(),Double::sum);
+                    for(var user:before.users()){
+                        double receipt=receipts.getOrDefault(user.name(),0.0);
+                        boolean expected=user.blocked()&&!(receipt>0&&user.currentBalance()+receipt>0);
+                        var settled=after.users().stream().filter(u->u.name().equals(user.name())).findFirst().orElseThrow();
+                        assertEquals(expected,settled.blocked());
+                        if(user.blocked()&&!settled.blocked())recoveredAccounts++;
+                    }
                 }
                 if(phase==0)world=world.purchaseLmsrShares("Other",1,2,Integer.MAX_VALUE);
             }
         }
-        System.out.println("R1 integer limits: settlements=16, maximum actual adjustment="+maximumDeficit);
+        assertTrue(recoveredAccounts>0);
+        System.out.println("R1 integer limits: settlements=16, recovered accounts="+recoveredAccounts+", maximum actual adjustment="+maximumDeficit);
     }
     @Test void publicCloseRejectsStalePreviewAndPublishesReceiptWithMatchingWorld() throws Exception {
         var engine=new GuessMarketWorldEngineImpl();

@@ -8,6 +8,42 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 final class LmsrPurchaseTest {
+    @org.junit.jupiter.api.io.TempDir java.nio.file.Path directory;
+    @Test void reachableHugeOrderBookReceiptRejectsLostLmsrDebitAtomically() throws Exception {
+        String events="";
+        for(int id=1;id<=3;id++) events+="<GM-event name=\"Boundary "+id+"\"><id>"+id+"</id><description>Cash boundary</description>"
+                +"<commission type=\"on-purchase\">0</commission><GM-options><GM-option>Yes</GM-option><GM-option>No</GM-option></GM-options><GM-method>"
+                +(id==3?"<GM-LMSR><b>1</b></GM-LMSR>":"<GM-order-book initial=\"0\" d=\"2147483647\" allow-mint=\"true\"/>")
+                +"</GM-method></GM-event>";
+        String xml="<Guess-Market><GM-events>"+events+"</GM-events><GM-users>"
+                +"<GM-user name=\"Owner\"><initial-cash>1000</initial-cash><GM-market-maker><event id=\"1\"/><event id=\"2\"/><event id=\"3\"/></GM-market-maker></GM-user>"
+                +"<GM-user name=\"A\"><initial-cash>1000</initial-cash></GM-user><GM-user name=\"B\"><initial-cash>1000</initial-cash></GM-user></GM-users></Guess-Market>";
+        var engine=new GuessMarketWorldEngineImpl();
+        engine.loadWorldFromXml(java.nio.file.Files.writeString(directory.resolve("boundary.xml"),xml));
+        engine.openLmsrEvent("Owner",3,engine.previewLmsrOpening("Owner",3).worldRevision());
+        for(int id:new int[]{1,2})engine.openOrderBookEvent("Owner",id,engine.previewOrderBookOpening("Owner",id).worldRevision());
+        var witness=new OrderRequest("B",2,1,OrderSide.BUY,1,new java.math.BigDecimal("1"));
+        engine.submitOrder(witness,engine.previewOrder(witness).worldRevision());
+        var opposite=new OrderRequest("A",1,2,OrderSide.BUY,Integer.MAX_VALUE,new java.math.BigDecimal("1073741823"));
+        engine.submitOrder(opposite,engine.previewOrder(opposite).worldRevision());
+        var winning=new OrderRequest("Owner",1,1,OrderSide.BUY,Integer.MAX_VALUE,new java.math.BigDecimal("1073741824"));
+        engine.submitOrder(winning,engine.previewOrder(winning).worldRevision());
+        engine.closeOrderBookEvent("Owner",1,1,engine.previewOrderBookClose("Owner",1,1).worldRevision());
+        var before=engine.getWorldSnapshot();
+        var owner=before.users().stream().filter(u->u.name().equals("Owner")).findFirst().orElseThrow();
+        assertTrue(owner.currentBalance()>2e18);assertFalse(owner.blocked());
+        assertEquals(1,before.events().get(1).orderBook().orElseThrow().orders().size());
+        long revision=engine.previewOrder(witness).worldRevision();
+        assertEquals(WorldCommandException.Code.FINANCIAL_CALCULATION_FAILED,assertThrows(WorldCommandException.class,
+                ()->engine.previewLmsrPurchase("Owner",3,1,1)).getCode());
+        assertEquals(before,engine.getWorldSnapshot());
+        assertEquals(revision,engine.previewOrder(witness).worldRevision());
+        assertEquals(WorldCommandException.Code.FINANCIAL_CALCULATION_FAILED,assertThrows(WorldCommandException.class,
+                ()->engine.purchaseLmsrShares("Owner",3,1,1,revision)).getCode());
+        assertEquals(before,engine.getWorldSnapshot());
+        assertEquals(revision,engine.previewOrder(witness).worldRevision());
+    }
+
     @Test void selfMakerGrossDebitRecoversWithPositiveCashAfterOwnCommission() throws Exception {
         double base=LmsrCalculator.purchaseCost(0,0,100,100), fee=base*.05;
         for(double cash:new double[]{base+fee/2,Math.nextDown(base+fee),base+fee}) {

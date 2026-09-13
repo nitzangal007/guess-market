@@ -9,7 +9,14 @@ public record EventSnapshot(int id, String name, String description, List<String
                             int commissionPercentage, CommissionMode commissionMode,
                             WorldEventStatus status, String marketMakerName,
                             double contractBalance, PricingConfiguration pricing,
-                            Optional<LmsrTradingSnapshot> lmsrTrading) {
+                            Optional<LmsrTradingSnapshot> lmsrTrading, Optional<OrderBookSnapshot> orderBook) {
+    public EventSnapshot(int id, String name, String description, List<String> optionLabels,
+                         int commissionPercentage, CommissionMode commissionMode, WorldEventStatus status,
+                         String marketMakerName, double contractBalance, PricingConfiguration pricing,
+                         Optional<LmsrTradingSnapshot> lmsrTrading) {
+        this(id,name,description,optionLabels,commissionPercentage,commissionMode,status,
+                marketMakerName,contractBalance,pricing,lmsrTrading,Optional.empty());
+    }
     public EventSnapshot(int id, String name, String description, List<String> optionLabels,
                          int commissionPercentage, CommissionMode commissionMode, WorldEventStatus status,
                          String marketMakerName, double contractBalance, PricingConfiguration pricing) {
@@ -28,6 +35,7 @@ public record EventSnapshot(int id, String name, String description, List<String
         Objects.requireNonNull(marketMakerName);
         Objects.requireNonNull(pricing);
         Objects.requireNonNull(lmsrTrading);
+        Objects.requireNonNull(orderBook);
         if (!Double.isFinite(contractBalance)) throw new IllegalArgumentException("Contract balance must be finite");
     }
 }

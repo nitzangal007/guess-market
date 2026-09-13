@@ -8,11 +8,51 @@ import guessmarket.dto.world.ClosePreview;
 import guessmarket.dto.world.CloseResult;
 import guessmarket.engine.xml.ex2.Ex2XmlWorldLoader;
 import java.nio.file.Path;
+import guessmarket.dto.world.OrderRequest;
+import guessmarket.dto.world.OrderPreview;
+import guessmarket.dto.world.OrderResult;
 
 public final class GuessMarketWorldEngineImpl implements GuessMarketWorldEngine {
     private final Ex2XmlWorldLoader loader = new Ex2XmlWorldLoader();
     private MarketWorld activeWorld;
     private long revision;
+
+    @Override public synchronized OrderPreview previewOrder(OrderRequest request)throws EngineOperationException,WorldCommandException {
+        requireWorld();return activeWorld.planOrder(request,revision).preview();
+    }
+    @Override public synchronized OrderResult submitOrder(OrderRequest request,long expectedWorldRevision)throws EngineOperationException,WorldCommandException {
+        requireWorld();requireRevision(expectedWorldRevision);
+        var candidate=activeWorld.planOrder(request,revision);
+        return new OrderResult(publish(candidate.world()),candidate.preview());
+    }
+    @Override public synchronized ClosePreview previewOrderBookClose(String actor,int eventId,int winner)throws EngineOperationException,WorldCommandException {
+        requireWorld();return activeWorld.previewOrderBookClose(actor,eventId,winner,revision);
+    }
+    @Override public synchronized CloseResult closeOrderBookEvent(String actor,int eventId,int winner,long expectedWorldRevision)throws EngineOperationException,WorldCommandException {
+        requireWorld();requireRevision(expectedWorldRevision);
+        var candidate=activeWorld.closeOrderBookEvent(actor,eventId,winner,revision);
+        var snapshot=candidate.snapshot();
+        var settlement=snapshot.events().stream().filter(e->e.id()==eventId).findFirst().orElseThrow().orderBook().orElseThrow().settlement().orElseThrow();
+        var result=new CloseResult(snapshot,settlement);
+        publish(candidate);return result;
+    }
+    private void requireRevision(long expected)throws WorldCommandException {
+        if(expected!=revision)throw new WorldCommandException(WorldCommandException.Code.STALE_WORLD,"The world changed. Review this operation again.");
+    }
+
+    @Override public synchronized OpeningPreview previewOrderBookOpening(String actingUser,int eventId)
+            throws EngineOperationException,WorldCommandException {
+        requireWorld();
+        return activeWorld.previewOrderBookOpening(actingUser,eventId,revision);
+    }
+    @Override public synchronized WorldSnapshot openOrderBookEvent(String actingUser,int eventId,long expectedWorldRevision)
+            throws EngineOperationException,WorldCommandException {
+        requireWorld();
+        if(expectedWorldRevision!=revision)
+            throw new WorldCommandException(WorldCommandException.Code.STALE_WORLD,
+                    "The world changed after this preview. Review the event again before opening.");
+        return publish(activeWorld.openOrderBookEvent(actingUser,eventId));
+    }
 
     @Override public synchronized WorldSnapshot loadWorldFromXml(Path path) throws EngineOperationException {
         MarketWorld candidate = loader.load(path);

@@ -32,7 +32,8 @@ final class InputDialogPresentationTest {
     }
     private void save(DialogPane pane,String name) throws Exception {
         pane.applyCss();pane.layout();
-        Path path=Path.of("private/coordination/assignment-2/ui-evidence-input-fix-"+System.getProperty("glass.win.uiScale","native"),name);
+        Path path=Path.of(System.getProperty("guessmarket.uiEvidenceDirectory",
+                "private/coordination/assignment-2/ui-evidence-input-fix-"+System.getProperty("glass.win.uiScale","native")),name);
         Files.createDirectories(path.getParent());
         var parameters=new javafx.scene.SnapshotParameters();
         double scale=pane.getScene().getWindow().getOutputScaleX();
@@ -89,4 +90,3 @@ final class InputDialogPresentationTest {
         });
     }
 }
-

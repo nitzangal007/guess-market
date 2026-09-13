@@ -17,7 +17,7 @@ final class OpeningDialog {
                 PurchaseDialog.field("Current balance",EventDetailsView.money(preview.currentBalance()),"openingBefore"),
                 PurchaseDialog.field("Required funding",EventDetailsView.money(preview.requiredFunding()),"openingFunding"),
                 PurchaseDialog.field("Balance after opening",EventDetailsView.money(preview.balanceAfterOpening()),"openingAfter"),
-                EventDetailsView.label("This transfers the opening subsidy to the event. No purchase commission is charged.","muted"));
+                EventDetailsView.label("This transfers the required opening funding to the event. No purchase commission is charged.","muted"));
         ScrollPane scroll=new ScrollPane(content);scroll.setFitToWidth(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);scroll.setPrefViewportHeight(300);
         dialog.getDialogPane().setContent(scroll);

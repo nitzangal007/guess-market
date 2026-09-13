@@ -20,6 +20,7 @@ final class MainController {
     @FXML private VBox details,eventCatalogue;
     @FXML private ScrollPane eventsScroll;
     @FXML private Tab usersTab;
+    @FXML private TabPane navigation;
     @FXML private ComboBox<String> methodFilter,statusFilter,commissionFilter;
     private final ToggleGroup selection=new ToggleGroup();
     private Integer displayedEventId;
@@ -38,6 +39,7 @@ final class MainController {
         loadButton.disableProperty().bind(session.busyProperty());
         eventCards.disableProperty().bind(session.busyProperty());
         usersTab.disableProperty().bind(session.worldProperty().map(world->world.users().isEmpty()));
+        navigation.getSelectionModel().selectedItemProperty().addListener((o,before,after)->session.dismissTransientFeedback());
         loadedPath.textProperty().bind(session.loadedPathProperty().map(path->path.isEmpty()?"No file loaded":Path.of(path).getFileName().toString()));
         fileDetails.disableProperty().bind(session.busyProperty().or(session.loadedPathProperty().isEmpty()));
         loadError.textProperty().bind(session.errorProperty());

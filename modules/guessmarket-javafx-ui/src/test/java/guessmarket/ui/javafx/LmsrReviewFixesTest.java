@@ -50,6 +50,7 @@ final class LmsrReviewFixesTest {
             view.user(2);
             view.act(()->view.session.previewPurchase("Menash",4,1,1,p->view.session.completePurchase(true)));
             FxTestSupport.fx(()->{
+                view.root.applyCss();view.root.layout();
                 assertEquals(2,((FlowPane)view.root.lookup("#userEventRows")).getChildren().size());
                 var marker=(Label)view.root.lookup("#participation-event-4");
                 assertNotNull(marker,"The user's non-first participating event must be identifiable without activating every card");

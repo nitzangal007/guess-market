@@ -44,7 +44,7 @@ call :sources "%PROJECT_ROOT%modules\guessmarket-engine\src\main\java" "%OUTPUT%
 if errorlevel 1 exit /b 1
 call :sources "%PROJECT_ROOT%modules\guessmarket-javafx-ui\src\main\java" "%OUTPUT%\sources\ui.txt"
 if errorlevel 1 exit /b 1
-call :sources "%PROJECT_ROOT%modules\guessmarket-javafx-ui\src\test\java" "%OUTPUT%\sources\tests.txt"
+call :tests
 if errorlevel 1 exit /b 1
 "%JAVAC%" --release 25 -encoding UTF-8 -Xlint:all -Werror -d "%OUTPUT%\classes\dto" @"%OUTPUT%\sources\dto.txt"
 if errorlevel 1 exit /b 1
@@ -71,16 +71,21 @@ copy /y "%PROJECT_ROOT%packaging\run-javafx.bat" "%OUTPUT%\dev\run-javafx.bat" >
 if errorlevel 1 exit /b 1
 "%JAVAC%" --release 25 -encoding UTF-8 -Xlint:all -Werror --module-path "%FX%" --add-modules javafx.controls,javafx.fxml -cp "%OUTPUT%\dev\lib\*;%JUNIT%" -d "%OUTPUT%\tests" @"%OUTPUT%\sources\tests.txt"
 if errorlevel 1 exit /b 1
-"%JAVAC%" --release 25 -encoding UTF-8 -Xlint:all -Werror -cp "%OUTPUT%\dev\lib\*;%JUNIT%" -d "%OUTPUT%\tests" "%PROJECT_ROOT%modules\guessmarket-engine\src\test\java\guessmarket\engine\GuessMarketWorldEngineTest.java" "%PROJECT_ROOT%modules\guessmarket-engine\src\test\java\guessmarket\engine\LmsrOpeningTest.java" "%PROJECT_ROOT%modules\guessmarket-engine\src\test\java\guessmarket\engine\LmsrPurchaseTest.java" "%PROJECT_ROOT%modules\guessmarket-engine\src\test\java\guessmarket\engine\LmsrSettlementTest.java" "%PROJECT_ROOT%modules\guessmarket-engine\src\test\java\guessmarket\engine\xml\ex2\Ex2XmlWorldLoaderTest.java"
+xcopy /e /i /y "%PROJECT_ROOT%modules\guessmarket-engine\src\test\resources\*" "%OUTPUT%\tests\" >nul
+if errorlevel 1 exit /b 1
+mkdir "%OUTPUT%\test-work\modules\guessmarket-engine\src\test"
+xcopy /e /i /y "%PROJECT_ROOT%modules\guessmarket-engine\src\test\resources\*" "%OUTPUT%\test-work\modules\guessmarket-engine\src\test\resources\" >nul
 if errorlevel 1 exit /b 1
 set "TEST_CP=%OUTPUT%\tests;%OUTPUT%\dev\lib\guessmarket-dto.jar;%OUTPUT%\dev\lib\guessmarket-engine.jar;%OUTPUT%\dev\lib\guessmarket-javafx-ui.jar;%JAXB_CP%"
-pushd "%PROJECT_ROOT%"
-"%JAVA%" --module-path "%FX%" --add-modules javafx.controls,javafx.fxml --enable-native-access=javafx.graphics -jar "%JUNIT%" execute --class-path "%TEST_CP%" --select-class guessmarket.engine.LmsrOpeningTest --select-class guessmarket.engine.LmsrPurchaseTest --select-class guessmarket.engine.LmsrSettlementTest --select-class guessmarket.engine.GuessMarketWorldEngineTest --select-class guessmarket.engine.xml.ex2.Ex2XmlWorldLoaderTest --select-class guessmarket.ui.javafx.WorldSessionTest --select-class guessmarket.ui.javafx.PackagedViewTest --select-class guessmarket.ui.javafx.OpeningFlowTest --select-class guessmarket.ui.javafx.LmsrLifecycleFlowTest --select-class guessmarket.ui.javafx.LmsrReviewFixesTest --fail-if-no-tests --disable-banner --details=summary --reports-dir "%OUTPUT%\reports" > "%OUTPUT%\reports\junit-output.txt" 2>&1
+pushd "%OUTPUT%\test-work"
+"%JAVA%" -Dprism.order=sw "-Dguessmarket.uiEvidenceDirectory=%OUTPUT%\native" --module-path "%FX%" --add-modules javafx.controls,javafx.fxml --enable-native-access=javafx.graphics -jar "%JUNIT%" execute --class-path "%TEST_CP%" --scan-classpath --fail-if-no-tests --disable-banner --details=summary --reports-dir "%OUTPUT%\reports" > "%OUTPUT%\reports\junit-output.txt" 2>&1
 set "TEST_EXIT=%ERRORLEVEL%"
 popd
 type "%OUTPUT%\reports\junit-output.txt"
 if not "%TEST_EXIT%"=="0" exit /b %TEST_EXIT%
-echo SUCCESS: JavaFX development JARs and tests passed.
+powershell -NoProfile -Command "$x=[xml](Get-Content -Raw -LiteralPath (Join-Path $env:OUTPUT 'reports/TEST-junit-jupiter.xml')); if([int]$x.testsuite.tests -ne 236 -or [int]$x.testsuite.failures -ne 0 -or [int]$x.testsuite.errors -ne 0 -or [int]$x.testsuite.skipped -ne 0){exit 1}"
+if errorlevel 1 exit /b 1
+echo SUCCESS: JavaFX development JARs and all 236 tests passed.
 echo Run: "%OUTPUT%\dev\run-javafx.bat"
 exit /b 0
 
@@ -88,4 +93,8 @@ exit /b 0
 set "SOURCE_ROOT=%~1"
 set "SOURCE_LIST=%~2"
 powershell -NoProfile -Command "$ErrorActionPreference='Stop'; $files=@(Get-ChildItem -LiteralPath $env:SOURCE_ROOT -Recurse -Filter '*.java'); if($files.Count -eq 0){throw 'No Java sources'}; $lines=$files | ForEach-Object {([char]34)+$_.FullName.Replace('\','/')+([char]34)}; [IO.File]::WriteAllLines($env:SOURCE_LIST,$lines,[Text.UTF8Encoding]::new($false))"
+exit /b %ERRORLEVEL%
+
+:tests
+powershell -NoProfile -Command "$ErrorActionPreference='Stop'; $roots=@('guessmarket-dto','guessmarket-engine','guessmarket-javafx-ui') | ForEach-Object {Join-Path $env:PROJECT_ROOT ('modules/'+$_+'/src/test/java')}; $files=@(Get-ChildItem -LiteralPath $roots -Recurse -Filter '*.java' -File | Sort-Object FullName); if($files.Count -eq 0){throw 'No test sources'}; $lines=$files | ForEach-Object {([char]34)+$_.FullName.Replace('\','/')+([char]34)}; [IO.File]::WriteAllLines((Join-Path $env:OUTPUT 'sources/tests.txt'),$lines,[Text.UTF8Encoding]::new($false))"
 exit /b %ERRORLEVEL%
