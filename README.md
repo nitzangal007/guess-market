@@ -1,121 +1,72 @@
 # Guess Market - Exercise 2
 
-Implemented bonuses: **None**.
+A Java 25 prediction-market application with a JavaFX interface, user accounts, LMSR trading and Order Book trading. Implemented bonuses: **None**.
 
-A Java 25 prediction-market application with separate user accounts, LMSR events and Order Book events. The Windows x64 submission includes its Java 25.0.4 and JavaFX 25.0.4 runtime plus JAXB 4.0.5 dependencies. No Java installation, JAVA_HOME or JAVAFX_HOME setting is required to run the extracted submission.
+## Run the submitted application
 
-## Run and use
+1. Extract the complete submitted ZIP into a writable folder. Keep `run.bat`, `lib` and `runtime` together.
+2. Double-click `run.bat`. The Windows x64 package includes Java 25.0.4 and JavaFX 25.0.4; running it requires no Java installation or environment-variable setup.
+3. Select **Load File** and choose an Exercise 2 XML file. Original course files are supplied separately from the ZIP.
+4. Use **Events** to inspect markets. Under **Users**, choose the acting user and open Available events, Owned events or Participations to trade or manage an event.
+5. Review a purchase/order before confirming. An event owner can open an event, select its winning outcome and review settlement payouts.
 
-1. Extract the complete ZIP into a writable folder. Keep `run.bat`, `lib` and `runtime` together, then double-click `run.bat`.
-2. Use Load File to choose an Exercise 2 XML file. Original assignment XML is supplied separately and is not included in this archive. A failed load retains the previous world.
-3. Inspect Events and its filters or open Users and select the acting user. Available, Owned and Participations show the appropriate events and retained closed history.
-4. The event owner opens an event and transfers its initial funding. For LMSR, choose an outcome and quantity and review the purchase. For Order Book, choose BUY or SELL, outcome, whole quantity and unit limit, then review executions before confirming. Back preserves the entered limit; Cancel leaves the world unchanged.
-5. The owner resolves an active event by selecting its winning outcome and reviewing payouts. Inspect trade history, holdings, fees and settlement afterward.
+An invalid XML load preserves the previous world. Successfully reloading XML starts a fresh simulation. The Exercise 2 interface does not save manual trades between launches.
 
-Each loaded world replaces the previous world after successful validation. Reloading creates a fresh simulation. The Exercise 2 interface does not save manual trades between application launches. Closing the main window exits the app.
+## Build, test and run from source
 
-## Modules and main classes
+Source builds require Windows x64, **Oracle JDK 25.0.4** and the **JavaFX 25.0.4 Windows x64 SDK**. Use a short checkout path, such as `C:\Projects\GuessMarket`: Windows `xcopy` can fail on deeply nested fixture paths. These development tools are separate from the runtime inside the submitted ZIP.
 
-- `guessmarket-dto.jar`: immutable requests, snapshots, previews and receipts shared between UI and Engine.
-- `guessmarket-engine.jar`: XML/schema and domain validation, accounts, LMSR calculations, Order Book matching, ledger and settlement. It does not depend on JavaFX.
-- `guessmarket-javafx-ui.jar`: JavaFX controls, background operations and presentation. Main class: `guessmarket.ui.javafx.GuessMarketApplication`.
-
-Key classes: `GuessMarketWorldEngineImpl` implements the Exercise 2 command boundary and revision checks; `MarketWorld` holds accounts and lifecycle; `OrderBookMatcher` plans compatible executions; `OrderBookOperations` validates and publishes orders and settlement; `OrderBookLedger` creates holdings/accounting/valuation snapshots; `WorldSession` serializes background commands and publishes observable UI state; `MainController` and `UsersController` drive the two views; `EventDetailsView` and `OrderBookView` present method-specific details; `OrderDialog` preserves exact input through review. FXML and CSS are included in the UI JAR, and the trusted schema is included in the Engine JAR.
-
-## Meaningful implementation choices
-
-- Match ordinary compatible orders first, at the resting order price. Best price wins; equal prices use FIFO. A partial remainder keeps its original priority.
-- If mint is enabled, compatible opposite BUY orders may create pairs when their limits sum to at least `d`, including equality. The best opposite BUY price and then FIFO determine priority. There is no manual unilateral mint action.
-- SELL orders reserve owned shares. BUY orders do not reserve cash. Self-matching and self-minting reject the entire command. Users cannot manually cancel orders in the selected assignment flow.
-- Complete all accepted fills before applying final blocking and cancellation across events. Cash falling below zero after the gross purchase debit blocks buying/opening; a positive receipt restores eligibility only if final cash is strictly positive. A blocked owner may still settle owned events. Zero receipts do not recover access.
-- Opening requires sufficient cash and a whole initial pair count. Otherwise-valid nondivisible Order Book funding loads but rejects at opening. Zero initial funding is valid.
-- Holdings estimates use MID when both sides have quotes, otherwise LAST, otherwise Unavailable. Closed events use winner `d` and loser zero. Cumulative purchases, sale receipts, fees and owner funding are reported separately; settled holdings are not counted twice in profit/loss.
-- Order limits and Order Book financial calculations use exact BigDecimal values. Sub-cent limits are allowed within the specified range. Entered limits remain exact in the book, editor and review. Calculated decimal outputs round half up to at most two fractional digits; display values are never sent back as calculation inputs.
-- LMSR accounts use double arithmetic with finite/overflow checks. Positive debits that disappear against the current cash balance reject before publication. Legitimate settlement rounding is bounded and verified from purchase history; malformed or unjustifiable states reject. Preview revisions protect against confirming a stale world.
-
-These choices follow the implemented assignment interpretation, including the detailed appendix mint equality rule and the locally selected cash-recovery policy.
-
-## Source and dependencies
-
-Current Exercise 2 source: https://github.com/nitzangal007/guess-market/tree/codex/e2-order-book
-
-The repository also preserves the Exercise 1 console application and its separate build/documentation. This submission launches the Exercise 2 JavaFX application.
-
-Bundled third-party notices are retained in `runtime/legal`, in dependency JARs and in `THIRD-PARTY-NOTICES.txt`. No open-source license is granted for application code; third-party components retain their own licenses. This runtime is for Windows x64. Local extracted-package verification does not certify other operating systems or every display scale.
-
-## Build Exercise 2 from source
-
-Install Oracle JDK 25.0.4 and the JavaFX 25.0.4 Windows x64 SDK, then set `JAVA_HOME` and `JAVAFX_HOME` to their installation directories for the current shell. Run `build-javafx.bat` from this repository. It compiles every DTO, Engine and JavaFX test/helper source and runs the complete 236-test scan, with packaged FXML/CSS/schema and Engine test resources. JAXB and JUnit dependencies are already vendored; the build downloads nothing.
-
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File packaging/package-exercise2.ps1 -RuntimeDirectory <linked-runtime-folder> -JavaFxLegalDirectory <sdk-legal-folder> -ManualPdf <verified-manual.pdf> -ArchiveName <submission-name.zip>` to assemble the caller-named ZIP under `build/javafx/distributions`. Supply a Windows x64 linked Java 25.0.4/JavaFX 25.0.4 runtime including its legal notices. Package generation requires a successful current build and a separately verified PDF manual. Submission-specific filename and private cover details are supplied separately and are not stored in this public template. The generated `dev/run-javafx.bat` remains a development launcher requiring the JDK/SDK environment.
-
-## Preserved Exercise 1 console documentation
-
-# Guess Market
-
-Guess Market is a Java 25 console-based prediction-market simulator. It loads market definitions from XML, calculates prices with the LMSR model, supports purchasing shares and closing events, and can save and restore the market state.
-
-## Features
-
-- XML loading and validation with JAXB
-- Display of all events and detailed trading status
-- LMSR-based share pricing and purchase receipts
-- Purchase or closing commission policies
-- Event closing with the final market-maker result
-- Save and restore of the complete engine state
-- Console input recovery for invalid commands and recoverable errors
-
-## Architecture
-
-The project uses three modules with one-directional dependencies:
-
-```text
-guessmarket-ui -> guessmarket-engine -> guessmarket-dto
-       |                  |
-       +----------------->+
-```
-
-- `guessmarket-dto` contains immutable values shared between modules.
-- `guessmarket-engine` contains market behavior, XML loading, LMSR calculations, persistence, and the supported engine interface.
-- `guessmarket-ui` contains the console menu, input, output, and application startup.
-
-Each module is packaged as a separate JAR. The UI JAR is the executable application JAR.
-
-## Requirements
-
-- Windows
-- Oracle JDK 25
-
-All required JAXB runtime dependencies are included in the repository. The build does not download dependencies.
-
-## Build and run
-
-From the repository root in Windows PowerShell, set `JAVA_HOME` to an Oracle JDK 25 installation and run:
+From the repository root in PowerShell, replace the two installation paths and run:
 
 ```powershell
-$env:JAVA_HOME = 'C:\Program Files\Java\jdk-25.0.4'
-.\build.bat
+$env:JAVA_HOME = 'C:\path\to\jdk-25.0.4'
+$env:JAVAFX_HOME = 'C:\path\to\javafx-sdk-25.0.4'
+.\build-javafx.bat
 ```
 
-The build compiles the three modules, runs the automated tests, creates the JAR files, and creates a submission archive under `build\distributions`.
+The build compiles DTO, Engine and JavaFX sources with UTF-8, `--release 25`, `-Xlint:all` and `-Werror`. It packages FXML, CSS and schemas, creates three application JARs and runs all **236 tests**. Dependencies are vendored; the build downloads nothing.
 
-To run the packaged application, extract the archive and run `run.bat` from the extracted folder.
+Generated output is under `build/javafx`:
+- `dev/lib`: application JARs and JAXB runtime libraries.
+- `reports`: JUnit XML and `junit-output.txt`.
+- `native`: screenshots from test-owned JavaFX stages.
 
-## Project layout
+After a successful build, run the development application with the same environment settings:
 
-- `modules/guessmarket-dto` - shared immutable data-transfer objects
-- `modules/guessmarket-engine` - market engine, XML support, and persistence
-- `modules/guessmarket-ui` - console application
-- `packaging` - manifest and runtime launcher inputs
-- `tools` - required JAXB and test dependencies
-- `build.bat` - reproducible Windows build and package entry point
+```powershell
+.\build\javafx\dev\run-javafx.bat
+```
 
-## Technical documentation
+## Architecture and source layout
 
-- [Build and run](docs/guides/BUILD-AND-RUN.md)
-- [Testing](docs/guides/TESTING.md)
-- [JAXB and XML](docs/guides/JAXB-AND-XML.md)
+```text
+JavaFX UI -> Engine -> DTO
+       \------------> DTO
+```
 
-## License
+| Module | Responsibility |
+| --- | --- |
+| `modules/guessmarket-javafx-ui` | FXML/CSS, controls, background commands and display. Entry point: `guessmarket.ui.javafx.GuessMarketApplication`. |
+| `modules/guessmarket-engine` | XML/schema and business validation, accounts, LMSR, matching, holdings and settlement. Independent of JavaFX. |
+| `modules/guessmarket-dto` | Immutable requests, snapshots, previews and receipts shared by UI and Engine. |
+| `modules/guessmarket-ui` | Preserved Exercise 1 console interface. Exercise 2 uses the JavaFX module above. |
 
-No open-source license is granted for the project code. Vendored third-party components retain their own licenses.
+Each module has its own source/test directory. The Exercise 2 submission contains the DTO, Engine and JavaFX JARs. `build.bat` and the console packaging inputs belong to the earlier Exercise 1 workflow; use `build-javafx.bat` for this exercise.
+
+## Trading and accounting choices
+
+- Ordinary matching runs first, at the resting order price. Best price takes priority; equal prices use FIFO. Partial remainders retain their priority.
+- When automatic mint is enabled, opposite BUY orders can create pairs if their limits sum to at least `d`, including equality. Best opposite price takes priority, then FIFO. Self-trading and self-minting reject the command atomically.
+- SELL orders reserve owned shares; BUY orders do not reserve cash. Users have no manual order-cancel action in this assignment flow.
+- An overdraft purchase blocks buying/opening. A later positive receipt restores eligibility when resulting cash is strictly positive. Blocked owners can still settle their own events; cancelled orders do not return after recovery.
+- Order Book arithmetic uses exact `BigDecimal` values. Entered limits retain their precision; calculated displays round half up to at most two decimal places. Authoritative calculations never use rounded display values.
+
+For main class roles, funding, valuation, settlement and the complete implementation choices, see the [application manual](packaging/README-exercise2.md).
+
+## Submission packaging and dependencies
+
+`packaging/package-exercise2.ps1` assembles the portable ZIP after the complete build gate. It requires explicit `RuntimeDirectory`, `JavaFxLegalDirectory`, `ManualPdf` and `ArchiveName` arguments: a linked Windows x64 Java 25.0.4/JavaFX 25.0.4 runtime, the SDK legal folder, a verified PDF manual and a ZIP filename. The runtime and submission-specific manual are supplied separately from this source repository.
+
+`tools` contains JAXB RI 4.0.5, its activation dependencies, code-generation tools and JUnit Platform Console 6.1.1. Their licenses/notices are retained alongside them. The submitted package includes five JAXB runtime JARs and runtime legal notices, with root `JAXB-LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
+
+No open-source license is granted for application code. Third-party components retain their own licenses.
