@@ -3,24 +3,11 @@
 /private/
 /submissions/
 
-# Internal development-process documentation
+# Local learning, planning and agent coordination
+/docs/
 /PROJECT_HANDOFF.md
-/docs/design/EXERCISE-1-DESIGN-BRIEF.md
-/docs/design/EXERCISE-1-DESIGN.md
-/docs/planning/
-/docs/repository/
-/docs/reviews/
-/docs/guides/IMPLEMENTATION-WALKTHROUGH.md
-/docs/guides/JAXB-AND-XML.md
-
-# Local-only documentation and operational records
-/docs/planning/EXERCISE-1-MASTER-ROADMAP.md
-/docs/reviews/EXERCISE-1-PRE-IMPLEMENTATION-REVIEW-BRIEF.md
-/docs/reviews/EXERCISE-1-PRE-IMPLEMENTATION-REVIEW.md
-/docs/reviews/JAR-PACKAGING-RECORDING-EVIDENCE.md
-/docs/guides/WORKSPACE-LAYOUT.md
-/docs/guides/JAXB-AND-XML-GUIDE.md
-/docs/repository/GITHUB-REPOSITORY-MIGRATION-PLAN.md
+/AGENTS.md
+/CLAUDE.md
 
 # Generated and local development output
 /.worktrees/
@@ -41,7 +28,7 @@
 !/tools/jaxb-ri-4.0.5/xjc-run.bat
 !/tools/jaxb-ri-4.0.5/LICENSE.txt
 
-# Approved test dependency location
+# Approved test dependencies
 /tools/testing/*
 !/tools/testing/junit-platform-console-standalone-6.1.1.jar
 !/tools/testing/LICENSE.txt

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="guessmarket.ui.javafx.UsersController">
+    <top>
+        <VBox spacing="14">
+            <padding><Insets top="18" right="26" bottom="16" left="26"/></padding>
+            <HBox spacing="18" alignment="CENTER_LEFT">
+                <VBox spacing="4" minWidth="0" HBox.hgrow="ALWAYS">
+                    <Label text="ACTING AS" styleClass="muted"/>
+                    <Label fx:id="userName" text="Select a user" styleClass="subheading" wrapText="true" minWidth="0" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="4" minWidth="130">
+                    <Label text="Personal balance" styleClass="muted"/>
+                    <Label fx:id="userBalance" styleClass="stat-value"/>
+                </VBox>
+                <Button fx:id="changeUser" text="Change user" onAction="#changeUser" minWidth="-Infinity"/>
+            </HBox>
+            <Label fx:id="blockedStatus" styleClass="warning" wrapText="true" maxWidth="Infinity" visible="false" managed="false"/>
+
+            <FlowPane hgap="10" vgap="10" styleClass="user-sections">
+                <ToggleButton fx:id="availableSection" text="Available events"/>
+                <ToggleButton fx:id="ownedSection" text="Owned events"/>
+                <ToggleButton fx:id="participationsSection" text="Participations"/>
+            </FlowPane>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fx:id="userScroll" fitToWidth="true" hbarPolicy="NEVER">
+            <content>
+                <VBox spacing="18" minWidth="0">
+                    <padding><Insets top="8" right="26" bottom="26" left="26"/></padding>
+                    <Label fx:id="purchaseNotice" styleClass="notice" wrapText="true" maxWidth="Infinity" visible="false" managed="false"/>
+                    <VBox fx:id="userCatalogue" spacing="16">
+                        <Label fx:id="sectionTitle" styleClass="section-title" wrapText="true"/>
+                        <Label fx:id="userCount" styleClass="muted"/>
+                        <Label fx:id="userEmpty" styleClass="muted" wrapText="true"/>
+                        <FlowPane fx:id="userEventRows" hgap="0" vgap="0" minWidth="0"/>
+                    </VBox>
+                    <VBox fx:id="userDetails" spacing="16" minWidth="0" visible="false" managed="false"/>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
