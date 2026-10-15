@@ -20,6 +20,9 @@
 *.tmp
 *.ser
 *.zip
+*.war
+*.rar
+*.pdf
 
 # Keep only the approved JAXB subset from the complete local distribution
 /tools/jaxb-ri-4.0.5/*

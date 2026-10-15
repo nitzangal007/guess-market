@@ -14,6 +14,29 @@ public final class MarketWorld {
         this.events = Collections.unmodifiableMap(new LinkedHashMap<>(events));
         this.users = Collections.unmodifiableMap(new LinkedHashMap<>(users));
     }
+    static MarketWorld empty(){return new MarketWorld(Map.of(),Map.of());}
+    Map<Integer,WorldEvent> events(){return events;}
+    Map<String,MarketUser> users(){return users;}
+    MarketWorld withAccount(String actor){
+        if(users.containsKey(actor))return this;
+        var next=new LinkedHashMap<>(users);next.put(actor,new MarketUser(actor,0,java.util.List.of()));
+        return new MarketWorld(events,next);
+    }
+    MarketWorld credit(String actor,double amount)throws WorldCommandException{
+        var user=users.get(actor);
+        if(user==null)throw new WorldCommandException(USER_NOT_FOUND,"The account does not exist.");
+        double after=user.currentBalance()+amount;
+        if(!Double.isFinite(amount)||amount<=0||!Double.isFinite(after)||Double.compare(after,user.currentBalance())==0)
+            throw new WorldCommandException(FINANCIAL_CALCULATION_FAILED,"The positive credit must change the represented account balance.");
+        var next=new LinkedHashMap<>(users);next.put(actor,user.received(amount));
+        return new MarketWorld(events,next);
+    }
+    MarketWorld append(java.util.List<WorldEvent> added,String actor){
+        var nextEvents=new LinkedHashMap<>(events);added.forEach(e->nextEvents.put(e.id(),e));
+        var owner=users.get(actor);var owned=new java.util.ArrayList<>(owner.ownedEventIds());added.forEach(e->owned.add(e.id()));
+        var nextUsers=new LinkedHashMap<>(users);nextUsers.put(actor,new MarketUser(actor,owner.currentBalance(),owned,owner.blocked()));
+        return new MarketWorld(nextEvents,nextUsers);
+    }
     OrderBookOperations.Candidate planOrder(OrderRequest request,long revision)throws WorldCommandException {
         return new OrderBookOperations(events,users).order(request,revision);
     }

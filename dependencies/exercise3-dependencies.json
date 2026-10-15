@@ -1,0 +1,686 @@
+{
+  "jdk": "Oracle25.0.4",
+  "tomcat": "10.1.61",
+  "tomcatSource": "https://archive.apache.org/dist/tomcat/tomcat-10/v10.1.61/bin/apache-tomcat-10.1.61.zip",
+  "tomcatSHA512": "018fca94e41e75ac74891a55894bd94f662bc838ad92a443937c169c0b1dc5617b69ceffb4e1c9f0648c4d9e5b1da7cb5f06c3ff6daab7e305fffc955f607ed4",
+  "tomcatPublishedSHA512Verified": true,
+  "javafx": "Gluon25.0.4+2 Windows x64",
+  "javafxSource": "https://download2.gluonhq.com/openjfx/25.0.4/openjfx-25.0.4_windows-x64_bin-sdk.zip",
+  "javafxArchiveSHA256": "80ED1B43B9FA96575885761C3ED19E690B2AA3FEB92973BAE39AACCACCBF101B",
+  "javafxArrangement": "Four SDK module JARs with sibling bin native DLLs and original legal directories",
+  "javafxFiles": [
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-console-l1-1-0.dll",
+      "sha256": "22b0d0412c274a04d11d7fd3f6545eff245e6f032e21b86d920c2844dd1007c6",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-console-l1-2-0.dll",
+      "sha256": "0c60ddcfddc6e11d77354d5695b822881f37fb537192e61e62f2ebd703fb2119",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-datetime-l1-1-0.dll",
+      "sha256": "631a106755f13a78032d7c17cd19c5185fe89d93fda2ac108c4f53e27dcdecdb",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-debug-l1-1-0.dll",
+      "sha256": "1ce185afeea0a30a12b496d95df395c18bd0e99570c0ac3126758476d4b6aea0",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-errorhandling-l1-1-0.dll",
+      "sha256": "cdbc9ee30658188fd9af68ad52b5d8e7f59111191b0681ec2ed9095d9c85ebee",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-file-l1-1-0.dll",
+      "sha256": "f36025fd0715ec893c112f06472072c565385b8c5fa675cce5b4a9158bfb87e9",
+      "bytes": 26232
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-file-l1-2-0.dll",
+      "sha256": "3d95961590fe6da5c569bcb0a54651488e70dd7b15c257e1b9faf8a3cc0e63e4",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-file-l2-1-0.dll",
+      "sha256": "c6515fb573cd8190ebc401aab4646069066205ee9eeca548ae5ddbec3633336b",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-handle-l1-1-0.dll",
+      "sha256": "523b4c1528aab62c5f8622e4e2c4a4ba0df43114098a05f0c58c69c716c42626",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-heap-l1-1-0.dll",
+      "sha256": "4fff338c18ab8a1a37d1190e3b9edcca55afa86b0ba0f97d87c4c841e4e29678",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-interlocked-l1-1-0.dll",
+      "sha256": "841aa4632552c47b43d453968da2c8d0861b1eb776d530a4e985d0290516d6c8",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-libraryloader-l1-1-0.dll",
+      "sha256": "e989c62edade6b3333d798e0481f4c2ec08f7d2a0c47acfcca2a869cd4b68a1f",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-localization-l1-2-0.dll",
+      "sha256": "945dacfe53f62d83acd0537a6712658558faafb18f68b76b88127db78482fd8f",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-memory-l1-1-0.dll",
+      "sha256": "a505bdf2e4dfd5120de230fd9d159ef75aa00fb3f98e24d259f5c0a456713c74",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-namedpipe-l1-1-0.dll",
+      "sha256": "b26de5e517b05e10ee34fdf4996f82c465668670329e7f19d21f39a7e39011e7",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-processenvironment-l1-1-0.dll",
+      "sha256": "32d11f07156248c7906027e0f17e93e51de848f136e6d3fd0d4f9d1ffb2c70da",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-processthreads-l1-1-0.dll",
+      "sha256": "562e2619e1e685080faf2122c12ae3c35202ce34ce8330d1ff0a3b566095fd38",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-processthreads-l1-1-1.dll",
+      "sha256": "73fabc60a9b24c1eb65ec886a59a190046af5853800572df1d48634417a15729",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-profile-l1-1-0.dll",
+      "sha256": "2401cc9407ebb1fa60ddf520d422ec1eefec050dd9871554756c869c9b730558",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-rtlsupport-l1-1-0.dll",
+      "sha256": "b5a61cd60ec9088ee27bf61d37c55abc9d6db3f722616d74fc191cf671a4902a",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-string-l1-1-0.dll",
+      "sha256": "7e97fbf5cee26ab01227d564f023337736310868c1cf23920e4dceeeb1c11701",
+      "bytes": 22112
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-synch-l1-1-0.dll",
+      "sha256": "4f47aad2664ed21dd80d30ffd954a34503ffe2493bebb39da058d452212e75af",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-synch-l1-2-0.dll",
+      "sha256": "a885774d4a5419db2e9f7fbd0ac06f7244e046aa614cd6585ab22fc428f2c7ee",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-sysinfo-l1-1-0.dll",
+      "sha256": "ac3b86a3e66c5ae2cb30d8a386b0574e6b59fe0f549120c16b7790c3489bc593",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-timezone-l1-1-0.dll",
+      "sha256": "003751ed79881bce98017b66206a2ba411321edd61fd51768779f29dfa99968d",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-core-util-l1-1-0.dll",
+      "sha256": "eb41c514f2660813fa6ac58a28bcd2adfb64552b945dfcad5123f51a1a71f863",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-conio-l1-1-0.dll",
+      "sha256": "e7fc8d3956ce856b1ce0b8d16c10fa4c886a33717a64b818aa6d2492d7492429",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-convert-l1-1-0.dll",
+      "sha256": "4d80b38c49c9e507190b133e97c7b06ac926c5e1d93095bef8e35c51e7be4e3c",
+      "bytes": 26216
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-environment-l1-1-0.dll",
+      "sha256": "65eb6a1276426e0bffc0a7686770cae2fb15a0f819cab4b96003a292c483ec5d",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-filesystem-l1-1-0.dll",
+      "sha256": "61424c4c6cf665ef1c6e092a105721813d495ff17d81c809b505acf9ac0c575a",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-heap-l1-1-0.dll",
+      "sha256": "42fed4693a9f2ee8ebb29b34ac92aaef9ff070f609e0cbff74258f65ea53d666",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-locale-l1-1-0.dll",
+      "sha256": "f2d099d580c733d3132ac3cd0179c7bfa0f1ed8f7bd063e411cd57e920510488",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-math-l1-1-0.dll",
+      "sha256": "8483828a6781dc3cc4a121e2a90f54abb6f6c42680a0634e02db8b736d16f877",
+      "bytes": 30328
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-multibyte-l1-1-0.dll",
+      "sha256": "63c233965965c6eab235c0e1e7530788fee44d5cab910a2cd22d325334a3dce2",
+      "bytes": 30328
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-private-l1-1-0.dll",
+      "sha256": "65e8380924c6b54147185cfd84deb0795c617b8c316d3767daa616f9fd88d6c0",
+      "bytes": 75368
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-process-l1-1-0.dll",
+      "sha256": "f426c73f187c4c3c6759514c11f752a1f8411a1f4392bbee984652e62d2e7296",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-runtime-l1-1-0.dll",
+      "sha256": "21c3d46f74f4249c81d723373da639ac2fb2733a626ec11310df49874663d2bc",
+      "bytes": 26216
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-stdio-l1-1-0.dll",
+      "sha256": "e4a6bd5d65d39da4424ab7828959cfeb7c362e29008bc63ecf16fb3b20001807",
+      "bytes": 26216
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-string-l1-1-0.dll",
+      "sha256": "a1cf3656daa57afb840714f891e7f072ca56bf5838f525d4394c362ef5c8ed8f",
+      "bytes": 26216
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-time-l1-1-0.dll",
+      "sha256": "fc27f6061faf91d696a2b3685a3bfac4de49fbf78d578b9970e1ed21f683b209",
+      "bytes": 22120
+    },
+    {
+      "path": "tools/javafx/bin/api-ms-win-crt-utility-l1-1-0.dll",
+      "sha256": "788611c05ef16759ac57df231b25b413be33fccabbeb446caaf4b5cbedd8e1dc",
+      "bytes": 22136
+    },
+    {
+      "path": "tools/javafx/bin/decora_sse.dll",
+      "sha256": "3b6f0f5c8267a4ed7339bd8b0456dc1a4a2e9d57cb907bc80bf741d180e8be2a",
+      "bytes": 82432
+    },
+    {
+      "path": "tools/javafx/bin/glass.dll",
+      "sha256": "a060f736badb6ed0a8d42d285ac328c710ec3c6512bd36f73bceb137b79caca0",
+      "bytes": 282112
+    },
+    {
+      "path": "tools/javafx/bin/javafx_font.dll",
+      "sha256": "00ba131127d670c10da469fc6a9222549a1fc7178ad8ef6c4d568d66602a61ec",
+      "bytes": 69632
+    },
+    {
+      "path": "tools/javafx/bin/javafx_iio.dll",
+      "sha256": "bf70158e34c384f735d0d2f613b78d0422c8e8c84f447c964ef9e037644b4044",
+      "bytes": 164352
+    },
+    {
+      "path": "tools/javafx/bin/msvcp140.dll",
+      "sha256": "b99eb28a471311113f5c4109cb3c463f39cfd9bdb3b07f706204dedddb4516a1",
+      "bytes": 575568
+    },
+    {
+      "path": "tools/javafx/bin/msvcp140_1.dll",
+      "sha256": "576d2ab235e32acc129eda78a3b9a3d3e78b0c97a01940d962cb8502acd030d1",
+      "bytes": 35920
+    },
+    {
+      "path": "tools/javafx/bin/msvcp140_2.dll",
+      "sha256": "9c9e06d56add83e08f0c530de6f0a82c5bfbee2b6ffa8b71e7b0446ec08e8970",
+      "bytes": 267888
+    },
+    {
+      "path": "tools/javafx/bin/prism_common.dll",
+      "sha256": "4ffad72bc76a74a1bd906148c9b54c1fbf2b6e576beac8a77dec8afbeec9ff83",
+      "bytes": 11264
+    },
+    {
+      "path": "tools/javafx/bin/prism_d3d.dll",
+      "sha256": "86222699a2e91f7d9e22b41ba74f2c8f9e34af7782c7bc80416fb1ea75918861",
+      "bytes": 180224
+    },
+    {
+      "path": "tools/javafx/bin/prism_sw.dll",
+      "sha256": "6328bad0cc01eb941317c823bddc26fd0f2e603c4f68e396b20ff8dc778b9e60",
+      "bytes": 58368
+    },
+    {
+      "path": "tools/javafx/bin/ucrtbase.dll",
+      "sha256": "91d027417ff2301b7135e864a5df6693488f8412ff87040f4897e0e03bc2577b",
+      "bytes": 1123944
+    },
+    {
+      "path": "tools/javafx/bin/vcruntime140.dll",
+      "sha256": "052ad6a20d375957e82aa6a3c441ea548d89be0981516ca7eb306e063d5027f4",
+      "bytes": 120400
+    },
+    {
+      "path": "tools/javafx/bin/vcruntime140_1.dll",
+      "sha256": "6a99bc0128e0c7d6cbbf615fcc26909565e17d4ca3451b97f8987f9c6acbc6c8",
+      "bytes": 49776
+    },
+    {
+      "path": "tools/javafx/legal/javafx.base/ADDITIONAL_LICENSE_INFO",
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "bytes": 2114
+    },
+    {
+      "path": "tools/javafx/legal/javafx.base/ASSEMBLY_EXCEPTION",
+      "sha256": "a44eb7b5caf5534c6ef536b21edb40b4d6babf91bf97d9d45596868618b2c6fb",
+      "bytes": 1522
+    },
+    {
+      "path": "tools/javafx/legal/javafx.base/LICENSE",
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "bytes": 19274
+    },
+    {
+      "path": "tools/javafx/legal/javafx.controls/ADDITIONAL_LICENSE_INFO",
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "bytes": 2114
+    },
+    {
+      "path": "tools/javafx/legal/javafx.controls/ASSEMBLY_EXCEPTION",
+      "sha256": "a44eb7b5caf5534c6ef536b21edb40b4d6babf91bf97d9d45596868618b2c6fb",
+      "bytes": 1522
+    },
+    {
+      "path": "tools/javafx/legal/javafx.controls/LICENSE",
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "bytes": 19274
+    },
+    {
+      "path": "tools/javafx/legal/javafx.fxml/ADDITIONAL_LICENSE_INFO",
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "bytes": 2114
+    },
+    {
+      "path": "tools/javafx/legal/javafx.fxml/ASSEMBLY_EXCEPTION",
+      "sha256": "a44eb7b5caf5534c6ef536b21edb40b4d6babf91bf97d9d45596868618b2c6fb",
+      "bytes": 1522
+    },
+    {
+      "path": "tools/javafx/legal/javafx.fxml/LICENSE",
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "bytes": 19274
+    },
+    {
+      "path": "tools/javafx/legal/javafx.graphics/ADDITIONAL_LICENSE_INFO",
+      "sha256": "a69bce275ba7a3570af6579cb0f55682cd75fedfcd49e0e8e9022270c447c916",
+      "bytes": 2114
+    },
+    {
+      "path": "tools/javafx/legal/javafx.graphics/ASSEMBLY_EXCEPTION",
+      "sha256": "a44eb7b5caf5534c6ef536b21edb40b4d6babf91bf97d9d45596868618b2c6fb",
+      "bytes": 1522
+    },
+    {
+      "path": "tools/javafx/legal/javafx.graphics/jpeg_fx.md",
+      "sha256": "4d8164326adbb7c6a3dbb65b1979962915e4b6f67eb5885409c80a3f350b322a",
+      "bytes": 1990
+    },
+    {
+      "path": "tools/javafx/legal/javafx.graphics/LICENSE",
+      "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+      "bytes": 19274
+    },
+    {
+      "path": "tools/javafx/legal/javafx.graphics/mesa3d.md",
+      "sha256": "63f4e6f75caebbccb95d903fb43e46ac7111b3624d0a34f146b276d7d9e7b152",
+      "bytes": 5732
+    },
+    {
+      "path": "tools/javafx/legal/javafx.graphics/pipewire.md",
+      "sha256": "56a8fb1652c70ac204d13bb52ca4d678162e7d21a97d10209c2a633de8082de0",
+      "bytes": 1479
+    },
+    {
+      "path": "tools/javafx/lib/javafx.base.jar",
+      "sha256": "f2d988492f0ac8fe9ba7320a3697dee888d3707f5f135f03ed7acde63b36bd91",
+      "bytes": 748924
+    },
+    {
+      "path": "tools/javafx/lib/javafx.controls.jar",
+      "sha256": "624bee8f9c439525452d1a17e4ceb08f2fd4c016a5cf69df5dad159add8480c9",
+      "bytes": 2602911
+    },
+    {
+      "path": "tools/javafx/lib/javafx.fxml.jar",
+      "sha256": "0612c78be66b70e4fdc1067f9c908edc47bf82ec4420cdf4e29f64769fe63125",
+      "bytes": 126177
+    },
+    {
+      "path": "tools/javafx/lib/javafx.graphics.jar",
+      "sha256": "cd5d661f59480741a3e9f5446d874a7052cf6936e7487d1ad399d57f4372615b",
+      "bytes": 4462066
+    },
+    {
+      "path": "tools/javafx/lib/javafx.properties",
+      "sha256": "75f972fe1d36624b8507393da203e0c9660de11ab0376de0985f9aaf4f2cc150",
+      "bytes": 77
+    }
+  ],
+  "kotlinResolution": "OkHttp1.8.21 Kotlin request reconciled to Okio1.9.10 closure, all Kotlin artifacts pinned1.9.10",
+  "artifacts": [
+    {
+      "name": "gson",
+      "coordinatePath": "com/google/code/gson/gson/2.13.2/gson-2.13.2",
+      "sourceJar": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.pom",
+      "sha256": "dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0",
+      "repositorySHA1Verified": true,
+      "bytes": 289901,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "Apache-2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "com.google.errorprone",
+          "artifact": "error_prone_annotations",
+          "version": "2.41.0",
+          "scope": null
+        },
+        {
+          "group": "junit",
+          "artifact": "junit",
+          "version": null,
+          "scope": "test"
+        },
+        {
+          "group": "com.google.truth",
+          "artifact": "truth",
+          "version": null,
+          "scope": "test"
+        },
+        {
+          "group": "com.google.guava",
+          "artifact": "guava-testlib",
+          "version": "33.4.8-jre",
+          "scope": "test"
+        },
+        {
+          "group": "com.google.guava",
+          "artifact": "guava",
+          "version": "33.4.8-jre",
+          "scope": "test"
+        }
+      ]
+    },
+    {
+      "name": "servlet",
+      "coordinatePath": "jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0",
+      "sourceJar": "https://repo.maven.apache.org/maven2/jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0.pom",
+      "sha256": "c034eb1afb158987dbb53a5fea0cadf611c8dae8daadd59c44d9d5ab70129cef",
+      "repositorySHA1Verified": true,
+      "bytes": 347613,
+      "scope": "compile-only",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "EPL 2.0",
+          "url": "http://www.eclipse.org/legal/epl-2.0"
+        },
+        {
+          "name": "GPL2 w/ CPE",
+          "url": "https://www.gnu.org/software/classpath/license.html"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "org.junit.jupiter",
+          "artifact": "junit-jupiter-engine",
+          "version": "5.8.1",
+          "scope": "test"
+        },
+        {
+          "group": "org.junit.jupiter",
+          "artifact": "junit-jupiter-params",
+          "version": "5.8.1",
+          "scope": "test"
+        },
+        {
+          "group": "org.hamcrest",
+          "artifact": "hamcrest",
+          "version": "2.2",
+          "scope": "test"
+        }
+      ]
+    },
+    {
+      "name": "okhttp",
+      "coordinatePath": "com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0",
+      "sourceJar": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.pom",
+      "sha256": "b1050081b14bb7a3a7e55a4d3ef01b5dcfabc453b4573a4fc019767191d5f4e0",
+      "repositorySHA1Verified": true,
+      "bytes": 789531,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "com.squareup.okio",
+          "artifact": "okio",
+          "version": "3.6.0",
+          "scope": "compile"
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib-jdk8",
+          "version": "1.8.21",
+          "scope": "compile"
+        }
+      ]
+    },
+    {
+      "name": "okio",
+      "coordinatePath": "com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0",
+      "sourceJar": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.pom",
+      "sha256": "67543f0736fc422ae927ed0e504b98bc5e269fda0d3500579337cb713da28412",
+      "repositorySHA1Verified": true,
+      "bytes": 359580,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib-jdk8",
+          "version": "1.9.10",
+          "scope": "compile"
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib-common",
+          "version": "1.9.10",
+          "scope": "compile"
+        }
+      ]
+    },
+    {
+      "name": "kotlin-stdlib",
+      "coordinatePath": "org/jetbrains/kotlin/kotlin-stdlib/1.9.10/kotlin-stdlib-1.9.10",
+      "sourceJar": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.10/kotlin-stdlib-1.9.10.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.10/kotlin-stdlib-1.9.10.pom",
+      "sha256": "55e989c512b80907799f854309f3bc7782c5b3d13932442d0379d5c472711504",
+      "repositorySHA1Verified": true,
+      "bytes": 1708006,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib-common",
+          "version": "1.9.10",
+          "scope": "compile"
+        },
+        {
+          "group": "org.jetbrains",
+          "artifact": "annotations",
+          "version": "13.0",
+          "scope": "compile"
+        }
+      ]
+    },
+    {
+      "name": "kotlin-jdk7",
+      "coordinatePath": "org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.9.10/kotlin-stdlib-jdk7-1.9.10",
+      "sourceJar": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.9.10/kotlin-stdlib-jdk7-1.9.10.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.9.10/kotlin-stdlib-jdk7-1.9.10.pom",
+      "sha256": "ac6361bf9ad1ed382c2103d9712c47cdec166232b4903ed596e8876b0681c9b7",
+      "repositorySHA1Verified": true,
+      "bytes": 959,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib",
+          "version": "1.9.10",
+          "scope": "compile"
+        }
+      ]
+    },
+    {
+      "name": "kotlin-jdk8",
+      "coordinatePath": "org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.9.10/kotlin-stdlib-jdk8-1.9.10",
+      "sourceJar": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.9.10/kotlin-stdlib-jdk8-1.9.10.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.9.10/kotlin-stdlib-jdk8-1.9.10.pom",
+      "sha256": "a4c74d94d64ce1abe53760fe0389dd941f6fc558d0dab35e47c085a11ec80f28",
+      "repositorySHA1Verified": true,
+      "bytes": 965,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib",
+          "version": "1.9.10",
+          "scope": "compile"
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib-jdk7",
+          "version": "1.9.10",
+          "scope": "compile"
+        }
+      ]
+    },
+    {
+      "name": "kotlin-common",
+      "coordinatePath": "org/jetbrains/kotlin/kotlin-stdlib-common/1.9.10/kotlin-stdlib-common-1.9.10",
+      "sourceJar": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-common/1.9.10/kotlin-stdlib-common-1.9.10.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib-common/1.9.10/kotlin-stdlib-common-1.9.10.pom",
+      "sha256": "cde3341ba18a2ba262b0b7cf6c55b20c90e8d434e42c9a13e6a3f770db965a88",
+      "repositorySHA1Verified": true,
+      "bytes": 225141,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "The Apache License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "annotations",
+      "coordinatePath": "org/jetbrains/annotations/13.0/annotations-13.0",
+      "sourceJar": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.pom",
+      "sha256": "ace2a10dc8e2d5fd34925ecac03e4988b2c0f851650c94b8cef49ba1bd111478",
+      "repositorySHA1Verified": true,
+      "bytes": 17536,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "The Apache Software License, Version 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "errorprone",
+      "coordinatePath": "com/google/errorprone/error_prone_annotations/2.41.0/error_prone_annotations-2.41.0",
+      "sourceJar": "https://repo.maven.apache.org/maven2/com/google/errorprone/error_prone_annotations/2.41.0/error_prone_annotations-2.41.0.jar",
+      "sourcePom": "https://repo.maven.apache.org/maven2/com/google/errorprone/error_prone_annotations/2.41.0/error_prone_annotations-2.41.0.pom",
+      "sha256": "a56e782b5b50811ac204073a355a21d915a2107fce13ec711331ad036f660fcc",
+      "repositorySHA1Verified": true,
+      "bytes": 20389,
+      "scope": "runtime",
+      "licenseEntries": [],
+      "pomLicenses": [
+        {
+          "name": "Apache 2.0",
+          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+      ],
+      "dependencies": [
+        {
+          "group": "junit",
+          "artifact": "junit",
+          "version": "${junit.version}",
+          "scope": "test"
+        }
+      ]
+    }
+  ]
+}
