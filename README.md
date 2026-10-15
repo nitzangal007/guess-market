@@ -1,72 +1,71 @@
-# Guess Market - Exercise 2
+# Guess Market - Exercise 3
 
-A Java 25 prediction-market application with a JavaFX interface, user accounts, LMSR trading and Order Book trading. Implemented bonuses: **None**.
+A Java 25 prediction market with one shared in-memory Tomcat server and independent JavaFX HTTP clients. Each client logs in as one account, uploads events, loads funds, and trades through the server. LMSR and Order Book rules from Exercise 2 are retained. **Implemented bonuses: None.** Exercise 4 is outside this release.
 
-## Run the submitted application
+Current source: [GitHub main](https://github.com/nitzangal007/guess-market/tree/main). [Detailed Exercise 3 instructions](README-EXERCISE3.md) explain accounts, trading, recovery and accounting. This repository contains source and pinned dependencies; the private submission ZIP and identity-bearing PDF are distributed separately.
 
-1. Extract the complete submitted ZIP into a writable folder. Keep `run.bat`, `lib` and `runtime` together.
-2. Double-click `run.bat`. The Windows x64 package includes Java 25.0.4 and JavaFX 25.0.4; running it requires no Java installation or environment-variable setup.
-3. Select **Load File** and choose an Exercise 2 XML file. Original course files are supplied separately from the ZIP.
-4. Use **Events** to inspect markets. Under **Users**, choose the acting user and open Available events, Owned events or Participations to trade or manage an event.
-5. Review a purchase/order before confirming. An event owner can open an event, select its winning outcome and review settlement payouts.
+## Run the Exercise 3 distribution
 
-An invalid XML load preserves the previous world. Successfully reloading XML starts a fresh simulation. The Exercise 2 interface does not save manual trades between launches.
+1. Install Windows x64 Java 25 and Apache Tomcat 10.1. Verified development versions: Oracle JDK 25.0.4, Tomcat 10.1.61, Jakarta Servlet 6.0.
+2. Extract the complete submission ZIP. Copy its single `guessmarket.war` to Tomcat's `webapps` folder. Start Tomcat with Java 25 on port **8080**. Keep the WAR basename unchanged.
+3. Keep `client/run.bat`, `client/lib` and `client/javafx` together. Run `client/run.bat` with Java 25 on `JAVA_HOME` or PATH. JavaFX module JARs and Windows native files are included; no IDE or `JAVAFX_HOME` is needed to launch.
+4. Run the batch again for another client with a different English login name. Both connect to `http://localhost:8080/guessmarket/api/v1/`.
+5. Load funds, upload valid EX3 XML, then review and confirm financial actions. Upload assigns ownership to the logged-in account, appends events as Not started, and does not itself debit cash.
 
-## Build, test and run from source
+For Tomcat, extract its Windows distribution, set `JAVA_HOME` to the Java 25 JDK, and run `bin/startup.bat` from the Tomcat installation. Its default HTTP connector must use port 8080. On setup errors, run `bin/catalina.bat run` in a console to see the server log. Wait for the `guessmarket.war` deployment to finish before logging in. Stop the server deliberately with `bin/shutdown.bat` after use; stopping resets this in-memory application. The submitted ZIP/PDF are supplied separately for the course and are not GitHub release assets.
 
-Source builds require Windows x64, **Oracle JDK 25.0.4** and the **JavaFX 25.0.4 Windows x64 SDK**. Use a short checkout path, such as `C:\Projects\GuessMarket`: Windows `xcopy` can fail on deeply nested fixture paths. These development tools are separate from the runtime inside the submitted ZIP.
+Every event has exactly two ordered outcomes. The supplied EX3 schema caps the list at two and course clarification retains binary trading despite broader handout wording. One or more than two is rejected; arbitrary-outcome LMSR is outside scope. Empty/repeated labels still have distinct option numbers.
 
-From the repository root in PowerShell, replace the two installation paths and run:
+Use **Logout** before closing the app or its CMD host, and allow the request to finish. Abrupt process termination can leave the name reserved until the original session expires after 30 minutes of inactivity. Reconnecting afterward retains the account in the same server run. Server restart intentionally clears all accounts, events and receipts.
 
-```powershell
-$env:JAVA_HOME = 'C:\path\to\jdk-25.0.4'
-$env:JAVAFX_HOME = 'C:\path\to\javafx-sdk-25.0.4'
-.\build-javafx.bat
-```
+## Build and test from source
 
-The build compiles DTO, Engine and JavaFX sources with UTF-8, `--release 25`, `-Xlint:all` and `-Werror`. It packages FXML, CSS and schemas, creates three application JARs and runs all **236 tests**. Dependencies are vendored; the build downloads nothing.
-
-Generated output is under `build/javafx`:
-- `dev/lib`: application JARs and JAXB runtime libraries.
-- `reports`: JUnit XML and `junit-output.txt`.
-- `native`: screenshots from test-owned JavaFX stages.
-
-After a successful build, run the development application with the same environment settings:
+Use Windows x64 and Oracle JDK 25.0.4, preferably in a short checkout path. JavaFX, JAXB, Gson, OkHttp/Okio/Kotlin and JUnit dependencies are vendored; the build downloads nothing.
 
 ```powershell
-.\build\javafx\dev\run-javafx.bat
+$env:JAVA_HOME = 'C:\Program Files\Java\jdk-25.0.4'
+Remove-Item Env:JAVAFX_HOME -ErrorAction SilentlyContinue
+.\build-exercise3.bat client-core
 ```
 
-## Architecture and source layout
+**Course-input prerequisite:** two preserved EX3 compatibility tests require authorized canonical `small.xml` and `multiple.xml` in `provided/assignment-3/test files ex3/`. That directory is ignored and unpublished. Obtain these course inputs before running the complete core suite. A public clone alone cannot run those two tests. They are not skipped or replaced. Product compilation uses included dependencies and embedded schemas; the packaged app does not require the samples to launch or upload another valid file.
+
+Compilation uses UTF-8, `--release 25`, `-Xlint:all` and `-Werror`. Output is under `build/exercise3`: `dev/guessmarket.war`, `dev/client`, timestamped JUnit reports and a build-input hash manifest. Deploy that WAR and use the development client's `run.bat` as above.
+
+| Target | Scope |
+| --- | --- |
+| `client-core` | DTO/Engine/server/client compilation and non-visible tests. `native-ui` and `live-server` tagged tests are explicitly outside this target. |
+| `client-ui` | Adds shown JavaFX UI tests, excluding live-server integration. Requires permitted native windows. |
+| `client-native` | Selects real-server native integration. Deploy an isolated server first; optional process-local `GUESSMARKET_TEST_URL` sets its API URL. |
+| `all` | Core build plus the preserved full Exercise 2 regression in a separate JVM, including native windows. |
+
+[Dependency metadata](dependencies/exercise3-dependencies.json) records pinned versions, hashes, source URLs, transitive closure and licenses. The distribution includes the same metadata as `licenses/dependency-manifest.json`. `packaging/package-exercise3.ps1` accepts `OutputDirectory`, verified private `ManualPdf`, and plain `ArchiveName` to package a verified build. No private PDF is needed for compilation.
+
+## Architecture
 
 ```text
-JavaFX UI -> Engine -> DTO
-       \------------> DTO
+JavaFX client + DTO -- HTTP/JSON, isolated cookies --> Tomcat server + Engine + DTO
 ```
 
 | Module | Responsibility |
 | --- | --- |
-| `modules/guessmarket-javafx-ui` | FXML/CSS, controls, background commands and display. Entry point: `guessmarket.ui.javafx.GuessMarketApplication`. |
-| `modules/guessmarket-engine` | XML/schema and business validation, accounts, LMSR, matching, holdings and settlement. Independent of JavaFX. |
-| `modules/guessmarket-dto` | Immutable requests, snapshots, previews and receipts shared by UI and Engine. |
-| `modules/guessmarket-ui` | Preserved Exercise 1 console interface. Exercise 2 uses the JavaFX module above. |
+| `guessmarket-client` | Events/Account views, dialogs, HTTP, polling, retained uncertain requests and private client state. Entry: `guessmarket.client.ClientMain`. No Engine/JAXB. |
+| `guessmarket-server` | Session-bound actors, validation, multipart XML, revision/UUID receipts and one synchronization gate. Tomcat supplies Servlet API. |
+| `guessmarket-engine` | Existing market rules plus account creation/credit/event append, secure stream parsing, scoped snapshots and observational journal. No JavaFX. |
+| `guessmarket-dto` | Concrete immutable requests, reviews, snapshots and receipts. JDK-only. |
 
-Each module has its own source/test directory. The Exercise 2 submission contains the DTO, Engine and JavaFX JARs. `build.bat` and the console packaging inputs belong to the earlier Exercise 1 workflow; use `build-javafx.bat` for this exercise.
+The server serializes transitions and snapshot capture under one gate; network reads and JSON writing occur outside it. Clients request server-calculated reviews and confirm their revision. They retain UUIDs for uncertain outcomes, with receipt lookup and explicit retry; automatic mutation retries and redirects are disabled. Polling uses a separate worker, at most one in flight. Only the FX thread changes controls.
 
-## Trading and accounting choices
+## Validation and known limits
 
-- Ordinary matching runs first, at the resting order price. Best price takes priority; equal prices use FIFO. Partial remainders retain their priority.
-- When automatic mint is enabled, opposite BUY orders can create pairs if their limits sum to at least `d`, including equality. Best opposite price takes priority, then FIFO. Self-trading and self-minting reject the command atomically.
-- SELL orders reserve owned shares; BUY orders do not reserve cash. Users have no manual order-cancel action in this assignment flow.
-- An overdraft purchase blocks buying/opening. A later positive receipt restores eligibility when resulting cash is strictly positive. Blocked owners can still settle their own events; cancelled orders do not return after recovery.
-- Order Book arithmetic uses exact `BigDecimal` values. Entered limits retain their precision; calculated displays round half up to at most two decimal places. Authoritative calculations never use rounded display values.
+The accepted non-visible runtime passed **247 core tests** and **32 independent reviewer methods**, with all four client findings closed. Independent HTTP/recovery/poll checks and an exact-package two-transport soak supplement those tests. Earlier Exercise 2 regression evidence is 236/236, separate from current native acceptance. A passing `client-core` does not imply tagged native or platform checks ran.
 
-For main class roles, funding, valuation, settlement and the complete implementation choices, see the [application manual](packaging/README-exercise2.md).
+Human reports cover two-account funding, shared XML visibility, LMSR opening/buy/close and a custom-label Order Book opening. A complete visible Order Book workflow, all dialogs/keyboard/DPI states, clean Windows 10 and exact client/server restart remain unverified. Development/native evidence uses Windows 11. Source publication does not imply course submission.
 
-## Submission packaging and dependencies
+Known deferred UI issue: empty/invalid funds submission can grow the validation banner and clip dialog buttons. Close that dialog with its X and reopen with a positive amount. The unverified layout patch is excluded. Closing the CMD host is different and can terminate the client abruptly.
 
-`packaging/package-exercise2.ps1` assembles the portable ZIP after the complete build gate. It requires explicit `RuntimeDirectory`, `JavaFxLegalDirectory`, `ManualPdf` and `ArchiveName` arguments: a linked Windows x64 Java 25.0.4/JavaFX 25.0.4 runtime, the SDK legal folder, a verified PDF manual and a ZIP filename. The runtime and submission-specific manual are supplied separately from this source repository.
+## Earlier exercises and notices
 
-`tools` contains JAXB RI 4.0.5, its activation dependencies, code-generation tools and JUnit Platform Console 6.1.1. Their licenses/notices are retained alongside them. The submitted package includes five JAXB runtime JARs and runtime legal notices, with root `JAXB-LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
+The [Exercise 2 guide](README-EXERCISE2.md) and [class/accounting manual](packaging/README-exercise2.md) retain the prior JavaFX workflow. `build-javafx.bat`, `guessmarket-javafx-ui` and `packaging/package-exercise2.ps1` remain Exercise 2 tools. Exercise 1's console UI remains in `guessmarket-ui`, with `build.bat` and `packaging/run.bat`; its private submission manual is excluded. Use the Exercise 3 commands above for the current application.
 
-No open-source license is granted for application code. Third-party components retain their own licenses.
+Third-party components retain original licenses/notices in `tools`, embedded JAR metadata and the distribution's license folders. Application code is published for coursework inspection; no application open-source license is granted.

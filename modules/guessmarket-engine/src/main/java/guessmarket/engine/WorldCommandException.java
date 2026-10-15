@@ -7,7 +7,7 @@ public final class WorldCommandException extends Exception {
         USER_NOT_FOUND, EVENT_NOT_FOUND, NOT_OWNER, WRONG_METHOD,
         WRONG_STATUS, INSUFFICIENT_FUNDS, STALE_WORLD,
         USER_BLOCKED, INVALID_OPTION, INVALID_QUANTITY, FINANCIAL_CALCULATION_FAILED,
-        POLICY_PENDING, INVALID_ORDER, SELF_MATCH_REJECTED
+        POLICY_PENDING, INVALID_ORDER, SELF_MATCH_REJECTED, DUPLICATE_EVENT_NAME
     }
     private final Code code;
     public WorldCommandException(Code code, String detail) {
